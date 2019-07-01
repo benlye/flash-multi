@@ -1,7 +1,11 @@
 # Flash-Multi
 Tool for flashing pre-compiled firmware to an STM32-based Multiprotocol TX module via an FTDI adapter or the built-in USB connection. 
 
-Supported modules include:
+<p align="center">
+  <img src="img/flash-multi.jpg">
+</p>
+
+# Supported Modules
 * Jumper JP4IN1
 * iRangeX IRX4, IRX4 Plus, and IRX4 Lite
 * Vantac MPM Lite
