@@ -35,7 +35,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.buttonBrowse = new System.Windows.Forms.Button();
-            this.labelAbout = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.buttonRefresh = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
@@ -44,12 +43,13 @@
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.textActivity = new System.Windows.Forms.TextBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.linkLabel2 = new System.Windows.Forms.LinkLabel();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonGo
             // 
-            this.buttonGo.Location = new System.Drawing.Point(373, 70);
+            this.buttonGo.Location = new System.Drawing.Point(373, 71);
             this.buttonGo.Name = "buttonGo";
             this.buttonGo.Size = new System.Drawing.Size(75, 23);
             this.buttonGo.TabIndex = 5;
@@ -62,7 +62,7 @@
             // 
             this.comPortSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comPortSelector.FormattingEnabled = true;
-            this.comPortSelector.Location = new System.Drawing.Point(101, 46);
+            this.comPortSelector.Location = new System.Drawing.Point(101, 48);
             this.comPortSelector.Name = "comPortSelector";
             this.comPortSelector.Size = new System.Drawing.Size(98, 21);
             this.comPortSelector.TabIndex = 2;
@@ -71,7 +71,7 @@
             // 
             // textFileName
             // 
-            this.textFileName.Location = new System.Drawing.Point(101, 19);
+            this.textFileName.Location = new System.Drawing.Point(101, 21);
             this.textFileName.Name = "textFileName";
             this.textFileName.Size = new System.Drawing.Size(266, 20);
             this.textFileName.TabIndex = 0;
@@ -80,7 +80,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(28, 23);
+            this.label2.Location = new System.Drawing.Point(28, 25);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(57, 13);
             this.label2.TabIndex = 7;
@@ -89,7 +89,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(28, 51);
+            this.label3.Location = new System.Drawing.Point(28, 53);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(58, 13);
             this.label3.TabIndex = 8;
@@ -97,22 +97,13 @@
             // 
             // buttonBrowse
             // 
-            this.buttonBrowse.Location = new System.Drawing.Point(373, 18);
+            this.buttonBrowse.Location = new System.Drawing.Point(373, 20);
             this.buttonBrowse.Name = "buttonBrowse";
             this.buttonBrowse.Size = new System.Drawing.Size(75, 23);
             this.buttonBrowse.TabIndex = 1;
             this.buttonBrowse.Text = "Browse";
             this.buttonBrowse.UseVisualStyleBackColor = true;
             this.buttonBrowse.Click += new System.EventHandler(this.ButtonBrowse_Click);
-            // 
-            // labelAbout
-            // 
-            this.labelAbout.AutoSize = true;
-            this.labelAbout.Location = new System.Drawing.Point(12, 13);
-            this.labelAbout.Name = "labelAbout";
-            this.labelAbout.Size = new System.Drawing.Size(317, 13);
-            this.labelAbout.TabIndex = 10;
-            this.labelAbout.Text = "Use this tool to update the firmware on a Multiprotocol TX module.";
             // 
             // groupBox1
             // 
@@ -132,7 +123,7 @@
             // 
             // buttonRefresh
             // 
-            this.buttonRefresh.Location = new System.Drawing.Point(205, 45);
+            this.buttonRefresh.Location = new System.Drawing.Point(205, 47);
             this.buttonRefresh.Name = "buttonRefresh";
             this.buttonRefresh.Size = new System.Drawing.Size(75, 23);
             this.buttonRefresh.TabIndex = 3;
@@ -205,11 +196,26 @@
             this.linkLabel1.Text = "https://github.com/benlye/flash-multi";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
+            // linkLabel2
+            // 
+            this.linkLabel2.AutoSize = true;
+            this.linkLabel2.LinkArea = new System.Windows.Forms.LinkArea(77, 81);
+            this.linkLabel2.Location = new System.Drawing.Point(14, 16);
+            this.linkLabel2.Name = "linkLabel2";
+            this.linkLabel2.Size = new System.Drawing.Size(408, 17);
+            this.linkLabel2.TabIndex = 14;
+            this.linkLabel2.TabStop = true;
+            this.linkLabel2.Text = "Upload firmware to a Multiprotocol TX module.  Get the latest firmware files here" +
+    ".";
+            this.linkLabel2.UseCompatibleTextRendering = true;
+            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
+            // 
             // FlashMulti
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(484, 291);
+            this.Controls.Add(this.linkLabel2);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.textActivity);
@@ -217,7 +223,6 @@
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.textVerbose);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.labelAbout);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -239,7 +244,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button buttonBrowse;
-        private System.Windows.Forms.Label labelAbout;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox textVerbose;
         private System.Windows.Forms.Label label4;
@@ -248,6 +252,7 @@
         private System.Windows.Forms.TextBox textActivity;
         private System.Windows.Forms.Button buttonRefresh;
         private System.Windows.Forms.LinkLabel linkLabel1;
+        private System.Windows.Forms.LinkLabel linkLabel2;
     }
 }
 

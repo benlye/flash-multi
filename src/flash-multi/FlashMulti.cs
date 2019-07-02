@@ -24,7 +24,7 @@ namespace flash_multi
             this.Text = String.Format("Flash Multi v{0}", Application.ProductVersion);
 
             // Set focus away from the textbox
-            this.ActiveControl = labelAbout;
+            this.ActiveControl = linkLabel2;
 
             // Populate the list of serial ports
             PopulateComPorts();
@@ -458,16 +458,32 @@ namespace flash_multi
         {
             try
             {
-                VisitLink();
+                VisitGitRepoLink();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
             }
         }
-        private void VisitLink()
+        private void VisitGitRepoLink()
         {
             System.Diagnostics.Process.Start("https://github.com/benlye/flash-multi");
+        }
+
+        private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            try
+            {
+                VisitReleaseLink();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+        private void VisitReleaseLink()
+        {
+            System.Diagnostics.Process.Start("https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/releases");
         }
     }
 }
