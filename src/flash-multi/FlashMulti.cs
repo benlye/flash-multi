@@ -64,6 +64,11 @@ namespace flash_multi
 
         private bool PortCheck(string port)
         {
+            if (port == "DFU Device")
+            {
+                return true;
+            }
+
             bool result = false;
 
             SerialPort serialPort = new SerialPort(port);
