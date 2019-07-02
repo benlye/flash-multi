@@ -13,8 +13,7 @@ OutputDir=flash-multi\bin
 OutputBaseFilename=flash-multi-{#MyAppVersion}
 
 [Files]
-Source: "flash-multi\bin\Release\*"; Excludes: "*.pdb,*.xml, *.config"; Flags: replacesameversion promptifolder recursesubdirs; DestDir: {app}
-Source: "drivers\wdi-simple.exe"; Flags: replacesameversion promptifolder recursesubdirs; DestDir: {app}\drivers\
+Source: "flash-multi\bin\Release\*"; Excludes: "*.pdb,*.xml, *.config, *.bat"; Flags: replacesameversion promptifolder recursesubdirs; DestDir: {app}
 
 [Icons]
 Name: "{group}\Flash Multi"; Filename: "{app}\flash-multi.exe"; IconFilename: "{app}\flash-multi.exe"
