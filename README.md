@@ -29,8 +29,9 @@ Tool for flashing pre-compiled firmware to an STM32-based Multiprotocol TX modul
 
 **Note for FTDI connections:** When using an FTDI adapter the `BOOT0` pin on the board must be connected to 5V, usually by installing a jumper on the `BOOT0` header pins.
 
-1. Connect your module using the USB port or via an FTDI adapter, as appropriate.  Note the COM port which appears when the device is connected.
-1. Double-click `flash-multi.exe`
+1. If the module is installed in the radio, ensure the radio is powered **off**
+1. Connect your module to the computer using the USB port or via an FTDI adapter, as appropriate.  Note the COM port which appears when the device is connected.
+1. Launch Flash Multi
 1. Click the **Browse** button and locate a compiled firmware file
 1. Select the appropriate COM port
 1. Click the **Go** button
