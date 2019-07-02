@@ -133,7 +133,19 @@ namespace flash_multi
             if (! File.Exists(textFileName.Text))
             {
                 AppendLog(String.Format("File {0} does not exist", textFileName.Text));
-                MessageBox.Show("File does not exist", "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Fimrware file does not exist.", "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                EnableControls(true);
+                return;
+            }
+
+            // Check that the file size is OK - max size is 120,832B (118KB) to allow for bootloader and EEPROM emulation
+            int maxFileSize = 120832;
+            long length = new System.IO.FileInfo(textFileName.Text).Length;
+
+            if (length > maxFileSize)
+            {
+                AppendLog(String.Format("Firmware file is too large.\r\nFile is {1:n0} KB, maximum size is {2:n0} KB.", textFileName.Text, length/1024, maxFileSize/1024));
+                MessageBox.Show("Firmware file is too large.", "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 EnableControls(true);
                 return;
             }
