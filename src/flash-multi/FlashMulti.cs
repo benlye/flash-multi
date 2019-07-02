@@ -27,7 +27,7 @@ namespace flash_multi
             this.ActiveControl = labelAbout;
 
             // Populate the list of serial ports
-            populateComPorts();
+            PopulateComPorts();
 
             // Disable the Go button until we're ready
             buttonGo.Enabled = false;
@@ -41,10 +41,10 @@ namespace flash_multi
                 switch ((int)m.WParam)
                 {
                     case UsbNotification.DbtDeviceremovecomplete:
-                        BeginInvoke(new InvokeDelegate(populateComPorts));
+                        BeginInvoke(new InvokeDelegate(PopulateComPorts));
                         break;
                     case UsbNotification.DbtDevicearrival:
-                        BeginInvoke(new InvokeDelegate(populateComPorts));
+                        BeginInvoke(new InvokeDelegate(PopulateComPorts));
                         break;
                 }
             }
@@ -88,7 +88,7 @@ namespace flash_multi
             return result;
         }
 
-        private void populateComPorts()
+        private void PopulateComPorts()
         {
             object selectedItem = null;
             selectedItem = comPortSelector.SelectedItem;
@@ -112,6 +112,8 @@ namespace flash_multi
             }
 
             comPortSelector.SelectedItem = selectedItem;
+
+            CheckControls();
         }
 
         private void ButtonGo_Click(object sender, EventArgs e)
@@ -182,7 +184,7 @@ namespace flash_multi
         {
             if (deviceUpdate)
             {
-                populateComPorts();
+                PopulateComPorts();
                 deviceUpdate = false;
             }
         }
@@ -357,7 +359,7 @@ namespace flash_multi
         private void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             //* Do your stuff with the output
-            Console.WriteLine(outLine.Data);
+            Debug.WriteLine(outLine.Data);
             /*
             // Update the progress bar if there is a percentage in the output
             Regex regex = new Regex(@"\((\d+)\.\d\d\%\)");
@@ -445,7 +447,7 @@ namespace flash_multi
 
         private void ButtonRefresh_Click(object sender, EventArgs e)
         {
-            populateComPorts();
+            PopulateComPorts();
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
