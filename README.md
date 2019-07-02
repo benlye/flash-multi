@@ -45,6 +45,32 @@ Other drivers may be needed if you are using an external FTDI adapter. Consult t
 1. Select the appropriate COM port
 1. Click the **Upload** button
 
+## Upload Output
+The output will vary depending on the type of module being flashed.
+
+Modules connected via an external FTDI adapter, and the Jumper JP4IN1 module (which has an *internal* FTDI adapter behind the USB port) will see output like this:
+```
+Starting Multimodule update
+[1/3] Erasing flash memory... done
+[2/3] Writing bootloader... done
+[3/3] Writing Multimodule firmware... done
+
+Multimodule updated sucessfully
+```
+
+Modules connected via USB (except the Jumper JP4IN1) will see output like this:
+```
+Maple device found in USB mode
+Starting Multimodule update
+Switching Multimodule into DFU mode ... done
+Waiting for DFU device ... got it
+Writing firmware to Multimodule ... done
+
+Multimodule updated sucessfully
+```
+
+For both methods, if the 'Show Verbose Output' box is checked the actual output from each of the flash proceses will be shown. If the flash fails for any reason the verbose messages are a good place to look for more details.
+
 # Multiprotocol Firmware
 Pre-compiled Multiprotocol firmware can be downloaded from the Multiprotocol TX Module [Releases](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/releases).
 
