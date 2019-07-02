@@ -183,6 +183,11 @@ namespace flash_multi
             buttonRefresh.Enabled = arg;
             textFileName.Enabled = arg;
             comPortSelector.Enabled = arg;
+
+            if (arg)
+            {
+                CheckControls();
+            }
         }
 
         private void ComPortSelectorDroppedDown(object sender, EventArgs e)
