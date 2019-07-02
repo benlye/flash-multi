@@ -38,7 +38,6 @@
             this.labelAbout = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.buttonRefresh = new System.Windows.Forms.Button();
-            this.buttonClose = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.showVerboseOutput = new System.Windows.Forms.CheckBox();
             this.textVerbose = new System.Windows.Forms.TextBox();
@@ -54,10 +53,10 @@
             this.buttonGo.Name = "buttonGo";
             this.buttonGo.Size = new System.Drawing.Size(75, 23);
             this.buttonGo.TabIndex = 5;
-            this.buttonGo.Text = "Go";
+            this.buttonGo.Text = "Upload";
             this.buttonGo.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
             this.buttonGo.UseVisualStyleBackColor = true;
-            this.buttonGo.Click += new System.EventHandler(this.ButtonGo_Click);
+            this.buttonGo.Click += new System.EventHandler(this.ButtonUpload_Click);
             // 
             // comPortSelector
             // 
@@ -118,7 +117,6 @@
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.buttonRefresh);
-            this.groupBox1.Controls.Add(this.buttonClose);
             this.groupBox1.Controls.Add(this.buttonGo);
             this.groupBox1.Controls.Add(this.buttonBrowse);
             this.groupBox1.Controls.Add(this.label3);
@@ -141,17 +139,6 @@
             this.buttonRefresh.Text = "Refresh";
             this.buttonRefresh.UseVisualStyleBackColor = true;
             this.buttonRefresh.Click += new System.EventHandler(this.ButtonRefresh_Click);
-            // 
-            // buttonClose
-            // 
-            this.buttonClose.Location = new System.Drawing.Point(292, 70);
-            this.buttonClose.Name = "buttonClose";
-            this.buttonClose.Size = new System.Drawing.Size(75, 23);
-            this.buttonClose.TabIndex = 4;
-            this.buttonClose.Text = "Close";
-            this.buttonClose.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
-            this.buttonClose.UseVisualStyleBackColor = true;
-            this.buttonClose.Click += new System.EventHandler(this.ButtonClose_Click);
             // 
             // label4
             // 
@@ -255,7 +242,6 @@
         private System.Windows.Forms.Label labelAbout;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox textVerbose;
-        private System.Windows.Forms.Button buttonClose;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.CheckBox showVerboseOutput;
         private System.Windows.Forms.ProgressBar progressBar1;

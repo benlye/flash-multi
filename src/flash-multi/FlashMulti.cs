@@ -121,7 +121,7 @@ namespace flash_multi
             CheckControls();
         }
 
-        private void ButtonGo_Click(object sender, EventArgs e)
+        private void ButtonUpload_Click(object sender, EventArgs e)
         {
             // Clear the output box
             Debug.WriteLine("Clearing the output textboxes...");
@@ -177,7 +177,6 @@ namespace flash_multi
         {
             // Enable the buttons
             Debug.WriteLine("Re-enabling the controls...");
-            buttonClose.Enabled = arg;
             buttonGo.Enabled = arg;
             buttonBrowse.Enabled = arg;
             buttonRefresh.Enabled = arg;
@@ -436,11 +435,6 @@ namespace flash_multi
                 return;
             }
             progressBar1.Value = value;
-        }
-
-        private void ButtonClose_Click(object sender, EventArgs e)
-        {
-            this.Close();
         }
 
         private void showVerboseOutput_OnChange(object sender, EventArgs e)
