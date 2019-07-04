@@ -8,14 +8,18 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Reflection;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace flash_multi
 {
     public partial class FlashMulti : Form
     {
-        private bool deviceUpdate = false;
         public delegate void InvokeDelegate();
 
+        /// <summary>
+        /// The main FlashMulti method.
+        /// </summary>
         public FlashMulti()
         {
             InitializeComponent();
@@ -29,10 +33,13 @@ namespace flash_multi
             // Populate the list of serial ports
             PopulateComPorts();
 
-            // Disable the Go button until we're ready
-            buttonGo.Enabled = false;
-
+            // Disable the Upload button until we're ready
+            buttonUpload.Enabled = false;
         }
+
+        /// <summary>
+        /// Handle USB device arrival/removal notifications.
+        /// </summary>
         protected override void WndProc(ref Message m)
         {
             base.WndProc(ref m);
@@ -50,20 +57,31 @@ namespace flash_multi
             }
         }
 
+        /// <summary>
+        /// Checks if the Upload button should be enabled or not.
+        /// Called by changes to the file name or COM port selector
+        /// </summary>
         private void CheckControls()
         {
             if (textFileName.Text != "" && comPortSelector.SelectedItem != null)
             {
-                buttonGo.Enabled = true;
+                buttonUpload.Enabled = true;
             }
             else
             {
-                buttonGo.Enabled = false;
+                buttonUpload.Enabled = false;
             }
         }
 
+        /// <summary>
+        /// Checks if the COM port can be opened.
+        /// </summary>
+        /// <returns>
+        /// Boolean indicating whether the port could be opened.
+        /// </returns>
         private bool PortCheck(string port)
         {
+            // Skip the check and return true if the selected port is 'DFU Device'
             if (port == "DFU Device")
             {
                 return true;
@@ -71,6 +89,7 @@ namespace flash_multi
 
             bool result = false;
 
+            // Try to open the serial port, catch an exception if fail
             SerialPort serialPort = new SerialPort(port);
             try
             {
@@ -93,34 +112,51 @@ namespace flash_multi
             return result;
         }
 
+        /// <summary>
+        /// Populates the list of COM ports.
+        /// </summary>
         private void PopulateComPorts()
         {
+            // Cache the selected item so we can try to re-select it later
             object selectedItem = null;
             selectedItem = comPortSelector.SelectedItem;
 
+            // Get the list of COM port names
             string[] comPorts = SerialPort.GetPortNames();
+            
+            // Sort the list of ports
+            var orderedComPorts = comPorts.OrderBy(c => c.Length).ThenBy(c => c).ToList();
+
+            // Clear the existing list
             comPortSelector.Items.Clear();
 
-            foreach (string port in comPorts)
+            // Add the ports one by one
+            foreach (string port in orderedComPorts)
             {
                 comPortSelector.Items.Add(port);
             }
-
+                        
+            // Short pause to give a DFU device time to show up
             Thread.Sleep(50);
 
-            // Check if we should add the DFU device (purely cosmetic, not really required)
+            // Check if we should add a DFU device to the list (purely cosmetic, not really required)
             MapleTools.FindMapleResult mapleCheck = MapleTools.FindMaple();
             if (mapleCheck.Device.DfuMode)
             {
                 comPortSelector.Items.Add("DFU Device");
-                comPortSelector.SelectedValue = "DFU Device";
             }
 
+            // Re-select the previously selected item
             comPortSelector.SelectedItem = selectedItem;
 
+            // Make sure the Update button is disabled if there is no port selected
             CheckControls();
         }
 
+        /// <summary>
+        /// Main method where all the action happens.
+        /// Called by the Upload button.
+        /// </summary>
         private void ButtonUpload_Click(object sender, EventArgs e)
         {
             // Clear the output box
@@ -185,30 +221,38 @@ namespace flash_multi
             }
         }
 
+        /// <summary>
+        /// Enable or disable the controls.
+        /// </summary>
         private void EnableControls(bool arg)
         {
             // Enable the buttons
-            Debug.WriteLine("Re-enabling the controls...");
-            buttonGo.Enabled = arg;
+            if (arg)
+            {
+                Debug.WriteLine("Re-enabling the controls...");
+            }
+            else
+            {
+                Debug.WriteLine("Disnabling the controls...");
+            }
+
+            // Toggle the controls
+            buttonUpload.Enabled = arg;
             buttonBrowse.Enabled = arg;
             buttonRefresh.Enabled = arg;
             textFileName.Enabled = arg;
             comPortSelector.Enabled = arg;
 
+            // If we're re-enabling, check if the Upload button should be enabled or disabled
             if (arg)
             {
                 CheckControls();
             }
         }
 
-        private void ComPortSelectorDroppedDown(object sender, EventArgs e)
-        {
-            if (deviceUpdate)
-            {
-                PopulateComPorts();
-                deviceUpdate = false;
-            }
-        }
+        /// <summary>
+        /// Writes the firmware to a Maple serial or DFU device
+        /// </summary>
         private async void MapleFlashWrite(string fileName, string comPort)
         {
             string command;
@@ -281,6 +325,9 @@ namespace flash_multi
             EnableControls(true);
         }
 
+        /// <summary>
+        /// Writes the firmware to a serial (FTDI) device.
+        /// </summary>
         private async void SerialFlashWrite(string fileName, string comPort)
         {
             string command = ".\\bin\\stm32flash.exe";
@@ -337,6 +384,9 @@ namespace flash_multi
 
         }
 
+        /// <summary>
+        /// Runs a command with arguments
+        /// </summary>
         private int RunCommand(string command, string args)
         {
             Debug.WriteLine("\n" + command + " " + args + "\n");
@@ -351,7 +401,7 @@ namespace flash_multi
 
             Process myProcess = new Process();
 
-            //Process process = new Process();
+            // Process process = new Process();
             myProcess.StartInfo.FileName = command;
             myProcess.StartInfo.Arguments = args;
             myProcess.StartInfo.UseShellExecute = false;
@@ -377,6 +427,10 @@ namespace flash_multi
             return myProcess.ExitCode;
         }
 
+        /// <summary>
+        /// Handles the standard and error output from a running command.
+        /// Updates the verbose output text box.
+        /// </summary>
         private void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             //* Do your stuff with the output
@@ -397,48 +451,84 @@ namespace flash_multi
             AppendVerbose(outLine.Data);
         }
 
+        /// <summary>
+        /// Selects a firmware file to flash
+        /// </summary>
         private void ButtonBrowse_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = ".bin File|*.bin";
-            openFileDialog.Title = "Choose file flash";
-            openFileDialog.ShowDialog();
-            textFileName.Text = openFileDialog.FileName;
-            CheckControls();
+            // Create the file open dialog
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                // Title for the dialog
+                Title = "Choose file flash",
 
+                // Filter for .bin files
+                Filter = ".bin File|*.bin"
+            };
+
+            // Show the dialog
+            openFileDialog.ShowDialog();
+
+            // Set the text box to the selected file name
+            textFileName.Text = openFileDialog.FileName;
+
+            // Check if the Upload button should be enabled yet
+            CheckControls();
         }
 
+        /// <summary>
+        /// Handles a change in the COM port selection dropdown.
+        /// </summary>
         private void ComPortSelector_SelectionChanged(object sender, EventArgs e)
         {
+            // Check if the Upload button should be enabled yet
             CheckControls();
         }
 
+        /// <summary>
+        /// Handles input in the firmware file name text box.
+        /// </summary>
         private void TextFileName_OnChange(object sender, EventArgs e)
         {
+            // Check if the Upload button should be enabled yet
             CheckControls();
         }
 
+        /// <summary>
+        /// Appends a string to the verbose output text box.
+        /// </summary>
         private void AppendVerbose(string text)
         {
+            // Check if we're called from another thread
             if (InvokeRequired)
             {
                 this.Invoke(new Action<string>(AppendVerbose), new object[] { text });
                 return;
             }
+
+            // Append the text
             textVerbose.AppendText(text + "\r\n");
-            
         }
 
+        /// <summary>
+        /// Appends a string to the log output text box.
+        /// </summary>
         private void AppendLog(string text)
         {
+            // Check if we're called from another thread
             if (InvokeRequired)
             {
                 this.Invoke(new Action<string>(AppendLog), new object[] { text });
                 return;
             }
+
+            // Append the text
             textActivity.AppendText(text);
         }
 
+        /// <summary>
+        /// Updates the progress bar.
+        /// </summary>
         private void UpdateProgress(int value)
         {
             if (InvokeRequired)
@@ -449,7 +539,11 @@ namespace flash_multi
             progressBar1.Value = value;
         }
 
-        private void showVerboseOutput_OnChange(object sender, EventArgs e)
+        /// <summary>
+        /// Handles the show verbose output text box being checked or unchecked.
+        /// Shows or hides the verbose output text box.
+        /// </summary>
+        private void ShowVerboseOutput_OnChange(object sender, EventArgs e)
         {
             if (showVerboseOutput.Checked == true)
             {
@@ -461,12 +555,19 @@ namespace flash_multi
             }
         }
 
+        /// <summary>
+        /// Handles the refresh button being clicked.
+        /// Updates the list of COM ports in the drop down.
+        /// </summary>
         private void ButtonRefresh_Click(object sender, EventArgs e)
         {
             PopulateComPorts();
         }
 
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        /// <summary>
+        /// Handles the Github repo link being clicked.
+        /// </summary>
+        private void RepoLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             try
             {
@@ -477,12 +578,19 @@ namespace flash_multi
                 Debug.WriteLine(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Opens the Github repo link in the default browser.
+        /// </summary>
         private void VisitGitRepoLink()
         {
             System.Diagnostics.Process.Start("https://github.com/benlye/flash-multi");
         }
 
-        private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        /// <summary>
+        /// Handles the Multi firmware repo releases link being clicked.
+        /// </summary>
+        private void ReleasesLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             try
             {
@@ -493,6 +601,10 @@ namespace flash_multi
                 Debug.WriteLine(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Opens the Multi firmware repo releases link in the default browser.
+        /// </summary>
         private void VisitReleaseLink()
         {
             System.Diagnostics.Process.Start("https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/releases");

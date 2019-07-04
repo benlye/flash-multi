@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FlashMulti));
-            this.buttonGo = new System.Windows.Forms.Button();
+            this.buttonUpload = new System.Windows.Forms.Button();
             this.comPortSelector = new System.Windows.Forms.ComboBox();
             this.textFileName = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -49,14 +49,14 @@
             // 
             // buttonGo
             // 
-            this.buttonGo.Location = new System.Drawing.Point(373, 71);
-            this.buttonGo.Name = "buttonGo";
-            this.buttonGo.Size = new System.Drawing.Size(75, 23);
-            this.buttonGo.TabIndex = 5;
-            this.buttonGo.Text = "Upload";
-            this.buttonGo.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
-            this.buttonGo.UseVisualStyleBackColor = true;
-            this.buttonGo.Click += new System.EventHandler(this.ButtonUpload_Click);
+            this.buttonUpload.Location = new System.Drawing.Point(373, 71);
+            this.buttonUpload.Name = "buttonGo";
+            this.buttonUpload.Size = new System.Drawing.Size(75, 23);
+            this.buttonUpload.TabIndex = 5;
+            this.buttonUpload.Text = "Upload";
+            this.buttonUpload.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
+            this.buttonUpload.UseVisualStyleBackColor = true;
+            this.buttonUpload.Click += new System.EventHandler(this.ButtonUpload_Click);
             // 
             // comPortSelector
             // 
@@ -66,7 +66,6 @@
             this.comPortSelector.Name = "comPortSelector";
             this.comPortSelector.Size = new System.Drawing.Size(98, 21);
             this.comPortSelector.TabIndex = 2;
-            this.comPortSelector.DropDown += new System.EventHandler(this.ComPortSelectorDroppedDown);
             this.comPortSelector.SelectedIndexChanged += new System.EventHandler(this.ComPortSelector_SelectionChanged);
             // 
             // textFileName
@@ -108,7 +107,7 @@
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.buttonRefresh);
-            this.groupBox1.Controls.Add(this.buttonGo);
+            this.groupBox1.Controls.Add(this.buttonUpload);
             this.groupBox1.Controls.Add(this.buttonBrowse);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.comPortSelector);
@@ -148,7 +147,7 @@
             this.showVerboseOutput.Size = new System.Drawing.Size(15, 14);
             this.showVerboseOutput.TabIndex = 6;
             this.showVerboseOutput.UseVisualStyleBackColor = true;
-            this.showVerboseOutput.CheckedChanged += new System.EventHandler(this.showVerboseOutput_OnChange);
+            this.showVerboseOutput.CheckedChanged += new System.EventHandler(this.ShowVerboseOutput_OnChange);
             // 
             // textVerbose
             // 
@@ -194,7 +193,7 @@
             this.linkLabel1.TabIndex = 7;
             this.linkLabel1.TabStop = true;
             this.linkLabel1.Text = "https://github.com/benlye/flash-multi";
-            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.RepoLink_LinkClicked);
             // 
             // linkLabel2
             // 
@@ -208,7 +207,7 @@
             this.linkLabel2.Text = "Upload firmware to a Multiprotocol TX module.  Get the latest firmware files here" +
     ".";
             this.linkLabel2.UseCompatibleTextRendering = true;
-            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
+            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ReleasesLink_LinkClicked);
             // 
             // FlashMulti
             // 
@@ -238,7 +237,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button buttonGo;
+        private System.Windows.Forms.Button buttonUpload;
         private System.Windows.Forms.ComboBox comPortSelector;
         private System.Windows.Forms.TextBox textFileName;
         private System.Windows.Forms.Label label2;
