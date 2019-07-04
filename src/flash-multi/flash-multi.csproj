@@ -90,8 +90,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>XCOPY "$(SolutionDir)tools" "$(TargetDir)bin\" /S /Y
-XCOPY "$(SolutionDir)bootloaders" "$(TargetDir)bootloaders\" /S /Y
-XCOPY "$(SolutionDir)drivers" "$(TargetDir)drivers\" /S /Y</PostBuildEvent>
+    <PostBuildEvent>XCOPY "$(SolutionDir)tools\*.*" "$(TargetDir)" /S /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>

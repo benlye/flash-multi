@@ -266,7 +266,7 @@ namespace flash_multi
             if (mapleMode == "USB")
             {
                 AppendLog("Switching Multimodule into DFU mode ...");
-                command = ".\\bin\\maple-reset.exe";
+                command = ".\\tools\\maple-reset.exe";
                 commandArgs = comPort;
                 await Task.Run(() => { returnCode = RunCommand(command, commandArgs); });
                 if (returnCode != 0)
@@ -307,7 +307,7 @@ namespace flash_multi
 
             // Flash firmware
             AppendLog("Writing firmware to Multimodule ...");
-            command = ".\\bin\\dfu-util.exe";
+            command = ".\\tools\\dfu-util.exe";
             commandArgs = String.Format("-R -a 2 -d 1EAF:0003 -D \"{0}\"", fileName, comPort);
             await Task.Run(() => { returnCode = RunCommand(command, commandArgs); });
             if (returnCode != 0)
@@ -330,7 +330,7 @@ namespace flash_multi
         /// </summary>
         private async void SerialFlashWrite(string fileName, string comPort)
         {
-            string command = ".\\bin\\stm32flash.exe";
+            string command = ".\\tools\\stm32flash.exe";
             string bootLoaderPath = ".\\bootloaders\\StmMulti4in1.bin";
             string commandArgs;
 
