@@ -472,6 +472,9 @@ namespace flash_multi
             // Set the text box to the selected file name
             textFileName.Text = openFileDialog.FileName;
 
+            // Dispose the file open dialog
+            openFileDialog.Dispose();
+
             // Check if the Upload button should be enabled yet
             CheckControls();
         }
