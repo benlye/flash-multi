@@ -457,29 +457,20 @@ namespace flash_multi
         private void ButtonBrowse_Click(object sender, EventArgs e)
         {
             // Create the file open dialog
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 // Title for the dialog
-                Title = "Choose file to flash",
+                openFileDialog.Title = "Choose file to flash";
 
                 // Filter for .bin files
-                Filter = ".bin File|*.bin"
-            };
+                openFileDialog.Filter = ".bin File|*.bin";
 
-            try
-            {
-                // Show the dialog
-                openFileDialog.ShowDialog();
-
-                // Set the text box to the selected file name
-                textFileName.Text = openFileDialog.FileName;
-            } catch (Exception ex)
-            {
-                MessageBox.Show(String.Format("Error selecting file: {0}", ex.Message), "Select File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    // Set the text box to the selected file name
+                    textFileName.Text = openFileDialog.FileName;
+                }
             }
-
-            // Dispose the file open dialog
-            openFileDialog.Dispose();
 
             // Check if the Upload button should be enabled yet
             CheckControls();
