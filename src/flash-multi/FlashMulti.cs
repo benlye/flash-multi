@@ -460,17 +460,23 @@ namespace flash_multi
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 // Title for the dialog
-                Title = "Choose file flash",
+                Title = "Choose file to flash",
 
                 // Filter for .bin files
                 Filter = ".bin File|*.bin"
             };
 
-            // Show the dialog
-            openFileDialog.ShowDialog();
+            try
+            {
+                // Show the dialog
+                openFileDialog.ShowDialog();
 
-            // Set the text box to the selected file name
-            textFileName.Text = openFileDialog.FileName;
+                // Set the text box to the selected file name
+                textFileName.Text = openFileDialog.FileName;
+            } catch (Exception ex)
+            {
+                MessageBox.Show(String.Format("Error selecting file: {0}", ex.Message), "Select File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
             // Dispose the file open dialog
             openFileDialog.Dispose();
