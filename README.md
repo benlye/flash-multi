@@ -1,5 +1,5 @@
 # Flash-Multi
-<img src=https://img.shields.io/github/downloads/benlye/flash-multi/total.svg>
+<img src=https://img.shields.io/github/downloads/benlye/flash-multi/total.svg> <a href="https://scan.coverity.com/projects/benlye-flash-multi"><img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/18725.svg"/></a>
 
 Tool for flashing pre-compiled firmware to an STM32-based Multiprotocol TX module.  Firmware upload can be performed using the built-in USB connection or via an external FTDI adapter.
 
