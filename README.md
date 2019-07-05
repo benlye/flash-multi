@@ -1,4 +1,6 @@
 # Flash-Multi
+<img src=https://img.shields.io/github/downloads/benlye/flash-multi/total.svg>
+
 Tool for flashing pre-compiled firmware to an STM32-based Multiprotocol TX module.  Firmware upload can be performed using the built-in USB connection or via an external FTDI adapter.
 
 <p align="center">
