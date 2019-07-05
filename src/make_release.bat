@@ -11,7 +11,7 @@ REM Create the zip archive
 "C:\Program Files\7-Zip\7z.exe" a -r -x!*.pdb .\flash-multi\bin\flash-multi-%fileVersion%.zip .\flash-multi\bin\Release
 
 REM Rename the root folder in the zip
-"C:\Program Files\7-Zip\7z.exe" rn  .\flash-multi\bin\flash-multi-%fileVersion%.zip Release\ release-%fileVersion%\
+"C:\Program Files\7-Zip\7z.exe" rn  .\flash-multi\bin\flash-multi-%fileVersion%.zip Release\ flash-multi-%fileVersion%\
 
 REM Create the installer package
-"C:\Program Files (x86)\Inno Setup 6\iscc.exe" flash-multi.iss
+"C:\Program Files (x86)\Inno Setup 6\iscc.exe"  /Qp /DMyAppVersion=%fileVersion% flash-multi.iss
