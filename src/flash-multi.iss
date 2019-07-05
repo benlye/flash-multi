@@ -1,10 +1,9 @@
-#define MyAppVersion '0.1.0'
 [Setup]
 AppName=Flash Multi
 AppVersion={#MyAppVersion}
 AppPublisher=Ben Lye
 AppPublisherURL=https://github.com/benlye/flash-multi
-DefaultDirName={pf}\FlashMulti
+DefaultDirName={commonpf}\FlashMulti
 DefaultGroupName=Flash Multi
 UninstallDisplayIcon={app}\flash-multi.exe
 Compression=lzma2
@@ -14,6 +13,9 @@ OutputBaseFilename=flash-multi-{#MyAppVersion}
 
 [Files]
 Source: "flash-multi\bin\Release\*"; Excludes: "*.pdb"; Flags: replacesameversion promptifolder recursesubdirs; DestDir: {app}
+
+[InstallDelete]
+Type: filesandordirs; Name: "{app}\bin"
 
 [Icons]
 Name: "{group}\Flash Multi"; Filename: "{app}\flash-multi.exe"; IconFilename: "{app}\flash-multi.exe"
