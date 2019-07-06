@@ -7,6 +7,8 @@ Tool for flashing pre-compiled firmware to an STM32-based Multiprotocol TX modul
   <img src="img/flash-multi.jpg">
 </p>
 
+**Important!! - Only flash firmware which has been compiled with `CHECK_FOR_BOOTLOADER` enabled. These are the files with 'TXFLASH' in the name on the Multiprotocol Releases page.  See [this issue](https://github.com/benlye/flash-multi/issues/2) for more details.**
+
 # Supported Modules
 * Jumper JP4IN1
 * iRangeX IRX4, IRX4 Plus, and IRX4 Lite
@@ -36,6 +38,8 @@ Other drivers may be needed if you are using an external FTDI adapter. Consult t
 *Windows 10 includes drivers for most common serial devices, including FTDI adapters and the USB-to-Serial chip in the Jumper JP4IN1 Module. Additonal drivers shouldn't need to be installed on Windows 10.*
 
 # Use
+**Important!! - Only flash firmware which has been compiled with `CHECK_FOR_BOOTLOADER` enabled. These are the files with 'TXFLASH' in the name on the Multiprotocol Releases page.  See [this issue](https://github.com/benlye/flash-multi/issues/2) for more details.**
+
 **Note for iRangeX, Banggood, and DIY modules:** The first time you flash your module you will need to connect it with an external FTDI adapter in order to flash the bootloader. The bootloader is required in order for the USB port work and it can only be written with an FTDI adapter.
 
 **Note for external FTDI connections:** When using an external FTDI adapter the `BOOT0` pin on the board must be connected to 5V, usually by installing a jumper on the `BOOT0` header pins.
@@ -74,6 +78,8 @@ Multimodule updated sucessfully
 For both methods, if the 'Show Verbose Output' box is checked the actual output from each of the flash proceses will be shown. If the flash fails for any reason the verbose messages are a good place to look for more details.
 
 # Multiprotocol Firmware
+**Important!! - Only flash firmware which has been compiled with `CHECK_FOR_BOOTLOADER` enabled. These are the files with 'TXFLASH' in the name on the Multiprotocol Releases page.  See [this issue](https://github.com/benlye/flash-multi/issues/2) for more details.**
+
 Pre-compiled Multiprotocol firmware can be downloaded from the Multiprotocol TX Module [Releases](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/releases).
 
 The Multiprotocol firmware can also be [compiled from source](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/blob/master/docs/Compiling_STM32.md) relatively easily.
