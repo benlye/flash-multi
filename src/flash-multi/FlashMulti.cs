@@ -63,7 +63,7 @@ namespace flash_multi
         /// </summary>
         private void CheckControls()
         {
-            if (textFileName.Text != "" && comPortSelector.SelectedItem != null)
+            if (textFileName.Text != "" && comPortSelector.SelectedItem != null && (writeBootloader_No.Checked || writeBootloader_Yes.Checked))
             {
                 buttonUpload.Enabled = true;
             }
@@ -139,11 +139,27 @@ namespace flash_multi
             // Short pause to give a DFU device time to show up
             Thread.Sleep(50);
 
-            // Check if we should add a DFU device to the list (purely cosmetic, not really required)
+            // Check if we there's a Maple device plugged in
             MapleTools.FindMapleResult mapleCheck = MapleTools.FindMaple();
-            if (mapleCheck.Device.DfuMode)
+
+            if (mapleCheck.MapleFound)
             {
-                comPortSelector.Items.Add("DFU Device");
+                // Set the Write Bootloader radio button and disable the controls if a Maple device is present
+                // Required so that the firmware size is calculated correctly
+                writeBootloader_Yes.Checked = true;
+                writeBootloader_Yes.Enabled = false;
+                writeBootloader_No.Enabled = false;
+
+                // If the Maple device is in DFU mode add a DFU device to the list
+                // Required in case there are no other serial devices present as the user need to select something from the list
+                if (mapleCheck.Device.DfuMode)
+                {
+                    comPortSelector.Items.Add("DFU Device");
+                }
+            } else
+            {
+                writeBootloader_Yes.Enabled = true;
+                writeBootloader_No.Enabled = true;
             }
 
             // Re-select the previously selected item
@@ -169,13 +185,19 @@ namespace flash_multi
             if (! File.Exists(textFileName.Text))
             {
                 AppendLog(String.Format("File {0} does not exist", textFileName.Text));
-                MessageBox.Show("Fimrware file does not exist.", "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Firmware file does not exist.", "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 EnableControls(true);
                 return;
             }
 
-            // Check that the file size is OK - max size is 120,832B (118KB) to allow for bootloader and EEPROM emulation
-            int maxFileSize = 120832;
+            // Check that the file size is OK
+            // Max size is 120,832B (118KB) with bootloader, 129,024B (126KB) without
+            int maxFileSize = 129024;
+            if (writeBootloader_Yes.Checked)
+            {
+                maxFileSize = 120832;
+            }
+            
             long length = new System.IO.FileInfo(textFileName.Text).Length;
 
             if (length > maxFileSize)
@@ -233,7 +255,7 @@ namespace flash_multi
             }
             else
             {
-                Debug.WriteLine("Disnabling the controls...");
+                Debug.WriteLine("Disabling the controls...");
             }
 
             // Toggle the controls
@@ -242,10 +264,21 @@ namespace flash_multi
             buttonRefresh.Enabled = arg;
             textFileName.Enabled = arg;
             comPortSelector.Enabled = arg;
+            writeBootloader_Yes.Enabled = arg;
+            writeBootloader_No.Enabled = arg;
 
-            // If we're re-enabling, check if the Upload button should be enabled or disabled
+            // Check a couple of things if we're re-enabling
             if (arg)
             {
+                // Keep the Write Bootloader controls disabled if a Maple device is plugged in.
+                if (MapleTools.FindMaple().MapleFound)
+                {
+                    writeBootloader_Yes.Checked = true;
+                    writeBootloader_Yes.Enabled = false;
+                    writeBootloader_No.Enabled = false;
+                }
+
+                // Check if the Upload button can be enabled
                 CheckControls();
             }
         }
@@ -335,11 +368,21 @@ namespace flash_multi
             string commandArgs;
 
             int returnCode = -1;
+            int flashStep = 1;
+            int flashSteps = 2;
+
+            int flashStart = 0;
+            string executionAddress = "0x8000000";
+
+            if (writeBootloader_Yes.Checked)
+            {
+                flashSteps = 3;
+            }
 
             AppendLog("Starting Multimodule update\r\n");
 
             // Erase
-            AppendLog("[1/3] Erasing flash memory...");
+            AppendLog($"[{flashStep}/{flashSteps}] Erasing flash memory...");
             commandArgs = String.Format("-o -S 0x8000000:129024 -b 115200 {0}", comPort);
             await Task.Run(() => { returnCode = RunCommand(command, commandArgs); });
             if (returnCode != 0)
@@ -351,22 +394,31 @@ namespace flash_multi
             }
             AppendLog(" done\r\n");
 
-            // Flash bootloader
-            AppendLog("[2/3] Writing bootloader...");
-            commandArgs = String.Format("-v -e 0 -g 0x8000000 -b 115200 -w \"{0}\" {1}", bootLoaderPath, comPort);
-            await Task.Run(() => { returnCode = RunCommand(command, commandArgs); });
-            if (returnCode != 0)
+            if (writeBootloader_Yes.Checked)
             {
-                EnableControls(true);
-                AppendLog(" failed!");
-                MessageBox.Show("Failed to write the bootloader.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                // Flash bootloader
+                flashStep ++;
+                AppendLog($"[{flashStep}/{flashSteps}] Writing bootloader...");
+                commandArgs = $"-v -e 0 -g {executionAddress} -b 115200 -w \"{bootLoaderPath}\" {comPort}";
+                await Task.Run(() => { returnCode = RunCommand(command, commandArgs); });
+                if (returnCode != 0)
+                {
+                    EnableControls(true);
+                    AppendLog(" failed!");
+                    MessageBox.Show("Failed to write the bootloader.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                AppendLog(" done\r\n");
+
+                // Set the flash address for a flash with bootloader
+                flashStart = 8;
+                executionAddress = "0x8002000";
             }
-            AppendLog(" done\r\n");
 
             // Flash firmware
-            AppendLog("[3/3] Writing Multimodule firmware...");
-            commandArgs = String.Format("-v -s 8 -e 0 -g 0x8002000 -b 115200 -w \"{0}\" {1}", fileName, comPort);
+            flashStep++;
+            AppendLog($"[{flashStep}/{flashSteps}] Writing Multimodule firmware...");
+            commandArgs = $"-v -s {flashStart} -e 0 -g {executionAddress} -b 115200 -w \"{fileName}\" {comPort}";
             await Task.Run(() => { returnCode = RunCommand(command, commandArgs); });
             if (returnCode != 0)
             {
@@ -472,6 +524,16 @@ namespace flash_multi
                 }
             }
 
+            // Check the file name and pre-set the Write Bootloader option
+            if (textFileName.Text.IndexOf("_FTDI_") > -1)
+            {
+                writeBootloader_No.Checked = true;
+            }
+            else if (textFileName.Text.IndexOf("_TXFLASH_") > -1)
+            {
+                writeBootloader_Yes.Checked = true;
+            }
+
             // Check if the Upload button should be enabled yet
             CheckControls();
         }
@@ -489,6 +551,12 @@ namespace flash_multi
         /// Handles input in the firmware file name text box.
         /// </summary>
         private void TextFileName_OnChange(object sender, EventArgs e)
+        {
+            // Check if the Upload button should be enabled yet
+            CheckControls();
+        }
+
+        private void WriteBootloader_OnChange(object sender, EventArgs e)
         {
             // Check if the Upload button should be enabled yet
             CheckControls();
