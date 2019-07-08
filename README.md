@@ -26,14 +26,15 @@ Tool for flashing pre-compiled firmware to an STM32-based Multiprotocol TX modul
 1. Run `\drivers\install_drivers.bat` to manually install the Maple USB device drivers (only needed once)
 1. Launch the application by running `flash-multi.exe`
 
-## Drivers for Older Versions of Windows
-**Users of Windows 7, XP, etc. will need to install additional drivers manually.**
+## Additional Drivers
+**Depending on your Multiprotocol module you may need to install additional drivers manually.**
 
-The driver for the Jumper JP4IN1 module, the Silicon Labs CP210x driver, can be downloaded from [here](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers).  This driver is **not** included with Flash Multi.
+The driver for the Jumper JP4IN1 module, the Silicon Labs CP210x driver, is **not** included with Flash Multi and can be downloaded from here:
+https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers
 
 Other drivers may be needed if you are using an external FTDI adapter. Consult the documentation for your adapter.
 
-*Windows 10 includes drivers for most common serial devices, including FTDI adapters and the USB-to-Serial chip in the Jumper JP4IN1 Module. Additonal drivers shouldn't need to be installed on Windows 10.*
+*Windows 10 includes drivers for many common serial devices, including many FTDI adapters, so check Device Manager to see if your device is recognised.*
 
 # Use
 **Note for iRangeX, Banggood, and DIY modules:** The first time you flash your module you will need to connect it with an external FTDI adapter in order to flash the bootloader. The bootloader is required in order for the USB port work and it can only be written with an FTDI adapter.
