@@ -37,7 +37,7 @@ namespace Flash_Multi
         /// <param name="dfuMode">Indicates if the device is in DFU mode.</param>
         /// <param name="usbMode">Indicates if the device is in USB mode.</param>
         /// <param name="mode">The device mode.</param>
-        public MapleDevice(bool deviceFound, string deviceId, bool dfuMode, bool usbMode, string mode)
+        public MapleDevice(bool deviceFound = false, string deviceId = null, bool dfuMode = false, bool usbMode = false, string mode = null)
         {
             this.DeviceFound = deviceFound;
             this.DeviceId = deviceId;
@@ -77,7 +77,7 @@ namespace Flash_Multi
         /// <returns>Returns a <see cref="MapleDevice"/>.</returns>
         public static MapleDevice FindMaple()
         {
-            MapleDevice result = null;
+            MapleDevice result = new MapleDevice(false);
 
             var usbDevices = UsbDeviceInfo.GetUSBDevices();
 
