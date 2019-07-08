@@ -17,13 +17,13 @@ Tool for flashing pre-compiled firmware to an STM32-based Multiprotocol TX modul
 # Installation
 ## Using the Installer
 1. Download the latest installer (`flash-multi-[version].exe`) from the [Releases](https://github.com/benlye/flash-multi/releases) page
-1. Run the installer to install the application and the DFU device drivers
-1. Launch the 'Flash Multi' from the Start menu
+1. Run the installer to install the application and the Maple USB device drivers - **the Maple USB device drivers must be selected for installation at least once**. They do not need to be installed on subsequent reinstalls or upgrades (but reinstalling them won't do any harm).
+1. Launch 'Flash Multi' from the Start menu
 
 ## Manual Installation
 1. Download the latest .zip archive (`flash-multi-[version].zip`) from the [Releases](https://github.com/benlye/flash-multi/releases) page
 1. Unzip the archive to a convenient location
-1. Run `\drivers\install_drivers.bat` to manually install the DFU device drivers
+1. Run `\drivers\install_drivers.bat` to manually install the Maple USB device drivers (only needed once)
 1. Launch the application by running `flash-multi.exe`
 
 ## Drivers for Older Versions of Windows
@@ -45,12 +45,11 @@ Other drivers may be needed if you are using an external FTDI adapter. Consult t
 1. Launch Flash Multi
 1. Click the **Browse** button and locate a compiled firmware file
 1. Select the appropriate COM port
-1. Select whether or not to write the bootloader
-   See [Writing the Bootloader](#writing-the-bootloader) below
+1. Select whether or not to write the bootloader - see [Writing the Bootloader](#writing-the-bootloader) below
 1. Click the **Upload** button
 
 ## Writing the Bootloader
-When flashing bia serial using either an exterral or internal FTDI adapter you must choose whether or not to write the bootloader.
+When flashing via serial using either an exterral or internal FTDI adapter you must choose whether or not to write the bootloader.
 
 The bootloader does two things:
 1. Enables the native USB port on devices which have it
