@@ -1,4 +1,4 @@
-﻿namespace flash_multi
+﻿namespace Flash_Multi
 {
     partial class FlashMulti
     {
@@ -291,8 +291,8 @@
         private System.Windows.Forms.Button buttonRefresh;
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.LinkLabel linkLabel2;
-        private System.Windows.Forms.RadioButton writeBootloader_No;
-        private System.Windows.Forms.RadioButton writeBootloader_Yes;
+        internal System.Windows.Forms.RadioButton writeBootloader_No;
+        internal System.Windows.Forms.RadioButton writeBootloader_Yes;
         private System.Windows.Forms.Label label1;
     }
 }

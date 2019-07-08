@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{72D5A55C-CC93-422C-A12F-CCE99E1C7300}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>flash_multi</RootNamespace>
+    <RootNamespace>Flash_Multi</RootNamespace>
     <AssemblyName>flash-multi</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -57,10 +57,14 @@
     <Compile Include="FlashMulti.Designer.cs">
       <DependentUpon>FlashMulti.cs</DependentUpon>
     </Compile>
-    <Compile Include="MapleTools.cs" />
+    <Compile Include="MapleDevice.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UsbNotifications.cs" />
+    <Compile Include="RunCommand.cs" />
+    <Compile Include="SerialDevice.cs" />
+    <Compile Include="UpdateCheck.cs" />
+    <Compile Include="UsbDeviceInfo.cs" />
+    <Compile Include="UsbNotification.cs" />
     <EmbeddedResource Include="FlashMulti.resx">
       <DependentUpon>FlashMulti.cs</DependentUpon>
     </EmbeddedResource>
