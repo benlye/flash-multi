@@ -10,6 +10,7 @@ using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 namespace flash_multi
 {
@@ -35,6 +36,21 @@ namespace flash_multi
 
             // Disable the Upload button until we're ready
             buttonUpload.Enabled = false;
+
+            // Register a hendler to check for a new version when the form is shown the first time
+            Shown += FlashMulti_Shown;
+        }
+
+        /// <summary>
+        /// Called when the form has finished loading for the first time.
+        /// Checks Github for a newer version.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FlashMulti_Shown(object sender, EventArgs e)
+        {
+            // Check for a new version
+            UpdateCheck();
         }
 
         /// <summary>
@@ -677,5 +693,155 @@ namespace flash_multi
         {
             System.Diagnostics.Process.Start("https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/releases");
         }
+
+        /// <summary>
+        /// Opens a URL in the default browser.
+        /// </summary>
+        private void OpenLink(string url)
+        {
+            System.Diagnostics.Process.Start(url);
+        }
+
+        /// <summary>
+        /// Compares the latest Github version to the current one and prompts the user to update if necessary.
+        /// </summary>
+        private void UpdateCheck()
+        {
+            // Get check for the latest version on Github
+            UpdateCheckResult check = GetLatestVersion();
+
+            // If the check completed successfully
+            if (check.CheckSuccess)
+            {
+                // Get the current version
+                Version currentVersion = Version.Parse(Application.ProductVersion);
+
+                // Get the version available on Github
+                Version latestVersion = check.LatestVersion;
+
+                // Check if the current version is older than the latest Github release version
+                if (currentVersion.CompareTo(latestVersion) == -1)
+                {
+                    // A newer version is available to show the user a prompt
+                    Debug.WriteLine($"App version is older than latest version: {currentVersion} < {latestVersion}");
+                    DialogResult showUpdate = MessageBox.Show(
+                        $"A newer version of Flash Multi is available.\n\nYou have v{currentVersion.ToString()} and v{latestVersion.ToString()} is available.\n\nSee the latest release on Github?", 
+                        "Flash Multi Update Available", 
+                        MessageBoxButtons.YesNo, 
+                        MessageBoxIcon.Information
+                        );
+
+                    // Show the Github release page for the new version if the user clicked Yes
+                    if (showUpdate == DialogResult.Yes)
+                    {
+                        try
+                        {
+                            OpenLink(check.ReleaseUrl);
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine(ex.Message);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks Github for the latest release.
+        /// <returns>Returns a boolean indicating if the check succeeds, the latest version number, and the latest release URL.</returns>
+        /// </summary>
+        private UpdateCheckResult GetLatestVersion()
+        {
+            // Somewhere to store the results
+            UpdateCheckResult results = new UpdateCheckResult
+            {
+                CheckSuccess = false
+            };
+
+            try
+            {
+                // The API URL to check for the latest release
+                // Returns a JSON payload containing all the details of the latest release
+                string releasesUrl = "https://api.github.com/repos/benlye/flash-multi/releases/latest";
+
+                // Set TLS1.2, as required by the Github API
+                System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                
+                // Create the WebRequest
+                HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(releasesUrl);
+
+                // Set the UserAgent, as required by the Github API
+                webRequest.UserAgent = $"flash-multi-{Application.ProductVersion}";
+
+                // Disable keepalive so we don't hold a connection open
+                webRequest.KeepAlive = false;
+
+                // Get the response and read it
+                using (WebResponse myResponse = webRequest.GetResponse())
+                using (StreamReader sr = new StreamReader(myResponse.GetResponseStream(), System.Text.Encoding.UTF8))
+                {
+                    // Read all of the output from the StreamReader
+                    string result = sr.ReadToEnd();
+
+                    // Parse the release tag out of the JSON
+                    // This contains the version string
+                    int tagStart = result.IndexOf("\"tag_name\":");
+                    int tagEnd = result.IndexOf(",", tagStart);
+                    string tagLine = result.Substring(tagStart, tagEnd - tagStart);
+                    string tag = tagLine.Split('"')[3];
+
+                    // Add the release tag to the results
+                    results.LatestVersion = Version.Parse(tag);
+
+                    // Parse the release URL out of the JSON
+                    // This is the URL of the Github page containing details of the latest release
+                    int urlStart = result.IndexOf("\"html_url\":");
+                    int urlEnd = result.IndexOf(",", urlStart);
+                    string urlLine = result.Substring(urlStart, urlEnd - urlStart);
+                    string url = urlLine.Split('"')[3];
+
+                    // Add the release URL to the results
+                    results.ReleaseUrl = url;
+                }
+
+                // Define a regular expression to test the version number looks how we expect it to
+                Regex versionRegex = new Regex(@"\d+\.\d+\.\d+");
+
+                // Check that the URL and version number are as we expect
+                if (results.ReleaseUrl.StartsWith("https://github.com/benlye/flash-multi/releases/") && versionRegex.Match(results.LatestVersion.ToString()).Success)
+                {
+                    // All looks good; the check succeeded
+                    results.CheckSuccess = true;
+                } 
+                
+            }
+            catch ( Exception ex)
+            {
+                Debug.WriteLine($"Error getting latest version: {ex.Message}");
+            }
+
+            // Return the results
+            return results;
+        }
+    }
+
+    /// <summary>
+    /// Class to store the results of a Github version check.
+    /// </summary>
+    public class UpdateCheckResult
+    {
+        /// <summary>
+        /// Gets or sets a boolean indicating whether or not the Github version check succeeded.
+        /// </summary>
+        public bool CheckSuccess { get; set; }
+        /// <summary>
+        /// Gets or sets a Version containing the version of the latest release.
+        /// </summary>
+        public Version LatestVersion { get; set; }
+        /// <summary>
+        /// Gets or sets a string containing the URL of the latest release
+        /// </summary>
+        public string ReleaseUrl { get; set; }
     }
 }
