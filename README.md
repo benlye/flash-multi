@@ -7,8 +7,6 @@ Tool for flashing pre-compiled firmware to an STM32-based Multiprotocol TX modul
   <img src="img/flash-multi.jpg">
 </p>
 
-**Important!! - Only flash firmware which has been compiled with `CHECK_FOR_BOOTLOADER` enabled. These are the files with 'TXFLASH' in the name on the Multiprotocol Releases page.  See [this issue](https://github.com/benlye/flash-multi/issues/2) for more details.**
-
 # Supported Modules
 * Jumper JP4IN1
 * iRangeX IRX4, IRX4 Plus, and IRX4 Lite
@@ -38,8 +36,6 @@ Other drivers may be needed if you are using an external FTDI adapter. Consult t
 *Windows 10 includes drivers for most common serial devices, including FTDI adapters and the USB-to-Serial chip in the Jumper JP4IN1 Module. Additonal drivers shouldn't need to be installed on Windows 10.*
 
 # Use
-**Important!! - Only flash firmware which has been compiled with `CHECK_FOR_BOOTLOADER` enabled. These are the files with 'TXFLASH' in the name on the Multiprotocol Releases page.  See [this issue](https://github.com/benlye/flash-multi/issues/2) for more details.**
-
 **Note for iRangeX, Banggood, and DIY modules:** The first time you flash your module you will need to connect it with an external FTDI adapter in order to flash the bootloader. The bootloader is required in order for the USB port work and it can only be written with an FTDI adapter.
 
 **Note for external FTDI connections:** When using an external FTDI adapter the `BOOT0` pin on the board must be connected to 5V, usually by installing a jumper on the `BOOT0` header pins.
@@ -49,7 +45,29 @@ Other drivers may be needed if you are using an external FTDI adapter. Consult t
 1. Launch Flash Multi
 1. Click the **Browse** button and locate a compiled firmware file
 1. Select the appropriate COM port
+1. Select whether or not to write the bootloader
+   See [Writing the Bootloader](#writing-the-bootloader) below
 1. Click the **Upload** button
+
+## Writing the Bootloader
+When flashing bia serial using either an exterral or internal FTDI adapter you must choose whether or not to write the bootloader.
+
+The bootloader does two things:
+1. Enables the native USB port on devices which have it
+1. Enables updating the Multiprotocol module's firmware from the radio (on radios which support this)
+
+The **Write Bootloader** option must match the `CHECK_FOR_BOOTLOADER` option in the firmware otherwise the module will not work. 
+
+For pre-compiled firmware from the Github Release page:
+* If the file name contains `_TXFLASH_` then **Yes** will be selected automatically.
+* If the file name contains `_FTDI_` then **No** will be selected automatically.
+
+For self-compiled firmware:
+* If `CHECK_FOR_BOOTLOADER` is enabled (uncommented) in your config you must manually select **Yes**.
+* If `CHECK_FOR_BOOTLOADER` is disabled (commented) in your config you must manually  select **No**.
+
+For native USB uploads:
+* If a Maple USB device is detected the **Write Bootloader** controls will be disabled and **Yes** will be selected as the bootloader is already installed, and cannot be changed via a native USB upload.
 
 ## Upload Output
 The output will vary depending on the type of module being flashed.
@@ -78,8 +96,6 @@ Multimodule updated sucessfully
 For both methods, if the 'Show Verbose Output' box is checked the actual output from each of the flash proceses will be shown. If the flash fails for any reason the verbose messages are a good place to look for more details.
 
 # Multiprotocol Firmware
-**Important!! - Only flash firmware which has been compiled with `CHECK_FOR_BOOTLOADER` enabled. These are the files with 'TXFLASH' in the name on the Multiprotocol Releases page.  See [this issue](https://github.com/benlye/flash-multi/issues/2) for more details.**
-
 Pre-compiled Multiprotocol firmware can be downloaded from the Multiprotocol TX Module [Releases](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/releases).
 
 The Multiprotocol firmware can also be [compiled from source](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/blob/master/docs/Compiling_STM32.md) relatively easily.
