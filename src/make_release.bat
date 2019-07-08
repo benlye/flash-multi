@@ -1,5 +1,8 @@
 @ECHO OFF
 
+DEL .\flash-multi\bin\*.zip
+DEL .\flash-multi\bin\*.exe
+
 REM Get the version
 FOR /F "USEBACKQ" %%F IN (`powershell -NoLogo -NoProfile -Command ^(Get-Item ".\flash-multi\bin\Release\flash-multi.exe"^).VersionInfo.FileVersion`) DO (SET fileVersion=%%F)
 echo File version: %fileVersion%
