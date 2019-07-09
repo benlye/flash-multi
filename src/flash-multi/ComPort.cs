@@ -71,10 +71,52 @@ namespace Flash_Multi
         }
 
         /// <summary>
-        /// Enumerates the available COM ports including the device description.
+        /// Enumerates the available COM ports without using WMI.
         /// </summary>
         /// <returns>Returns an ordered list of ports <see cref="ComPort"/>.</returns>
         public static List<ComPort> EnumeratePortList()
+        {
+            List<ComPort> comPorts = new List<ComPort>();
+
+            // Get all the COM ports
+            string[] comPortNames = SerialPort.GetPortNames();
+
+            // Add all available to the list
+            foreach (string portName in comPortNames)
+            {
+                ComPort thisPort = new ComPort
+                {
+                    Name = portName,
+                    Description = portName,
+                    DisplayName = portName,
+                };
+                comPorts.Add(thisPort);
+            }
+
+            // Sort the list of ports
+            comPorts = comPorts.OrderBy(c => c.Name.Length).ThenBy(c => c.Name).ToList();
+
+            // Check if we there's a Maple device in DFU mode plugged in
+            if (MapleDevice.FindMaple().DfuMode)
+            {
+                ComPort dfuPort = new ComPort
+                {
+                    Name = "DFU Device",
+                    Description = "DFU Device",
+                    DisplayName = "DFU Device",
+                };
+                comPorts.Add(dfuPort);
+            }
+
+            // Return a list of COM ports
+            return comPorts;
+        }
+
+        /// <summary>
+        /// Enumerates the available COM ports using WMI, including the device description.
+        /// </summary>
+        /// <returns>Returns an ordered list of ports <see cref="ComPort"/>.</returns>
+        public static List<ComPort> EnumeratePortList2()
         {
             List<ComPort> comPorts = new List<ComPort>();
 
@@ -83,23 +125,24 @@ namespace Flash_Multi
                 "root\\cimv2",
                 "SELECT * FROM Win32_PnPEntity WHERE ClassGuid=\"{4d36e978-e325-11ce-bfc1-08002be10318}\""))
             {
-                // Add all available (COM)-ports to the combobox
+                // Add all available ports to the list
                 foreach (ManagementObject queryObj in searcher.Get())
                 {
                     string portCaption = queryObj["Caption"].ToString();
 
                     if (portCaption.Contains("(COM"))
                     {
-                        ComPort thisPort = new ComPort();
-
                         // Get the index number where "(COM" starts in the string
                         int indexOfCom = portCaption.IndexOf("(COM");
                         string portName = portCaption.Substring(indexOfCom + 1, portCaption.Length - indexOfCom - 2);
                         string portDescription = portCaption.Substring(0, indexOfCom - 1);
 
-                        thisPort.Name = portName;
-                        thisPort.Description = portDescription;
-                        thisPort.DisplayName = $"{portName} ({portDescription})";
+                        ComPort thisPort = new ComPort
+                        {
+                            Name = portName,
+                            Description = portDescription,
+                            DisplayName = $"{portName} ({portDescription})",
+                        };
 
                         comPorts.Add(thisPort);
                     }

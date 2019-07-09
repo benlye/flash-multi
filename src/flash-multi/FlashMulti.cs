@@ -244,6 +244,7 @@ namespace Flash_Multi
             object selectedValue = null;
             selectedValue = this.comPortSelector.SelectedValue;
 
+            // Enumerate the COM ports and bind the COM port selector
             List<ComPort> comPorts = ComPort.EnumeratePortList();
             this.comPortSelector.DataSource = comPorts;
             this.comPortSelector.DisplayMember = "Name";
