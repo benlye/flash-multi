@@ -1,5 +1,5 @@
 ﻿// -------------------------------------------------------------------------------
-// <copyright file="ComPorts.cs" company="Ben Lye">
+// <copyright file="ComPort.cs" company="Ben Lye">
 // Copyright 2019 Ben Lye
 //
 // This file is part of Flash Multi.
@@ -31,22 +31,34 @@ namespace Flash_Multi
     /// <summary>
     /// Class for dealing with COM ports.
     /// </summary>
-    internal class ComPorts
+    internal class ComPort
     {
+        /// <summary>
+        /// Gets the name of the port.
+        /// </summary>
+        public string Name { get; private set; }
+
+        /// <summary>
+        /// Gets the description of the port.
+        /// </summary>
+        public string Description { get; private set; }
+
+        /// <summary>
+        /// Gets the displayname of the port (name + description).
+        /// </summary>
+        public string DisplayName { get; private set; }
+
         /// <summary>
         /// Enumerates the available COM ports.
         /// </summary>
         /// <returns>Returns an ordered array of COM port names.</returns>
-        public static string[] Enumerate()
+        public static string[] EnumeratePorts()
         {
             // Get the list of COM port names
             List<string> comPorts = SerialPort.GetPortNames().ToList();
 
             // Sort the list of ports
             comPorts = comPorts.OrderBy(c => c.Length).ThenBy(c => c).ToList();
-
-            // Short pause to give a DFU device time to show up
-            Thread.Sleep(50);
 
             // Check if we there's a Maple device plugged in
             if (MapleDevice.FindMaple().DeviceFound)
@@ -56,6 +68,61 @@ namespace Flash_Multi
 
             // Return an array of COM port names
             return comPorts.ToArray();
+        }
+
+        /// <summary>
+        /// Enumerates the available COM ports including the device description.
+        /// </summary>
+        /// <returns>Returns an ordered list of ports <see cref="ComPort"/>.</returns>
+        public static List<ComPort> EnumeratePortList()
+        {
+            List<ComPort> comPorts = new List<ComPort>();
+
+            // Get all the COM ports using WMI
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(
+                "root\\cimv2",
+                "SELECT * FROM Win32_PnPEntity WHERE ClassGuid=\"{4d36e978-e325-11ce-bfc1-08002be10318}\""))
+            {
+                // Add all available (COM)-ports to the combobox
+                foreach (ManagementObject queryObj in searcher.Get())
+                {
+                    string portCaption = queryObj["Caption"].ToString();
+
+                    if (portCaption.Contains("(COM"))
+                    {
+                        ComPort thisPort = new ComPort();
+
+                        // Get the index number where "(COM" starts in the string
+                        int indexOfCom = portCaption.IndexOf("(COM");
+                        string portName = portCaption.Substring(indexOfCom + 1, portCaption.Length - indexOfCom - 2);
+                        string portDescription = portCaption.Substring(0, indexOfCom - 1);
+
+                        thisPort.Name = portName;
+                        thisPort.Description = portDescription;
+                        thisPort.DisplayName = $"{portName} ({portDescription})";
+
+                        comPorts.Add(thisPort);
+                    }
+                }
+            }
+
+            // Sort the list of ports
+            comPorts = comPorts.OrderBy(c => c.Name.Length).ThenBy(c => c.Name).ToList();
+
+            // Check if we there's a Maple device in DFU mode plugged in
+            if (MapleDevice.FindMaple().DfuMode)
+            {
+                ComPort dfuPort = new ComPort
+                {
+                    Name = "DFU Device",
+                    Description = "Maple DFU Device",
+                    DisplayName = "DFU Device",
+                };
+                comPorts.Add(dfuPort);
+            }
+
+            // Return a list of COM ports
+            return comPorts;
         }
 
         /// <summary>

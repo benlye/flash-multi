@@ -39,7 +39,6 @@
             this.writeBootloader_No = new System.Windows.Forms.RadioButton();
             this.writeBootloader_Yes = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
-            this.buttonRefresh = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.showVerboseOutput = new System.Windows.Forms.CheckBox();
             this.textVerbose = new System.Windows.Forms.TextBox();
@@ -47,12 +46,13 @@
             this.textActivity = new System.Windows.Forms.TextBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.linkLabel2 = new System.Windows.Forms.LinkLabel();
+            this.buttonRefresh = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonUpload
             // 
-            this.buttonUpload.Location = new System.Drawing.Point(373, 71);
+            this.buttonUpload.Location = new System.Drawing.Point(373, 76);
             this.buttonUpload.Name = "buttonUpload";
             this.buttonUpload.Size = new System.Drawing.Size(75, 23);
             this.buttonUpload.TabIndex = 6;
@@ -64,10 +64,11 @@
             // comPortSelector
             // 
             this.comPortSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comPortSelector.DropDownWidth = 90;
             this.comPortSelector.FormattingEnabled = true;
             this.comPortSelector.Location = new System.Drawing.Point(101, 48);
             this.comPortSelector.Name = "comPortSelector";
-            this.comPortSelector.Size = new System.Drawing.Size(98, 21);
+            this.comPortSelector.Size = new System.Drawing.Size(90, 21);
             this.comPortSelector.TabIndex = 2;
             this.comPortSelector.SelectedIndexChanged += new System.EventHandler(this.ComPortSelector_SelectionChanged);
             // 
@@ -99,7 +100,7 @@
             // 
             // buttonBrowse
             // 
-            this.buttonBrowse.Location = new System.Drawing.Point(373, 19);
+            this.buttonBrowse.Location = new System.Drawing.Point(373, 18);
             this.buttonBrowse.Name = "buttonBrowse";
             this.buttonBrowse.Size = new System.Drawing.Size(75, 23);
             this.buttonBrowse.TabIndex = 1;
@@ -158,16 +159,6 @@
             this.label1.Size = new System.Drawing.Size(89, 13);
             this.label1.TabIndex = 9;
             this.label1.Text = "Write Bootloader:";
-            // 
-            // buttonRefresh
-            // 
-            this.buttonRefresh.Location = new System.Drawing.Point(205, 47);
-            this.buttonRefresh.Name = "buttonRefresh";
-            this.buttonRefresh.Size = new System.Drawing.Size(75, 23);
-            this.buttonRefresh.TabIndex = 3;
-            this.buttonRefresh.Text = "Refresh";
-            this.buttonRefresh.UseVisualStyleBackColor = true;
-            this.buttonRefresh.Click += new System.EventHandler(this.ButtonRefresh_Click);
             // 
             // label4
             // 
@@ -248,6 +239,16 @@
             this.linkLabel2.UseCompatibleTextRendering = true;
             this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ReleasesLink_LinkClicked);
             // 
+            // buttonRefresh
+            // 
+            this.buttonRefresh.Location = new System.Drawing.Point(197, 47);
+            this.buttonRefresh.Name = "buttonRefresh";
+            this.buttonRefresh.Size = new System.Drawing.Size(75, 23);
+            this.buttonRefresh.TabIndex = 3;
+            this.buttonRefresh.Text = "Refresh";
+            this.buttonRefresh.UseVisualStyleBackColor = true;
+            this.buttonRefresh.Click += new System.EventHandler(this.ButtonRefresh_Click);
+            // 
             // FlashMulti
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -288,12 +289,12 @@
         private System.Windows.Forms.CheckBox showVerboseOutput;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.TextBox textActivity;
-        private System.Windows.Forms.Button buttonRefresh;
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.LinkLabel linkLabel2;
         internal System.Windows.Forms.RadioButton writeBootloader_No;
         internal System.Windows.Forms.RadioButton writeBootloader_Yes;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button buttonRefresh;
     }
 }
 

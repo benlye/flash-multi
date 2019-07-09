@@ -21,6 +21,7 @@
 namespace Flash_Multi
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.IO.Ports;
@@ -130,12 +131,13 @@ namespace Flash_Multi
             this.buttonRefresh.Enabled = arg;
             this.textFileName.Enabled = arg;
             this.comPortSelector.Enabled = arg;
-            this.writeBootloader_Yes.Enabled = arg;
-            this.writeBootloader_No.Enabled = arg;
 
             // Check a couple of things if we're re-enabling
             if (arg)
             {
+                // Populate the COM ports
+                this.PopulateComPorts();
+
                 // Keep the Write Bootloader controls disabled if a Maple device is plugged in.
                 if (MapleDevice.FindMaple().DeviceFound)
                 {
@@ -146,6 +148,11 @@ namespace Flash_Multi
 
                 // Check if the Upload button can be enabled
                 this.CheckControls();
+            }
+            else
+            {
+                this.writeBootloader_Yes.Enabled = arg;
+                this.writeBootloader_No.Enabled = arg;
             }
         }
 
@@ -177,9 +184,17 @@ namespace Flash_Multi
                 switch ((int)m.WParam)
                 {
                     case UsbNotification.DbtDeviceremovecomplete:
+                        // Short pause to give a DFU device time to finish showing up
+                        Thread.Sleep(150);
+
+                        // Update the COM port list
                         this.BeginInvoke(new InvokeDelegate(this.PopulateComPorts));
                         break;
                     case UsbNotification.DbtDevicearrival:
+                        // Short pause to give a DFU device time to finish showing up
+                        Thread.Sleep(150);
+
+                        // Update the COM port list
                         this.BeginInvoke(new InvokeDelegate(this.PopulateComPorts));
                         break;
                 }
@@ -196,7 +211,6 @@ namespace Flash_Multi
         {
             // Check for a new version
             UpdateCheck.DoCheck(this);
-            ComPorts.Enumerate();
         }
 
         /// <summary>
@@ -220,42 +234,39 @@ namespace Flash_Multi
         /// </summary>
         private void PopulateComPorts()
         {
-            // Cache the selected item so we can try to re-select it later
-            object selectedItem = null;
-            selectedItem = this.comPortSelector.SelectedItem;
-
-            // Get the list of COM port names
-            string[] comPorts = ComPorts.Enumerate();
-
-            // Clear the existing list
-            this.comPortSelector.Items.Clear();
-
-            // Add the ports one by one
-            foreach (string port in comPorts)
+            // No need to refresh if the control is not enabled
+            if (!this.comPortSelector.Enabled)
             {
-                this.comPortSelector.Items.Add(port);
+                return;
             }
 
-            // Short pause to give a DFU device time to show up
-            Thread.Sleep(50);
+            // Cache the selected item so we can try to re-select it later
+            object selectedValue = null;
+            selectedValue = this.comPortSelector.SelectedValue;
+
+            List<ComPort> comPorts = ComPort.EnumeratePortList();
+            this.comPortSelector.DataSource = comPorts;
+            this.comPortSelector.DisplayMember = "Name";
+            this.comPortSelector.ValueMember = "Name";
+
+            // Re-select the previously selected item
+            if (selectedValue != null)
+            {
+                this.comPortSelector.SelectedValue = selectedValue;
+            }
+            else
+            {
+                this.comPortSelector.SelectedItem = null;
+            }
 
             // Check if we there's a Maple device plugged in
-            MapleDevice mapleCheck = MapleDevice.FindMaple();
-
-            if (mapleCheck.DeviceFound)
+            if (MapleDevice.FindMaple().DeviceFound)
             {
                 // Set the Write Bootloader radio button and disable the controls if a Maple device is present
                 // Required so that the firmware size is calculated correctly
                 this.writeBootloader_Yes.Checked = true;
                 this.writeBootloader_Yes.Enabled = false;
                 this.writeBootloader_No.Enabled = false;
-
-                // If the Maple device is in DFU mode add a DFU device to the list
-                // Required in case there are no other serial devices present as the user need to select something from the list
-                if (mapleCheck.DfuMode)
-                {
-                    this.comPortSelector.Items.Add("DFU Device");
-                }
             }
             else
             {
@@ -263,8 +274,8 @@ namespace Flash_Multi
                 this.writeBootloader_No.Enabled = true;
             }
 
-            // Re-select the previously selected item
-            this.comPortSelector.SelectedItem = selectedItem;
+            // Set the width of the dropdown
+            // this.comPortSelector.DropDownWidth = comPorts.Select(c => c.DisplayName).ToList().Max(x => TextRenderer.MeasureText(x, this.comPortSelector.Font).Width);
 
             // Make sure the Update button is disabled if there is no port selected
             this.CheckControls();
@@ -310,10 +321,10 @@ namespace Flash_Multi
             }
 
             // Get the selected COM port
-            string comPort = this.comPortSelector.SelectedItem.ToString();
+            string comPort = this.comPortSelector.SelectedValue.ToString();
 
             // Check if the port can be opened
-            if (!ComPorts.CheckPort(comPort))
+            if (!ComPort.CheckPort(comPort))
             {
                 this.AppendLog(string.Format("Couldn't open port {0}", comPort));
                 MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
