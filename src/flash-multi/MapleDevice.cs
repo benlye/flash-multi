@@ -20,6 +20,7 @@
 
 namespace Flash_Multi
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Forms;
@@ -100,6 +101,28 @@ namespace Flash_Multi
         }
 
         /// <summary>
+        /// Waits for a Maple DFU device to be present.
+        /// </summary>
+        /// <param name="timeout">Timeout in milliseconds.</param>
+        /// <returns>Boolean indicating whether or not a DFU device appeared within the timeout.</returns>
+        public static bool WaitForDFU(int timeout = 500)
+        {
+            DateTime start = DateTime.Now;
+            bool dfuCheck = MapleDevice.FindMaple().DfuMode;
+
+            double elapsedMs = (DateTime.Now - start).TotalMilliseconds;
+
+            while (dfuCheck == false && elapsedMs < timeout)
+            {
+                Thread.Sleep(50);
+                dfuCheck = MapleDevice.FindMaple().DfuMode;
+                elapsedMs = (DateTime.Now - start).TotalMilliseconds;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Writes the firmware to a Maple serial or DFU device.
         /// </summary>
         /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
@@ -134,16 +157,8 @@ namespace Flash_Multi
                 // Check for a Maple DFU device
                 flashMulti.AppendLog("Waiting for DFU device ...");
                 bool dfuCheck = false;
-                int counter = 0;
 
-                dfuCheck = MapleDevice.FindMaple().DfuMode;
-
-                while (dfuCheck == false && counter < 20)
-                {
-                    Thread.Sleep(50);
-                    dfuCheck = MapleDevice.FindMaple().DfuMode;
-                    counter++;
-                }
+                await Task.Run(() => { dfuCheck = WaitForDFU(1000); });
 
                 if (dfuCheck)
                 {

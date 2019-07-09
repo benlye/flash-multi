@@ -34,6 +34,12 @@ namespace Flash_Multi
     internal class ComPort
     {
         /// <summary>
+        /// Delay in ms to wait for a Maple device to go from DFU to USB mode.
+        /// Prevents a DFU device appearing momentarily before the Maple USB device.
+        /// </summary>
+        private const int DfuDelay = 0;
+
+        /// <summary>
         /// Gets the name of the port.
         /// </summary>
         public string Name { get; private set; }
@@ -61,7 +67,7 @@ namespace Flash_Multi
             comPorts = comPorts.OrderBy(c => c.Length).ThenBy(c => c).ToList();
 
             // Short pause to give a DFU device time to finish showing up
-            Thread.Sleep(500);
+            Thread.Sleep(DfuDelay);
 
             // Check if we there's a Maple device plugged in
             if (MapleDevice.FindMaple().DeviceFound)
@@ -79,6 +85,9 @@ namespace Flash_Multi
         /// <returns>Returns an ordered list of ports <see cref="ComPort"/>.</returns>
         public static List<ComPort> EnumeratePortList()
         {
+            DateTime start = DateTime.Now;
+            Debug.WriteLine("Enumerating COM ports");
+
             List<ComPort> comPorts = new List<ComPort>();
 
             // Get all the COM ports
@@ -100,7 +109,7 @@ namespace Flash_Multi
             comPorts = comPorts.OrderBy(c => c.Name.Length).ThenBy(c => c.Name).ToList();
 
             // Short pause to give a DFU device time to finish showing up
-            Thread.Sleep(500);
+            Thread.Sleep(DfuDelay);
 
             // Check if we there's a Maple device in DFU mode plugged in
             if (MapleDevice.FindMaple().DfuMode)
@@ -113,6 +122,9 @@ namespace Flash_Multi
                 };
                 comPorts.Add(dfuPort);
             }
+
+            DateTime end = DateTime.Now;
+            Debug.WriteLine($"COM ports enumerated in {end - start}.");
 
             // Return a list of COM ports
             return comPorts;
@@ -159,7 +171,7 @@ namespace Flash_Multi
             comPorts = comPorts.OrderBy(c => c.Name.Length).ThenBy(c => c.Name).ToList();
 
             // Short pause to give a DFU device time to finish showing up
-            Thread.Sleep(500);
+            Thread.Sleep(DfuDelay);
 
             // Check if we there's a Maple device in DFU mode plugged in
             if (MapleDevice.FindMaple().DfuMode)

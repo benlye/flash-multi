@@ -56,6 +56,9 @@ namespace Flash_Multi
 
             // Register a hendler to check for a new version when the form is shown the first time
             this.Shown += this.FlashMulti_Shown;
+
+            // Resgister a handler to be notified when USB devices are added or removed
+            UsbNotification.RegisterUsbDeviceNotification(this.Handle);
         }
 
         /// <summary>
@@ -126,6 +129,15 @@ namespace Flash_Multi
                 Debug.WriteLine("Disabling the controls...");
             }
 
+            if (arg)
+            {
+                // Populate the COM ports
+                this.PopulateComPortsAsync();
+            }
+
+            // Check if there is a Maple device attached
+            MapleDevice mapleCheck = MapleDevice.FindMaple();
+
             // Toggle the controls
             this.buttonUpload.Enabled = arg;
             this.buttonBrowse.Enabled = arg;
@@ -133,27 +145,24 @@ namespace Flash_Multi
             this.textFileName.Enabled = arg;
             this.comPortSelector.Enabled = arg;
 
-            // Check a couple of things if we're re-enabling
-            if (arg)
+            // Keep the Write Bootloader controls disabled if a Maple device is plugged in.
+            if (mapleCheck.DeviceFound)
             {
-                // Populate the COM ports
-                this.PopulateComPorts();
-
-                // Keep the Write Bootloader controls disabled if a Maple device is plugged in.
-                if (MapleDevice.FindMaple().DeviceFound)
-                {
-                    this.writeBootloader_Yes.Checked = true;
-                    this.writeBootloader_Yes.Enabled = false;
-                    this.writeBootloader_No.Enabled = false;
-                }
-
-                // Check if the Upload button can be enabled
-                this.CheckControls();
+                this.writeBootloader_Yes.Checked = true;
+                this.writeBootloader_Yes.Enabled = false;
+                this.writeBootloader_No.Enabled = false;
             }
             else
             {
                 this.writeBootloader_Yes.Enabled = arg;
                 this.writeBootloader_No.Enabled = arg;
+            }
+
+            // Check a couple of things if we're re-enabling
+            if (arg)
+            {
+                // Check if the Upload button can be enabled
+                this.CheckControls();
             }
         }
 
@@ -186,11 +195,11 @@ namespace Flash_Multi
                 {
                     case UsbNotification.DbtDeviceremovecomplete:
                         // Update the COM port list
-                        this.BeginInvoke(new InvokeDelegate(this.PopulateComPorts));
+                        this.BeginInvoke(new InvokeDelegate(this.PopulateComPortsAsync));
                         break;
                     case UsbNotification.DbtDevicearrival:
                         // Update the COM port list
-                        this.BeginInvoke(new InvokeDelegate(this.PopulateComPorts));
+                        this.BeginInvoke(new InvokeDelegate(this.PopulateComPortsAsync));
                         break;
                 }
             }
@@ -224,12 +233,17 @@ namespace Flash_Multi
             }
         }
 
+        private async void PopulateComPortsAsync()
+        {
+            await Task.Run(() => { this.PopulateComPorts(); });
+        }
+
         /// <summary>
         /// Populates the list of COM ports.
         /// </summary>
-        private async void PopulateComPorts()
+        private void PopulateComPorts()
         {
-            // No need to refresh if the control is not enabled
+            // Don't refresh if the control is not enabled
             if (!this.comPortSelector.Enabled)
             {
                 return;
@@ -240,15 +254,37 @@ namespace Flash_Multi
 
             // Cache the selected item so we can try to re-select it later
             object selectedValue = null;
-            selectedValue = this.comPortSelector.SelectedValue;
+            if (this.InvokeRequired)
+            {
+                selectedValue = (string)this.Invoke(new Func<object>(() => this.comPortSelector.SelectedValue));
+            }
+            else
+            {
+                selectedValue = this.comPortSelector.SelectedValue;
+            }
 
             // Enumerate the COM ports and bind the COM port selector
             List<ComPort> comPorts = new List<ComPort>();
-            await Task.Run(() => { comPorts = ComPort.EnumeratePortList(); });
+            comPorts = ComPort.EnumeratePortList();
 
-            this.comPortSelector.DataSource = comPorts;
-            this.comPortSelector.DisplayMember = "Name";
-            this.comPortSelector.ValueMember = "Name";
+            // Check if we have a Maple device
+            MapleDevice mapleCheck = MapleDevice.FindMaple();
+
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    this.comPortSelector.DataSource = comPorts;
+                    this.comPortSelector.DisplayMember = "Name";
+                    this.comPortSelector.ValueMember = "Name";
+                });
+            }
+            else
+            {
+                this.comPortSelector.DataSource = comPorts;
+                this.comPortSelector.DisplayMember = "Name";
+                this.comPortSelector.ValueMember = "Name";
+            }
 
             // If we had an old list, compare it to the new one and pick the first item which is new
             if (oldPortList.Count > 0)
@@ -267,7 +303,7 @@ namespace Flash_Multi
                     if (found == false)
                     {
                         Debug.WriteLine($"{newPort.Name} was added.");
-                        this.comPortSelector.SelectedItem = newPort.Name;
+                        selectedValue = newPort.Name;
                     }
                 }
             }
@@ -275,33 +311,77 @@ namespace Flash_Multi
             // Re-select the previously selected item
             if (selectedValue != null)
             {
-                this.comPortSelector.SelectedValue = selectedValue;
+                if (this.InvokeRequired)
+                {
+                    this.Invoke((MethodInvoker)delegate { this.comPortSelector.SelectedValue = selectedValue; });
+                }
+                else
+                {
+                    this.comPortSelector.SelectedValue = selectedValue;
+                }
             }
             else
             {
-                this.comPortSelector.SelectedItem = null;
+                if (this.InvokeRequired)
+                {
+                    this.Invoke((MethodInvoker)delegate { this.comPortSelector.SelectedItem = null; });
+                }
+                else
+                {
+                    this.comPortSelector.SelectedItem = null;
+                }
             }
 
             // Check if we there's a Maple device plugged in
-            if (MapleDevice.FindMaple().DeviceFound)
+            if (mapleCheck.DeviceFound)
             {
                 // Set the Write Bootloader radio button and disable the controls if a Maple device is present
                 // Required so that the firmware size is calculated correctly
-                this.writeBootloader_Yes.Checked = true;
-                this.writeBootloader_Yes.Enabled = false;
-                this.writeBootloader_No.Enabled = false;
+                if (this.InvokeRequired)
+                {
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        this.writeBootloader_Yes.Checked = true;
+                        this.writeBootloader_Yes.Enabled = false;
+                        this.writeBootloader_No.Enabled = false;
+                    });
+                }
+                else
+                {
+                    this.writeBootloader_Yes.Checked = true;
+                    this.writeBootloader_Yes.Enabled = false;
+                    this.writeBootloader_No.Enabled = false;
+                }
             }
             else
             {
-                this.writeBootloader_Yes.Enabled = true;
-                this.writeBootloader_No.Enabled = true;
+                if (this.InvokeRequired)
+                {
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        this.writeBootloader_Yes.Enabled = true;
+                        this.writeBootloader_No.Enabled = true;
+                    });
+                }
+                else
+                {
+                    this.writeBootloader_Yes.Enabled = true;
+                    this.writeBootloader_No.Enabled = true;
+                }
             }
 
             // Set the width of the dropdown
             // this.comPortSelector.DropDownWidth = comPorts.Select(c => c.DisplayName).ToList().Max(x => TextRenderer.MeasureText(x, this.comPortSelector.Font).Width);
 
             // Make sure the Update button is disabled if there is no port selected
-            this.CheckControls();
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(this.CheckControls));
+            }
+            else
+            {
+                this.CheckControls();
+            }
         }
 
         /// <summary>
@@ -474,7 +554,7 @@ namespace Flash_Multi
         /// </summary>
         private void ButtonRefresh_Click(object sender, EventArgs e)
         {
-            this.PopulateComPorts();
+            this.PopulateComPortsAsync();
         }
 
         /// <summary>
