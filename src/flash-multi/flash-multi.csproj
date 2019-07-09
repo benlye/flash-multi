@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComPorts.cs" />
     <Compile Include="FlashMulti.cs">
       <SubType>Form</SubType>
     </Compile>

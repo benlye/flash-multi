@@ -196,6 +196,7 @@ namespace Flash_Multi
         {
             // Check for a new version
             UpdateCheck.DoCheck(this);
+            ComPorts.Enumerate();
         }
 
         /// <summary>
@@ -215,45 +216,6 @@ namespace Flash_Multi
         }
 
         /// <summary>
-        /// Checks if the COM port can be opened.
-        /// </summary>
-        /// <returns>
-        /// Boolean indicating whether the port could be opened.
-        /// </returns>
-        private bool PortCheck(string port)
-        {
-            // Skip the check and return true if the selected port is 'DFU Device'
-            if (port == "DFU Device")
-            {
-                return true;
-            }
-
-            bool result = false;
-
-            // Try to open the serial port, catch an exception if we fail
-            SerialPort serialPort = new SerialPort(port);
-            try
-            {
-                serialPort.Open();
-                if (serialPort.IsOpen)
-                {
-                    result = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-            }
-            finally
-            {
-                Thread.Sleep(50);
-                serialPort.Close();
-            }
-
-            return result;
-        }
-
-        /// <summary>
         /// Populates the list of COM ports.
         /// </summary>
         private void PopulateComPorts()
@@ -263,16 +225,13 @@ namespace Flash_Multi
             selectedItem = this.comPortSelector.SelectedItem;
 
             // Get the list of COM port names
-            string[] comPorts = SerialPort.GetPortNames();
-
-            // Sort the list of ports
-            var orderedComPorts = comPorts.OrderBy(c => c.Length).ThenBy(c => c).ToList();
+            string[] comPorts = ComPorts.Enumerate();
 
             // Clear the existing list
             this.comPortSelector.Items.Clear();
 
             // Add the ports one by one
-            foreach (string port in orderedComPorts)
+            foreach (string port in comPorts)
             {
                 this.comPortSelector.Items.Add(port);
             }
@@ -354,7 +313,7 @@ namespace Flash_Multi
             string comPort = this.comPortSelector.SelectedItem.ToString();
 
             // Check if the port can be opened
-            if (!this.PortCheck(comPort))
+            if (!ComPorts.CheckPort(comPort))
             {
                 this.AppendLog(string.Format("Couldn't open port {0}", comPort));
                 MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
