@@ -27,6 +27,7 @@ namespace Flash_Multi
     using System.IO.Ports;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows.Forms;
 
     /// <summary>
@@ -184,16 +185,10 @@ namespace Flash_Multi
                 switch ((int)m.WParam)
                 {
                     case UsbNotification.DbtDeviceremovecomplete:
-                        // Short pause to give a DFU device time to finish showing up
-                        Thread.Sleep(150);
-
                         // Update the COM port list
                         this.BeginInvoke(new InvokeDelegate(this.PopulateComPorts));
                         break;
                     case UsbNotification.DbtDevicearrival:
-                        // Short pause to give a DFU device time to finish showing up
-                        Thread.Sleep(150);
-
                         // Update the COM port list
                         this.BeginInvoke(new InvokeDelegate(this.PopulateComPorts));
                         break;
@@ -232,7 +227,7 @@ namespace Flash_Multi
         /// <summary>
         /// Populates the list of COM ports.
         /// </summary>
-        private void PopulateComPorts()
+        private async void PopulateComPorts()
         {
             // No need to refresh if the control is not enabled
             if (!this.comPortSelector.Enabled)
@@ -240,15 +235,42 @@ namespace Flash_Multi
                 return;
             }
 
+            // Get the current list from the combobox so we can auto-select the new device
+            var oldPortList = this.comPortSelector.Items;
+
             // Cache the selected item so we can try to re-select it later
             object selectedValue = null;
             selectedValue = this.comPortSelector.SelectedValue;
 
             // Enumerate the COM ports and bind the COM port selector
-            List<ComPort> comPorts = ComPort.EnumeratePortList();
+            List<ComPort> comPorts = new List<ComPort>();
+            await Task.Run(() => { comPorts = ComPort.EnumeratePortList(); });
+
             this.comPortSelector.DataSource = comPorts;
             this.comPortSelector.DisplayMember = "Name";
             this.comPortSelector.ValueMember = "Name";
+
+            // If we had an old list, compare it to the new one and pick the first item which is new
+            if (oldPortList.Count > 0)
+            {
+                foreach (ComPort newPort in comPorts)
+                {
+                    bool found = false;
+                    foreach (ComPort oldPort in oldPortList)
+                    {
+                        if (newPort.Name == oldPort.Name)
+                        {
+                            found = true;
+                        }
+                    }
+
+                    if (found == false)
+                    {
+                        Debug.WriteLine($"{newPort.Name} was added.");
+                        this.comPortSelector.SelectedItem = newPort.Name;
+                    }
+                }
+            }
 
             // Re-select the previously selected item
             if (selectedValue != null)

@@ -60,6 +60,9 @@ namespace Flash_Multi
             // Sort the list of ports
             comPorts = comPorts.OrderBy(c => c.Length).ThenBy(c => c).ToList();
 
+            // Short pause to give a DFU device time to finish showing up
+            Thread.Sleep(500);
+
             // Check if we there's a Maple device plugged in
             if (MapleDevice.FindMaple().DeviceFound)
             {
@@ -95,6 +98,9 @@ namespace Flash_Multi
 
             // Sort the list of ports
             comPorts = comPorts.OrderBy(c => c.Name.Length).ThenBy(c => c.Name).ToList();
+
+            // Short pause to give a DFU device time to finish showing up
+            Thread.Sleep(500);
 
             // Check if we there's a Maple device in DFU mode plugged in
             if (MapleDevice.FindMaple().DfuMode)
@@ -151,6 +157,9 @@ namespace Flash_Multi
 
             // Sort the list of ports
             comPorts = comPorts.OrderBy(c => c.Name.Length).ThenBy(c => c.Name).ToList();
+
+            // Short pause to give a DFU device time to finish showing up
+            Thread.Sleep(500);
 
             // Check if we there's a Maple device in DFU mode plugged in
             if (MapleDevice.FindMaple().DfuMode)
