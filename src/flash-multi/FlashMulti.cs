@@ -24,9 +24,6 @@ namespace Flash_Multi
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.IO.Ports;
-    using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Forms;
 
@@ -203,6 +200,16 @@ namespace Flash_Multi
                         break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Handle the application closing.
+        /// Unregisters device change notifications.
+        /// </summary>
+        /// <param name="e">The event.</param>
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            UsbNotification.UnregisterUsbDeviceNotification();
         }
 
         /// <summary>
