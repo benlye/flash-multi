@@ -34,12 +34,6 @@ namespace Flash_Multi
     internal class ComPort
     {
         /// <summary>
-        /// Delay in ms to wait for a Maple device to go from DFU to USB mode.
-        /// Prevents a DFU device appearing momentarily before the Maple USB device.
-        /// </summary>
-        private const int DfuDelay = 0;
-
-        /// <summary>
         /// Gets the name of the port.
         /// </summary>
         public string Name { get; private set; }
@@ -65,9 +59,6 @@ namespace Flash_Multi
 
             // Sort the list of ports
             comPorts = comPorts.OrderBy(c => c.Length).ThenBy(c => c).ToList();
-
-            // Short pause to give a DFU device time to finish showing up
-            Thread.Sleep(DfuDelay);
 
             // Check if we there's a Maple device plugged in
             if (MapleDevice.FindMaple().DeviceFound)
@@ -107,9 +98,6 @@ namespace Flash_Multi
 
             // Sort the list of ports
             comPorts = comPorts.OrderBy(c => c.Name.Length).ThenBy(c => c.Name).ToList();
-
-            // Short pause to give a DFU device time to finish showing up
-            Thread.Sleep(DfuDelay);
 
             // Check if we there's a Maple device in DFU mode plugged in
             if (MapleDevice.FindMaple().DfuMode)
@@ -169,9 +157,6 @@ namespace Flash_Multi
 
             // Sort the list of ports
             comPorts = comPorts.OrderBy(c => c.Name.Length).ThenBy(c => c.Name).ToList();
-
-            // Short pause to give a DFU device time to finish showing up
-            Thread.Sleep(DfuDelay);
 
             // Check if we there's a Maple device in DFU mode plugged in
             if (MapleDevice.FindMaple().DfuMode)
