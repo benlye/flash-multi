@@ -1,4 +1,4 @@
-# Connecting to your Multiprotocol Module
+# Connecting Your Multiprotocol Module
 There are three ways that a Multiprotocol module can be connected to a PC, and knowing which you can or should use can be confusing. The purpose of this page is to help you to identify and use your device's connection(s).
 
 The three connection types are:
