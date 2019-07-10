@@ -250,6 +250,12 @@ namespace Flash_Multi
         /// </summary>
         private void PopulateComPorts()
         {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(this.PopulateComPorts));
+                return;
+            }
+
             // Don't refresh if the control is not enabled
             if (!this.comPortSelector.Enabled)
             {
@@ -261,14 +267,7 @@ namespace Flash_Multi
 
             // Cache the selected item so we can try to re-select it later
             object selectedValue = null;
-            if (this.InvokeRequired)
-            {
-                selectedValue = (string)this.Invoke(new Func<object>(() => this.comPortSelector.SelectedValue));
-            }
-            else
-            {
-                selectedValue = this.comPortSelector.SelectedValue;
-            }
+            selectedValue = this.comPortSelector.SelectedValue;
 
             // Enumerate the COM ports and bind the COM port selector
             List<ComPort> comPorts = new List<ComPort>();
@@ -277,21 +276,9 @@ namespace Flash_Multi
             // Check if we have a Maple device
             MapleDevice mapleCheck = MapleDevice.FindMaple();
 
-            if (this.InvokeRequired)
-            {
-                this.Invoke((MethodInvoker)delegate
-                {
-                    this.comPortSelector.DataSource = comPorts;
-                    this.comPortSelector.DisplayMember = "Name";
-                    this.comPortSelector.ValueMember = "Name";
-                });
-            }
-            else
-            {
-                this.comPortSelector.DataSource = comPorts;
-                this.comPortSelector.DisplayMember = "Name";
-                this.comPortSelector.ValueMember = "Name";
-            }
+            this.comPortSelector.DataSource = comPorts;
+            this.comPortSelector.DisplayMember = "Name";
+            this.comPortSelector.ValueMember = "Name";
 
             // If we had an old list, compare it to the new one and pick the first item which is new
             if (oldPortList.Count > 0)
@@ -318,25 +305,11 @@ namespace Flash_Multi
             // Re-select the previously selected item
             if (selectedValue != null)
             {
-                if (this.InvokeRequired)
-                {
-                    this.Invoke((MethodInvoker)delegate { this.comPortSelector.SelectedValue = selectedValue; });
-                }
-                else
-                {
-                    this.comPortSelector.SelectedValue = selectedValue;
-                }
+                this.comPortSelector.SelectedValue = selectedValue;
             }
             else
             {
-                if (this.InvokeRequired)
-                {
-                    this.Invoke((MethodInvoker)delegate { this.comPortSelector.SelectedItem = null; });
-                }
-                else
-                {
-                    this.comPortSelector.SelectedItem = null;
-                }
+                this.comPortSelector.SelectedItem = null;
             }
 
             // Check if we there's a Maple device plugged in
@@ -344,51 +317,21 @@ namespace Flash_Multi
             {
                 // Set the Write Bootloader radio button and disable the controls if a Maple device is present
                 // Required so that the firmware size is calculated correctly
-                if (this.InvokeRequired)
-                {
-                    this.Invoke((MethodInvoker)delegate
-                    {
-                        this.writeBootloader_Yes.Checked = true;
-                        this.writeBootloader_Yes.Enabled = false;
-                        this.writeBootloader_No.Enabled = false;
-                    });
-                }
-                else
-                {
-                    this.writeBootloader_Yes.Checked = true;
-                    this.writeBootloader_Yes.Enabled = false;
-                    this.writeBootloader_No.Enabled = false;
-                }
+                this.writeBootloader_Yes.Checked = true;
+                this.writeBootloader_Yes.Enabled = false;
+                this.writeBootloader_No.Enabled = false;
             }
             else
             {
-                if (this.InvokeRequired)
-                {
-                    this.Invoke((MethodInvoker)delegate
-                    {
-                        this.writeBootloader_Yes.Enabled = true;
-                        this.writeBootloader_No.Enabled = true;
-                    });
-                }
-                else
-                {
-                    this.writeBootloader_Yes.Enabled = true;
-                    this.writeBootloader_No.Enabled = true;
-                }
+                this.writeBootloader_Yes.Enabled = true;
+                this.writeBootloader_No.Enabled = true;
             }
 
             // Set the width of the dropdown
             // this.comPortSelector.DropDownWidth = comPorts.Select(c => c.DisplayName).ToList().Max(x => TextRenderer.MeasureText(x, this.comPortSelector.Font).Width);
 
             // Make sure the Update button is disabled if there is no port selected
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action(this.CheckControls));
-            }
-            else
-            {
-                this.CheckControls();
-            }
+            this.CheckControls();
         }
 
         /// <summary>
