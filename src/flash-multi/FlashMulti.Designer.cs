@@ -1,4 +1,24 @@
-﻿namespace flash_multi
+﻿// -------------------------------------------------------------------------------
+// <copyright file="FlashMulti.Designer.cs" company="Ben Lye">
+// Copyright 2019 Ben Lye
+//
+// This file is part of Flash Multi.
+//
+// Flash Multi is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or(at your option) any later
+// version.
+//
+// Flash Multi is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// Flash Multi. If not, see http://www.gnu.org/licenses/.
+// </copyright>
+// -------------------------------------------------------------------------------
+
+namespace Flash_Multi
 {
     partial class FlashMulti
     {
@@ -52,7 +72,7 @@
             // 
             // buttonUpload
             // 
-            this.buttonUpload.Location = new System.Drawing.Point(373, 71);
+            this.buttonUpload.Location = new System.Drawing.Point(373, 76);
             this.buttonUpload.Name = "buttonUpload";
             this.buttonUpload.Size = new System.Drawing.Size(75, 23);
             this.buttonUpload.TabIndex = 6;
@@ -64,10 +84,11 @@
             // comPortSelector
             // 
             this.comPortSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comPortSelector.DropDownWidth = 90;
             this.comPortSelector.FormattingEnabled = true;
             this.comPortSelector.Location = new System.Drawing.Point(101, 48);
             this.comPortSelector.Name = "comPortSelector";
-            this.comPortSelector.Size = new System.Drawing.Size(98, 21);
+            this.comPortSelector.Size = new System.Drawing.Size(90, 21);
             this.comPortSelector.TabIndex = 2;
             this.comPortSelector.SelectedIndexChanged += new System.EventHandler(this.ComPortSelector_SelectionChanged);
             // 
@@ -99,7 +120,7 @@
             // 
             // buttonBrowse
             // 
-            this.buttonBrowse.Location = new System.Drawing.Point(373, 19);
+            this.buttonBrowse.Location = new System.Drawing.Point(373, 18);
             this.buttonBrowse.Name = "buttonBrowse";
             this.buttonBrowse.Size = new System.Drawing.Size(75, 23);
             this.buttonBrowse.TabIndex = 1;
@@ -161,7 +182,7 @@
             // 
             // buttonRefresh
             // 
-            this.buttonRefresh.Location = new System.Drawing.Point(205, 47);
+            this.buttonRefresh.Location = new System.Drawing.Point(197, 47);
             this.buttonRefresh.Name = "buttonRefresh";
             this.buttonRefresh.Size = new System.Drawing.Size(75, 23);
             this.buttonRefresh.TabIndex = 3;
@@ -288,12 +309,12 @@
         private System.Windows.Forms.CheckBox showVerboseOutput;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.TextBox textActivity;
-        private System.Windows.Forms.Button buttonRefresh;
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.LinkLabel linkLabel2;
-        private System.Windows.Forms.RadioButton writeBootloader_No;
-        private System.Windows.Forms.RadioButton writeBootloader_Yes;
+        internal System.Windows.Forms.RadioButton writeBootloader_No;
+        internal System.Windows.Forms.RadioButton writeBootloader_Yes;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button buttonRefresh;
     }
 }
 

@@ -12,6 +12,7 @@ OutputDir=flash-multi\bin
 OutputBaseFilename=flash-multi-{#MyAppVersion}
 InfoAfterFile=.\installer_infoafter.txt
 DisableWelcomePage=no
+LicenseFile=flash-multi\license.txt
 
 [Files]
 Source: "flash-multi\bin\Release\*"; Excludes: "*.pdb"; Flags: replacesameversion promptifolder recursesubdirs; DestDir: {app}; Components: main
@@ -24,7 +25,7 @@ Name: "{group}\Flash Multi"; Filename: "{app}\flash-multi.exe"; IconFilename: "{
 
 [Components]
 Name: "main"; Description: "Flash Multi Application"; Types: full compact custom; Flags: fixed
-Name: "drivers"; Description: "Maple USB Drivers"; Types: full
+Name: "drivers"; Description: "Run Maple USB Driver Installer"; Types: full
 
 [Run]
 ; Install the drivers - https://github.com/pbatard/libwdi/blob/master/examples/wdi-simple.iss
