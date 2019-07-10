@@ -203,12 +203,16 @@ namespace Flash_Multi
         }
 
         /// <summary>
-        /// Handle the application closing.
+        /// Override method to handle the application closing.
         /// Unregisters device change notifications.
         /// </summary>
         /// <param name="e">The event.</param>
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
+            // Call the base method
+            base.OnFormClosing(e);
+
+            // Unregister for USB notifications
             UsbNotification.UnregisterUsbDeviceNotification();
         }
 
