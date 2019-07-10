@@ -27,7 +27,7 @@ Tool for flashing pre-compiled firmware to an STM32-based Multiprotocol TX modul
 1. Launch the application by running `flash-multi.exe`
 
 ## Additional Drivers
-**Depending on your Multiprotocol module you may need to install additional drivers manually.**
+**Depending on your Multiprotocol module and version of Windows you may need to install additional drivers manually.**
 
 The driver for the Jumper JP4IN1 module, the Silicon Labs CP210x driver, is **not** included with Flash Multi and can be downloaded from here:
 https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers
@@ -37,20 +37,22 @@ Other drivers may be needed if you are using an external FTDI adapter. Consult t
 *Windows 10 includes drivers for many common serial devices, including many FTDI adapters, so check Device Manager to see if your device is recognised.*
 
 # Use
-**Note for iRangeX, Banggood, and DIY modules:** The first time you flash your module you will need to connect it with an external FTDI adapter in order to flash the bootloader. The bootloader is required in order for the USB port work and it can only be written with an FTDI adapter.
+**Note:** The first time you flash your module you may need to connect it with an external FTDI adapter in order to flash the bootloader. The bootloader is required in order for the native USB port work, and it can only be written with an FTDI adapter.  This does not apply to newer Jumper 4IN1 modules, which have an _internal_ FTDI adapter.
 
-**Note for external FTDI connections:** When using an external FTDI adapter the `BOOT0` pin on the board must be connected to 5V, usually by installing a jumper on the `BOOT0` header pins.
+**Note for external FTDI connections:** When using an external FTDI adapter, the `BOOT0` pin on the board must be connected to 5V, usually by installing a jumper on the `BOOT0` header pins.
 
-1. If the module is installed in the radio, ensure the radio is powered **off**
-1. Connect your module to the computer using the USB port or via an external FTDI adapter, as appropriate.  Note the COM port which appears when the device is connected.
-1. Launch Flash Multi
-1. Click the **Browse** button and locate a compiled firmware file
-1. Select the appropriate COM port
+1. If the module is installed in the radio and you are connecting to the module's USB port, ensure the radio is powered **off**
+1. Launch **Flash Multi**
+1. Connect your module to the computer using the module's USB port or via an external FTDI adapter, as appropriate
+   > _Tip: Flash Multi will automatically select the new COM port, if it's running when the module is plugged in._
+1. Click the **Browse** button and select a compiled firmware file
+1. If it wasn't automatically selected, select the appropriate COM port
 1. Select whether or not to write the bootloader - see [Writing the Bootloader](#writing-the-bootloader) below
+   > _Tip: If you are flashing a file which was downloaded from the Multiprotocol firmware Releases page, the **Write Bootloader** option will be set automatically, based on the file name._
 1. Click the **Upload** button
 
 ## Writing the Bootloader
-When flashing via serial using either an exterral or internal FTDI adapter you must choose whether or not to write the bootloader.
+When flashing via serial using either an external or internal FTDI adapter, you must choose whether or not to write the bootloader.
 
 The bootloader does two things:
 1. Enables the native USB port on devices which have it
