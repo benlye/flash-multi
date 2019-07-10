@@ -3,10 +3,10 @@ There are three ways that a Multiprotocol module can be connected to a PC, and k
 
 The three connection types are:
 * Native USB port
-* Internal USB-to-Serial Adapter
 * External USB-to-Serial Adapter
+* Internal USB-to-Serial Adapter
 
-The choices available to you will depend on the specific module you have. 
+The connections available to you will depend on the specific module you have. 
 
 **Note:** 'FTDI' is commonly used as a synonym for USB-to-Serial, but is in fact one specific chip used in USB-to-Serial adapters.  For the purpose of the Flash Multi documentation 'FTDI Adapter' means 'USB-to Serial Adapter' anywhere it may be used.
 
@@ -14,6 +14,8 @@ The choices available to you will depend on the specific module you have.
 The 'native' USB port (also known as the Maple port) is a USB port which interfaces directly with the STM32 micro-controller in the Multiprotocol module.  
 
 Using it requires that the USB bootloader has been flashed to the module, and the module is running Multiprotocol firmware has was built with USB support.
+
+_**Tip:** Using the native USB port is the fastest way to flash your Multiprotocol module._
 
 ### Drivers
 The native USB port requires two drivers, Maple Serial and Maple DFU, which are included with Flash Multi.
