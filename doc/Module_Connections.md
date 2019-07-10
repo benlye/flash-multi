@@ -1,5 +1,5 @@
 # Connecting Your Multiprotocol Module
-There are three ways that a Multiprotocol module can be connected to a PC, and knowing which you can or should use can be confusing. The purpose of this page is to help you to identify and use your device's connection(s).
+There are three ways that a Multiprotocol module can be connected to a PC and knowing which you can (or should) use can be confusing.  The purpose of this page is to help you to identify and use your device's connection(s).
 
 The three connection types are:
 * Native USB port
@@ -13,12 +13,12 @@ The connections available to you will depend on the specific module you have.
 ## Native USB Port
 The 'native' USB port (also known as the Maple port) is a USB port which interfaces directly with the STM32 micro-controller in the Multiprotocol module.  
 
-Using it requires that the USB bootloader has been flashed to the module, and the module is running Multiprotocol firmware has was built with USB support.
+Using the native port requires that, at a minimum, the USB bootloader has been flashed to the module.
 
 _**Tip:** Using the native USB port is the fastest way to flash your Multiprotocol module._
 
 ### Drivers
-The native USB port requires two drivers, Maple Serial and Maple DFU, which are included with Flash Multi.
+The native USB port requires two drivers, Maple Serial and Maple DFU, both of which are included with Flash Multi.
 
 ### Modes
 The native USB port has two modes, USB and DFU.  DFU, or Device Firmware Update, mode is used when flashing the module. In USB mode the module appears as a serial (COM) port.
