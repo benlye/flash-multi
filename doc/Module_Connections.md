@@ -25,7 +25,9 @@ The native USB port requires two drivers, Maple Serial and Maple DFU, both of wh
 ### Modes
 The native USB port has two modes, USB and DFU.  DFU, or Device Firmware Update, mode is used when flashing the module. In USB mode the module appears as a serial (COM) port.
 
-Assuming the PC has the drivers installed, and the module has the correct (USB-enabled) firmware installed, when the module is plugged in it will briefly appear as a Maple DFU device and then reappear as a Maple Serial device (COM port).  
+Assuming the PC has the drivers installed, and the module has the correct (USB-enabled) firmware installed, when the module is plugged in it will briefly appear as a Maple DFU device and then reappear as a Maple Serial device (COM port).
+
+Flash Multi will automatically switch the module into DFU mode during the firmware flash process.
 
 ### How it Appears
 The native USB device has a device ID of `VID_1EAF&PID_0003` in DFU mode or `VID_1EAF&PID_0004` in USB mode.  It can appear differently in Device Manager, depending on what firmware, bootloader, and drivers are installed.
