@@ -34,7 +34,7 @@ Supported modules include:
 
 # Flash Multi Requirements
 Flash Multi requires .Net Framework 4.5 or newer.  You probably already have a compatible version installed, but if not, the latest version can be downloaded from (Microsoft)[https://dotnet.microsoft.com/download/dotnet-framework].  
-> _Tip: When you lauch Flash Multi it will tell you if you need to upgrade._
+> _Tip: When you launch Flash Multi it will tell you if you need to upgrade._
 
 # Installing Flash Multi
 ## Using the Installer
