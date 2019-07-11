@@ -23,7 +23,7 @@ Tool for flashing pre-compiled firmware to an STM32-based Multiprotocol TX modul
 1. [Warranty](#warranty)
 
 # Supported Modules
-All Multiprotocol modules based on the STM32 microcontroller are supported.  Modules based on the ATmega328 microcontoller are not supported.
+All Multiprotocol modules based on the STM32 microcontroller are supported.  Modules based on the ATmega328 microcontoller are _not_ supported.
 
 Supported modules include:
 * Jumper JP4IN1
