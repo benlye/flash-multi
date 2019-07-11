@@ -16,6 +16,7 @@ Most likely you have flashed a non-USB enabled firmware over the USB port, makin
 
 Luckily, the USB bootloader always starts the module up briefly in DFU mode, and we can take advantage of that to re-flash it.
 
+### Recovery
 1. Download or compile the correct, **USB-enabled**, firmware
 1. Open a **Command Prompt** and change to the 'tools' sub-folder in the Flash Multi folder
    
