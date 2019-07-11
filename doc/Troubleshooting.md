@@ -20,26 +20,26 @@ Luckily, the USB bootloader always starts the module up briefly in DFU mode, and
 1. Open a **Command Prompt** and change to the 'tools' sub-folder in the Flash Multi folder
    
    E.g.:
-   `cd "C:\Program Files (x86)\FlashMulti"`
+   `cd "C:\Program Files (x86)\FlashMulti\tools"`
 
-1. Prepare the flash command, but don't run it yet:
+1. Prepare the `dfu-util.exe` flash command, but don't run it yet:
 
    `dfu-util.exe -R -a 2 -d 1EAF:0003 -D "[firmware_file]"`
    
    E.g.: `dfu-util.exe -R -a 2 -d 1EAF:0003 -D "C:\Temp\Multi-STM_TXFLASH_INV_OPENTX-v1.2.1.67.bin"`
 
 1. Unplug the module
-1. Plug the module in and watch the green LED - it blinks very rapidly, then blinks a slightly slower, then goes out
+1. Plug the module in and watch the green LED - it blinks very rapidly, then blinks slightly slower, then goes out
 1. Unplug the module again
 1. Plug the module in and as soon as the green LED is in the second phase, hit **[Enter]** in the Command Prompt to run the flash command
 
-You have about 0.5s to do it to run the `dfu-util` flash command while the green LED is in the second phase.
+You have about 0.5s to run the `dfu-util.exe` flash command while the green LED is in the second phase.
 
 You may need to try it a few times, but if you can hit enter in the command prompt as soon as the green LED changes to the second phase you will be able to re-flash the module and it will be back to normal.  Once you've got the hang of the timing you'll be able to do it easily.
 
 <p align=center><img src="../img/dfu-recovery.png"></p>
 
-**Note:** `dfu-util` always gives this error at the end:
+**Note:** `dfu-util.exe` always gives this error at the end:
 
 `error resetting after download: usb_reset: could not reset device, win error: The system cannot find the file specified.`
 
