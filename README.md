@@ -38,7 +38,7 @@ Flash Multi requires .Net Framework 4.5 or newer.  You probably already have a c
 
 # Installing Flash Multi
 
-**Note:** If your Multiprotocol module is plugged in when you run the application or driver installer, you may receive an error stating that the drivers could not be installed.  To remedy this, unplug the module, run the driver installation again, then reconnect the module.
+**Note:** Make sure your Multiprotocol module is not plugged in when you run the Flash Multi installer, or when you run the manual Maple USB driver installer.  This is to avoid potential problems with the driver installation.
 
 ## Using the Installer
 1. Download the latest installer (`flash-multi-[version].exe`) from the [Releases](https://github.com/benlye/flash-multi/releases) page
@@ -128,7 +128,7 @@ Pre-compiled Multiprotocol firmware can be downloaded from the Multiprotocol TX 
 The Multiprotocol firmware can also be [compiled from source](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/blob/master/docs/Compiling_STM32.md) relatively easily.
 
 # Troubleshooting
-See the dedicated [Troubleshooting](doc/Troubleshooting.md) page.
+See the dedicated [Troubleshooting page](doc/Troubleshooting.md).
 
 # More Information
 Much more information about flashing a Multiprotocol module, including how to connect a USB-to-serial adapter and connect the `BOOT0` pin, can be found in the documentation for the DIY Multiprotocol Module at https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/blob/master/README.md.
