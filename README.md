@@ -128,7 +128,7 @@ Pre-compiled Multiprotocol firmware can be downloaded from the Multiprotocol TX 
 The Multiprotocol firmware can also be [compiled from source](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/blob/master/docs/Compiling_STM32.md) relatively easily.
 
 # Troubleshooting
-TBD
+See the dedicated [Troubleshooting](doc/Troubleshooting.md) page.
 
 # More Information
 Much more information about flashing a Multiprotocol module, including how to connect a USB-to-serial adapter and connect the `BOOT0` pin, can be found in the documentation for the DIY Multiprotocol Module at https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/blob/master/README.md.
