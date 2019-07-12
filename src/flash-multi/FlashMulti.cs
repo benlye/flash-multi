@@ -51,7 +51,7 @@ namespace Flash_Multi
             // Disable the Upload button until we're ready
             this.buttonUpload.Enabled = false;
 
-            // Register a hendler to check for a new version when the form is shown the first time
+            // Register a handler to check for a new version when the form is shown the first time
             this.Shown += this.FlashMulti_Shown;
 
             // Resgister a handler to be notified when USB devices are added or removed

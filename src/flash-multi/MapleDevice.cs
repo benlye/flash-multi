@@ -21,6 +21,7 @@
 namespace Flash_Multi
 {
     using System;
+    using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Forms;
@@ -120,7 +121,16 @@ namespace Flash_Multi
                 elapsedMs = (DateTime.Now - start).TotalMilliseconds;
             }
 
-            return true;
+            Debug.WriteLine($"Elapsed time: {elapsedMs}");
+
+            if (elapsedMs < timeout)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -159,7 +169,7 @@ namespace Flash_Multi
                 flashMulti.AppendLog("Waiting for DFU device ...");
                 bool dfuCheck = false;
 
-                await Task.Run(() => { dfuCheck = WaitForDFU(1000); });
+                await Task.Run(() => { dfuCheck = WaitForDFU(2000); });
 
                 if (dfuCheck)
                 {
@@ -187,55 +197,30 @@ namespace Flash_Multi
 
                 flashMulti.AppendLog("Attempting bootloader recovery flash.\r\n");
 
-                // Prompt the user to unplug the device
-                // Do something here ...
+                // Show the recovery mode dialog
+                DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
+                var recoveryResult = recoveryDialog.ShowDialog();
 
-                flashMulti.AppendLog("Waiting up to 30s for DFU device to disappear ...");
-
-                // Wait for the DFU device to disappear
-                bool dfuCheck = false;
-                await Task.Run(() => { dfuCheck = WaitForDFU(30000, true); });
-
-                if (dfuCheck)
+                // If we made it into recovyer mode, flash the module
+                if (recoveryResult == DialogResult.OK)
                 {
-                    flashMulti.AppendLog(" gone.\r\n");
+                    // Run the recovery flash command
+                    flashMulti.AppendLog("Writing firmware to Multimodule ...");
+                    await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+                    if (returnCode != 0)
+                    {
+                        flashMulti.EnableControls(true);
+                        flashMulti.AppendLog(" failed!");
+                        MessageBox.Show("Failed to write the firmware.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
                 }
                 else
                 {
-                    flashMulti.AppendLog(" timed out!");
-                    MessageBox.Show("DFU device was not removed in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    flashMulti.EnableControls(true);
-                    return;
-                }
-
-                // Prompt the user to re-plug the device
-                // Do something here ...
-
-                flashMulti.AppendLog("Waiting up to 30s for DFU device to appear ...");
-
-                // Wait for the DFU device to disappear
-                await Task.Run(() => { dfuCheck = WaitForDFU(30000); });
-
-                if (dfuCheck)
-                {
-                    flashMulti.AppendLog(" got it.\r\n");
-                }
-                else
-                {
-                    flashMulti.AppendLog(" timed out!");
+                    flashMulti.AppendLog("DFU Recovery Mode failed.");
+                    recoveryDialog.Hide();
                     MessageBox.Show("DFU device did not appear in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     flashMulti.EnableControls(true);
-                    return;
-                }
-
-                // Run the recovery flash command
-                flashMulti.AppendLog("Writing firmware to Multimodule ...");
-                await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
-                if (returnCode != 0)
-                {
-                    flashMulti.EnableControls(true);
-                    flashMulti.AppendLog(" failed!");
-                    MessageBox.Show("Failed to write the firmware.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
             }
