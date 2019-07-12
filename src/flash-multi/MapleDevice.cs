@@ -195,7 +195,7 @@ namespace Flash_Multi
                 // First attempt failed so we need to try bootloader recovery
                 flashMulti.AppendLog(" failed!\r\n");
 
-                flashMulti.AppendLog("Attempting bootloader recovery flash.\r\n");
+                flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
 
                 // Show the recovery mode dialog
                 DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
@@ -210,7 +210,7 @@ namespace Flash_Multi
                     if (returnCode != 0)
                     {
                         flashMulti.EnableControls(true);
-                        flashMulti.AppendLog(" failed!");
+                        flashMulti.AppendLog(" failed!\r\n");
                         MessageBox.Show("Failed to write the firmware.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
@@ -218,8 +218,6 @@ namespace Flash_Multi
                 else
                 {
                     flashMulti.AppendLog("DFU Recovery Mode failed.");
-                    recoveryDialog.Hide();
-                    MessageBox.Show("DFU device did not appear in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     flashMulti.EnableControls(true);
                     return;
                 }

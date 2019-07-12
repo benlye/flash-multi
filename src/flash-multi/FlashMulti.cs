@@ -434,12 +434,15 @@ namespace Flash_Multi
                 }
             }
 
+            // Check if there is a Maple device
+            bool mapleCheck = MapleDevice.FindMaple().DeviceFound;
+
             // Check the file name and pre-set the Write Bootloader option
-            if (this.textFileName.Text.IndexOf("_FTDI_") > -1)
+            if (this.textFileName.Text.IndexOf("_FTDI_") > -1 && !mapleCheck)
             {
                 this.writeBootloader_No.Checked = true;
             }
-            else if (this.textFileName.Text.IndexOf("_TXFLASH_") > -1)
+            else if (this.textFileName.Text.IndexOf("_TXFLASH_") > -1 && !mapleCheck)
             {
                 this.writeBootloader_Yes.Checked = true;
             }

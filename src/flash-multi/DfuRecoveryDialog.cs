@@ -43,11 +43,6 @@ namespace Flash_Multi
             this.Shown += this.DfuRecoveryDialog_Shown;
         }
 
-        /// <summary>
-        /// Gets a value indicating whether or not the DFU device appeared.
-        /// </summary>
-        public bool RecoveryMode { get; private set; }
-
         private async void DfuRecoveryDialog_Shown(object sender, EventArgs e)
         {
             this.flashMulti.AppendLog("Waiting up to 30s for DFU device to disappear ...");
@@ -62,11 +57,11 @@ namespace Flash_Multi
             }
             else
             {
-                this.flashMulti.AppendLog(" timed out!");
-                MessageBox.Show("DFU device was not removed in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                this.RecoveryMode = false;
+                this.flashMulti.AppendLog(" timed out!\r\n");
+                MessageBox.Show("DFU device was not unplugged in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.DialogResult = DialogResult.Cancel;
                 this.Close();
+                return;
             }
 
             this.flashMulti.AppendLog("Waiting up to 30s for DFU device to appear ...");
@@ -74,29 +69,32 @@ namespace Flash_Multi
             // Reset the progress bar
             this.progressBar1.Value = 0;
 
-            // Wait for the DFU device to disappear
+            // Wait for the DFU device to appear
             await Task.Run(() => { dfuCheck = MapleDevice.WaitForDFU(30000); });
 
             if (dfuCheck)
             {
                 this.flashMulti.AppendLog(" got it.\r\n");
-                this.RecoveryMode = true;
                 this.DialogResult = DialogResult.OK;
                 this.Close();
+                return;
             }
             else
             {
-                this.flashMulti.AppendLog(" timed out!");
-                MessageBox.Show("DFU device did not appear in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                this.RecoveryMode = true;
+                this.flashMulti.AppendLog(" timed out!\r\n");
+                MessageBox.Show("DFU device was not plugged in in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.DialogResult = DialogResult.Cancel;
                 this.Close();
+                return;
             }
         }
 
         private void ButtonCancel_Click(object sender, System.EventArgs e)
         {
-            // Do cancellation stuff here!
+            this.flashMulti.AppendLog("\r\nDFU Recovery cancelled.\r\n");
+            this.DialogResult = DialogResult.Cancel;
+            this.Close();
+            return;
         }
 
         private void DfuRecoveryDialog_Load(object sender, EventArgs e)
