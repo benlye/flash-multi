@@ -33,7 +33,7 @@
             this.buttonCancel = new System.Windows.Forms.Button();
             this.warningIcon = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.timerProgressBar = new System.Windows.Forms.ProgressBar();
             ((System.ComponentModel.ISupportInitialize)(this.warningIcon)).BeginInit();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -50,10 +50,12 @@
             // 
             // buttonCancel
             // 
-            this.buttonCancel.Location = new System.Drawing.Point(315, 150);
+            this.buttonCancel.Enabled = false;
+            this.buttonCancel.Location = new System.Drawing.Point(315, 155);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(67, 24);
             this.buttonCancel.TabIndex = 1;
+            this.buttonCancel.TabStop = false;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
@@ -70,28 +72,29 @@
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.panel2.Controls.Add(this.progressBar1);
+            this.panel2.Controls.Add(this.timerProgressBar);
             this.panel2.Controls.Add(this.dialogText);
             this.panel2.Controls.Add(this.warningIcon);
             this.panel2.Location = new System.Drawing.Point(-2, -1);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(405, 145);
+            this.panel2.Size = new System.Drawing.Size(405, 156);
             this.panel2.TabIndex = 4;
             // 
-            // progressBar1
+            // timerProgressBar
             // 
-            this.progressBar1.Location = new System.Drawing.Point(58, 100);
-            this.progressBar1.Maximum = 30;
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(297, 23);
-            this.progressBar1.Step = 1;
-            this.progressBar1.TabIndex = 3;
+            this.timerProgressBar.Location = new System.Drawing.Point(58, 100);
+            this.timerProgressBar.Maximum = 30;
+            this.timerProgressBar.Name = "timerProgressBar";
+            this.timerProgressBar.Size = new System.Drawing.Size(297, 23);
+            this.timerProgressBar.Step = 1;
+            this.timerProgressBar.TabIndex = 3;
+            this.timerProgressBar.Value = 30;
             // 
             // DfuRecoveryDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(404, 145);
+            this.ClientSize = new System.Drawing.Size(404, 152);
             this.ControlBox = false;
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.panel2);
@@ -113,6 +116,6 @@
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.PictureBox warningIcon;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.ProgressBar timerProgressBar;
     }
 }

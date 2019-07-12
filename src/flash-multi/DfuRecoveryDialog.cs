@@ -29,12 +29,13 @@ namespace Flash_Multi
     /// </summary>
     public partial class DfuRecoveryDialog : Form
     {
-        private Timer timer1 = new Timer();
+        private Timer progressTimer = new Timer();
         private FlashMulti flashMulti;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DfuRecoveryDialog"/> class.
         /// </summary>
+        /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> form.</param>
         public DfuRecoveryDialog(FlashMulti flashMulti)
         {
             this.InitializeComponent();
@@ -43,20 +44,27 @@ namespace Flash_Multi
             this.Shown += this.DfuRecoveryDialog_Shown;
         }
 
+        /// <summary>
+        /// Prompts the user to unplug / replug the module to get it into recovery mode.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Event arguments.</param>
         private async void DfuRecoveryDialog_Shown(object sender, EventArgs e)
         {
             this.flashMulti.AppendLog("Waiting up to 30s for DFU device to disappear ...");
 
-            // Wait for the DFU device to disappear
+            // Wait 30s for the DFU device to disappear
             bool dfuCheck = false;
             await Task.Run(() => { dfuCheck = MapleDevice.WaitForDFU(30000, true); });
 
             if (dfuCheck)
             {
+                // The module was unplugged
                 this.flashMulti.AppendLog(" gone.\r\n");
             }
             else
             {
+                // The module wasn't unplugged when the timer expired.
                 this.flashMulti.AppendLog(" timed out!\r\n");
                 MessageBox.Show("DFU device was not unplugged in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.DialogResult = DialogResult.Cancel;
@@ -67,13 +75,14 @@ namespace Flash_Multi
             this.flashMulti.AppendLog("Waiting up to 30s for DFU device to appear ...");
 
             // Reset the progress bar
-            this.progressBar1.Value = 0;
+            this.timerProgressBar.Value = 0;
 
             // Wait for the DFU device to appear
             await Task.Run(() => { dfuCheck = MapleDevice.WaitForDFU(30000); });
 
             if (dfuCheck)
             {
+                // The module was plugged in
                 this.flashMulti.AppendLog(" got it.\r\n");
                 this.DialogResult = DialogResult.OK;
                 this.Close();
@@ -81,6 +90,7 @@ namespace Flash_Multi
             }
             else
             {
+                // The module wasn't plugged in when the timer expired
                 this.flashMulti.AppendLog(" timed out!\r\n");
                 MessageBox.Show("DFU device was not plugged in in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.DialogResult = DialogResult.Cancel;
@@ -89,6 +99,11 @@ namespace Flash_Multi
             }
         }
 
+        /// <summary>
+        /// Handle the Cancel button being clicked.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Event argument.</param>
         private void ButtonCancel_Click(object sender, System.EventArgs e)
         {
             this.flashMulti.AppendLog("\r\nDFU Recovery cancelled.\r\n");
@@ -97,24 +112,58 @@ namespace Flash_Multi
             return;
         }
 
+        /// <summary>
+        /// Configure the timer when the form is loaded.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Event arguments.</param>
         private void DfuRecoveryDialog_Load(object sender, EventArgs e)
         {
-            this.timer1.Enabled = true;
-            this.timer1.Start();
-            this.timer1.Interval = 1000;
-            this.progressBar1.Maximum = 30;
-            this.timer1.Tick += new EventHandler(this.Timer1_Tick);
+            // Configures the timer used to count the progress bar down
+            this.progressTimer.Enabled = true;
+            this.progressTimer.Interval = 1000;
+
+            // Configure the progress bar
+            this.timerProgressBar.Minimum = 0;
+            this.timerProgressBar.Maximum = 30;
+            this.timerProgressBar.Value = 0;
+            this.progressTimer.Tick += new EventHandler(this.ProgressBarTimer_TickUp);
+
+            // Start the timer to count the bar down
+            this.progressTimer.Start();
         }
 
-        private void Timer1_Tick(object sender, EventArgs e)
+        /// <summary>
+        /// Increment the progress bar when the timer ticks.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Event arguments.</param>
+        private void ProgressBarTimer_TickUp(object sender, EventArgs e)
         {
-            if (this.progressBar1.Value != this.progressBar1.Maximum)
+            if (this.timerProgressBar.Value != this.timerProgressBar.Maximum)
             {
-                this.progressBar1.Value++;
+                this.timerProgressBar.Value++;
             }
             else
             {
-                this.timer1.Stop();
+                this.progressTimer.Stop();
+            }
+        }
+
+        /// <summary>
+        /// Increment the progress bar when the timer ticks.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Event arguments.</param>
+        private void ProgressBarTimer_TickDown(object sender, EventArgs e)
+        {
+            if (this.timerProgressBar.Value != this.timerProgressBar.Minimum)
+            {
+                this.timerProgressBar.Value--;
+            }
+            else
+            {
+                this.progressTimer.Stop();
             }
         }
     }
