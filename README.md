@@ -34,7 +34,7 @@ Supported modules include:
 
 # Flash Multi Requirements
 Flash Multi requires .Net Framework 4.5 or newer.  You probably already have a compatible version installed, but if not, the latest version can be downloaded from (Microsoft)[https://dotnet.microsoft.com/download/dotnet-framework].  
-> _Tip: When you launch Flash Multi it will tell you if you need to upgrade._
+> _Tip: When you launch Flash Multi it will tell you if you need to install or upgrade your .Net Framework._
 
 # Installing Flash Multi
 
@@ -62,9 +62,9 @@ Other drivers may be needed if you are using an external USB-to-serial adapter. 
 *Windows 10 includes drivers for many common serial devices, including many USB-to-serial adapters, so check Device Manager to see if your device is recognised.*
 
 # Using Flash Multi
-**Note:** The first time you flash your module you may need to connect it with an external USB-to-serial adapter in order to flash the bootloader. The bootloader is required in order for the native USB port work, and it can only be written with an USB-to-serial adapter.  This does not apply to newer Jumper 4IN1 modules, which have an _internal_ USB-to-serial adapter.
+**Note:** The first time you flash your module you may need to connect it with an external USB-to-serial adapter in order to flash the bootloader. The bootloader is required in order for the native USB port work, and it can only be written with a USB-to-serial adapter.  This does not apply to newer Jumper 4IN1 modules, which have an _internal_ USB-to-serial adapter.
 
-**Note for external USB-to-serial connections:** When using an external USB-to-serial adapter, the `BOOT0` pin on the board must be connected to 5V, usually by installing a jumper on the `BOOT0` header pins.
+**Note for external USB-to-serial connections:** When using an external USB-to-serial adapter, the `BOOT0` pin on the board must be connected to 3.3V, usually by installing a jumper on the `BOOT0` header pins.
 
 1. If the module is installed in the radio and you are connecting to the module's USB port, ensure the radio is powered **off**
 1. Launch **Flash Multi**
