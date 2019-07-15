@@ -21,6 +21,7 @@
 namespace Flash_Multi
 {
     using System;
+    using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Forms;
@@ -101,25 +102,35 @@ namespace Flash_Multi
         }
 
         /// <summary>
-        /// Waits for a Maple DFU device to be present.
+        /// Waits for a Maple DFU device to be added or removed.
         /// </summary>
         /// <param name="timeout">Timeout in milliseconds.</param>
-        /// <returns>Boolean indicating whether or not a DFU device appeared within the timeout.</returns>
-        public static bool WaitForDFU(int timeout = 500)
+        /// <param name="removed">Set to true to wait for DFU device to be removed.</param>
+        /// <returns>Boolean indicating whether or not a DFU device appeared or disappeared within the timeout.</returns>
+        public static bool WaitForDFU(int timeout = 500, bool removed = false)
         {
             DateTime start = DateTime.Now;
             bool dfuCheck = MapleDevice.FindMaple().DfuMode;
 
             double elapsedMs = (DateTime.Now - start).TotalMilliseconds;
 
-            while (dfuCheck == false && elapsedMs < timeout)
+            while (dfuCheck == removed && elapsedMs < timeout)
             {
                 Thread.Sleep(50);
                 dfuCheck = MapleDevice.FindMaple().DfuMode;
                 elapsedMs = (DateTime.Now - start).TotalMilliseconds;
             }
 
-            return true;
+            Debug.WriteLine($"Elapsed time: {elapsedMs}");
+
+            if (elapsedMs < timeout)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -158,7 +169,7 @@ namespace Flash_Multi
                 flashMulti.AppendLog("Waiting for DFU device ...");
                 bool dfuCheck = false;
 
-                await Task.Run(() => { dfuCheck = WaitForDFU(1000); });
+                await Task.Run(() => { dfuCheck = WaitForDFU(2000); });
 
                 if (dfuCheck)
                 {
@@ -173,17 +184,43 @@ namespace Flash_Multi
                 }
             }
 
-            // Flash firmware
+            // First attempt to flash the firmware
             flashMulti.AppendLog("Writing firmware to Multimodule ...");
             command = ".\\tools\\dfu-util.exe";
             commandArgs = string.Format("-R -a 2 -d 1EAF:0003 -D \"{0}\"", fileName, comPort);
+
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
             if (returnCode != 0)
             {
-                flashMulti.EnableControls(true);
-                flashMulti.AppendLog(" failed!");
-                MessageBox.Show("Failed to write the firmware.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                // First attempt failed so we need to try bootloader recovery
+                flashMulti.AppendLog(" failed!\r\n");
+
+                flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
+
+                // Show the recovery mode dialog
+                DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
+                var recoveryResult = recoveryDialog.ShowDialog();
+
+                // If we made it into recovyer mode, flash the module
+                if (recoveryResult == DialogResult.OK)
+                {
+                    // Run the recovery flash command
+                    flashMulti.AppendLog("Writing firmware to Multimodule ...");
+                    await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+                    if (returnCode != 0)
+                    {
+                        flashMulti.EnableControls(true);
+                        flashMulti.AppendLog(" failed!\r\n");
+                        MessageBox.Show("Failed to write the firmware.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                }
+                else
+                {
+                    flashMulti.AppendLog("DFU Recovery Mode failed.");
+                    flashMulti.EnableControls(true);
+                    return;
+                }
             }
 
             flashMulti.AppendLog(" done\r\n");

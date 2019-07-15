@@ -52,6 +52,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComPort.cs" />
+    <Compile Include="DfuRecoveryDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DfuRecoveryDialog.Designer.cs">
+      <DependentUpon>DfuRecoveryDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="FlashMulti.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -66,6 +72,9 @@
     <Compile Include="UpdateCheck.cs" />
     <Compile Include="UsbDeviceInfo.cs" />
     <Compile Include="UsbNotification.cs" />
+    <EmbeddedResource Include="DfuRecoveryDialog.resx">
+      <DependentUpon>DfuRecoveryDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FlashMulti.resx">
       <DependentUpon>FlashMulti.cs</DependentUpon>
     </EmbeddedResource>

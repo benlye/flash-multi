@@ -72,9 +72,9 @@ namespace Flash_Multi
             // 
             // buttonUpload
             // 
-            this.buttonUpload.Location = new System.Drawing.Point(373, 76);
+            this.buttonUpload.Location = new System.Drawing.Point(373, 77);
             this.buttonUpload.Name = "buttonUpload";
-            this.buttonUpload.Size = new System.Drawing.Size(75, 23);
+            this.buttonUpload.Size = new System.Drawing.Size(75, 22);
             this.buttonUpload.TabIndex = 6;
             this.buttonUpload.Text = "Upload";
             this.buttonUpload.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
@@ -96,7 +96,7 @@ namespace Flash_Multi
             // 
             this.textFileName.Location = new System.Drawing.Point(101, 20);
             this.textFileName.Name = "textFileName";
-            this.textFileName.Size = new System.Drawing.Size(266, 20);
+            this.textFileName.Size = new System.Drawing.Size(270, 20);
             this.textFileName.TabIndex = 0;
             this.textFileName.DoubleClick += new System.EventHandler(this.ButtonBrowse_Click);
             // 
@@ -120,9 +120,9 @@ namespace Flash_Multi
             // 
             // buttonBrowse
             // 
-            this.buttonBrowse.Location = new System.Drawing.Point(373, 18);
+            this.buttonBrowse.Location = new System.Drawing.Point(373, 19);
             this.buttonBrowse.Name = "buttonBrowse";
-            this.buttonBrowse.Size = new System.Drawing.Size(75, 23);
+            this.buttonBrowse.Size = new System.Drawing.Size(75, 22);
             this.buttonBrowse.TabIndex = 1;
             this.buttonBrowse.Text = "Browse";
             this.buttonBrowse.UseVisualStyleBackColor = true;
