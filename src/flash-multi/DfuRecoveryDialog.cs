@@ -51,25 +51,29 @@ namespace Flash_Multi
         /// <param name="e">Event arguments.</param>
         private async void DfuRecoveryDialog_Shown(object sender, EventArgs e)
         {
-            this.flashMulti.AppendLog("Waiting up to 30s for DFU device to disappear ...");
-
-            // Wait 30s for the DFU device to disappear
-            bool dfuCheck = false;
-            await Task.Run(() => { dfuCheck = MapleDevice.WaitForDFU(30000, true); });
+            bool dfuCheck = MapleDevice.FindMaple().DfuMode;
 
             if (dfuCheck)
             {
-                // The module was unplugged
-                this.flashMulti.AppendLog(" gone.\r\n");
-            }
-            else
-            {
-                // The module wasn't unplugged when the timer expired.
-                this.flashMulti.AppendLog(" timed out!\r\n");
-                MessageBox.Show("DFU device was not unplugged in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                this.DialogResult = DialogResult.Cancel;
-                this.Close();
-                return;
+                this.flashMulti.AppendLog("Waiting up to 30s for DFU device to disappear ...");
+
+                // Wait 30s for the DFU device to disappear
+                await Task.Run(() => { dfuCheck = MapleDevice.WaitForDFU(30000, true); });
+
+                if (dfuCheck)
+                {
+                    // The module was unplugged
+                    this.flashMulti.AppendLog(" gone.\r\n");
+                }
+                else
+                {
+                    // The module wasn't unplugged when the timer expired.
+                    this.flashMulti.AppendLog(" timed out!\r\n");
+                    MessageBox.Show("DFU device was not unplugged in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.DialogResult = DialogResult.Cancel;
+                    this.Close();
+                    return;
+                }
             }
 
             this.flashMulti.AppendLog("Waiting up to 30s for DFU device to appear ...");

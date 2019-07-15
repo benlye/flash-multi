@@ -177,10 +177,20 @@ namespace Flash_Multi
                 }
                 else
                 {
-                    flashMulti.AppendLog(" failed!");
-                    MessageBox.Show("Failed to find module in DFU mode.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    flashMulti.EnableControls(true);
-                    return;
+                    flashMulti.AppendLog(" failed!\r\n");
+                    flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
+
+                    // Show the recovery mode dialog
+                    DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
+                    var recoveryResult = recoveryDialog.ShowDialog();
+
+                    // Error out if we didn't made it into recovery mode
+                    if (recoveryResult != DialogResult.OK)
+                    {
+                        flashMulti.AppendLog("DFU Recovery Mode failed.");
+                        flashMulti.EnableControls(true);
+                        return;
+                    }
                 }
             }
 
@@ -190,6 +200,7 @@ namespace Flash_Multi
             commandArgs = string.Format("-R -a 2 -d 1EAF:0003 -D \"{0}\"", fileName, comPort);
 
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+
             if (returnCode != 0)
             {
                 // First attempt failed so we need to try bootloader recovery
