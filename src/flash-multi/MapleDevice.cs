@@ -184,10 +184,16 @@ namespace Flash_Multi
                     DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
                     var recoveryResult = recoveryDialog.ShowDialog();
 
-                    // Error out if we didn't made it into recovery mode
-                    if (recoveryResult != DialogResult.OK)
+                    // Stop if we didn't made it into recovery mode
+                    if (recoveryResult == DialogResult.Cancel)
                     {
-                        flashMulti.AppendLog("DFU Recovery Mode failed.");
+                        flashMulti.AppendLog("DFU Recovery cancelled.");
+                        flashMulti.EnableControls(true);
+                        return;
+                    }
+                    else if (recoveryResult == DialogResult.Abort)
+                    {
+                        flashMulti.AppendLog("DFU Recovery failed.");
                         flashMulti.EnableControls(true);
                         return;
                     }
@@ -212,7 +218,7 @@ namespace Flash_Multi
                 DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
                 var recoveryResult = recoveryDialog.ShowDialog();
 
-                // If we made it into recovyer mode, flash the module
+                // If we made it into recovery mode, flash the module
                 if (recoveryResult == DialogResult.OK)
                 {
                     // Run the recovery flash command
@@ -220,15 +226,22 @@ namespace Flash_Multi
                     await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
                     if (returnCode != 0)
                     {
-                        flashMulti.EnableControls(true);
                         flashMulti.AppendLog(" failed!\r\n");
                         MessageBox.Show("Failed to write the firmware.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        flashMulti.EnableControls(true);
                         return;
                     }
                 }
+                else if (recoveryResult == DialogResult.Cancel)
+                {
+                    flashMulti.AppendLog("DFU Recovery cancelled.");
+                    flashMulti.EnableControls(true);
+                    return;
+                }
                 else
                 {
-                    flashMulti.AppendLog("DFU Recovery Mode failed.");
+                    flashMulti.AppendLog("DFU Recovery failed.\r\n");
+                    // MessageBox.Show("Failed to write the firmware. DFU Recovery failed.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     flashMulti.EnableControls(true);
                     return;
                 }

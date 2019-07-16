@@ -21,6 +21,7 @@
 namespace Flash_Multi
 {
     using System;
+    using System.Diagnostics;
     using System.Threading.Tasks;
     using System.Windows.Forms;
 
@@ -51,38 +52,54 @@ namespace Flash_Multi
         /// <param name="e">Event arguments.</param>
         private async void DfuRecoveryDialog_Shown(object sender, EventArgs e)
         {
+            // Check if we have a DFU device we need to see unplugged
             bool dfuCheck = MapleDevice.FindMaple().DfuMode;
 
             if (dfuCheck)
             {
-                this.flashMulti.AppendLog("Waiting up to 30s for DFU device to disappear ...");
+                this.flashMulti.AppendLog("Waiting for DFU device to disappear ...");
 
-                // Wait 30s for the DFU device to disappear
+                // Wait 30s for the DFU device to disappear and reappear
                 await Task.Run(() => { dfuCheck = MapleDevice.WaitForDFU(30000, true); });
+
+                // Handle user cancelling DFU recovery
+                if (this.DialogResult == DialogResult.Cancel)
+                {
+                    return;
+                }
 
                 if (dfuCheck)
                 {
-                    // The module was unplugged
-                    this.flashMulti.AppendLog(" gone.\r\n");
-                }
-                else
-                {
-                    // The module wasn't unplugged when the timer expired.
-                    this.flashMulti.AppendLog(" timed out!\r\n");
-                    MessageBox.Show("DFU device was not unplugged in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    this.DialogResult = DialogResult.Cancel;
-                    this.Close();
-                    return;
+                    // Wait 30s for the DFU device to disappear
+                    await Task.Run(() => { dfuCheck = MapleDevice.WaitForDFU(30000, true); });
+
+                    if (dfuCheck)
+                    {
+                        // The module was unplugged
+                        this.flashMulti.AppendLog(" gone.\r\n");
+                    }
+                    else
+                    {
+                        // The module wasn't unplugged when the timer expired.
+                        this.flashMulti.AppendLog(" timed out!\r\n");
+                        MessageBox.Show("DFU device was not unplugged in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.DialogResult = DialogResult.Cancel;
+                        this.Close();
+                        return;
+                    }
                 }
             }
 
-            this.flashMulti.AppendLog("Waiting up to 30s for DFU device to appear ...");
-
-            // Reset the progress bar
-            this.timerProgressBar.Value = 0;
+            this.flashMulti.AppendLog("Waiting for DFU device to appear ...");
 
             // Wait for the DFU device to appear
-            await Task.Run(() => { dfuCheck = MapleDevice.WaitForDFU(30000); });
+            await Task.Run(() => { dfuCheck = MapleDevice.WaitForDFU(30000 - (this.timerProgressBar.Value * 1000)); });
+
+            // Handle user cancelling DFU recovery
+            if (this.DialogResult == DialogResult.Cancel)
+            {
+                return;
+            }
 
             if (dfuCheck)
             {
@@ -97,7 +114,7 @@ namespace Flash_Multi
                 // The module wasn't plugged in when the timer expired
                 this.flashMulti.AppendLog(" timed out!\r\n");
                 MessageBox.Show("DFU device was not plugged in in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                this.DialogResult = DialogResult.Cancel;
+                this.DialogResult = DialogResult.Abort;
                 this.Close();
                 return;
             }
@@ -110,7 +127,7 @@ namespace Flash_Multi
         /// <param name="e">Event argument.</param>
         private void ButtonCancel_Click(object sender, System.EventArgs e)
         {
-            this.flashMulti.AppendLog("\r\nDFU Recovery cancelled.\r\n");
+            this.flashMulti.AppendLog(" cancelled.\r\n");
             this.DialogResult = DialogResult.Cancel;
             this.Close();
             return;
