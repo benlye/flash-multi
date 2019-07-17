@@ -240,8 +240,7 @@ namespace Flash_Multi
                 }
                 else
                 {
-                    flashMulti.AppendLog("DFU Recovery failed.\r\n");
-                    // MessageBox.Show("Failed to write the firmware. DFU Recovery failed.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    flashMulti.AppendLog("DFU Recovery failed.");
                     flashMulti.EnableControls(true);
                     return;
                 }
