@@ -54,6 +54,9 @@ namespace Flash_Multi
             // Register a handler to check for a new version when the form is shown the first time
             this.Shown += this.FlashMulti_Shown;
 
+            // Register a handler to run on loading the form
+            this.Load += this.FlashMulti_Load;
+
             // Resgister a handler to be notified when USB devices are added or removed
             UsbNotification.RegisterUsbDeviceNotification(this.Handle);
         }
@@ -214,6 +217,10 @@ namespace Flash_Multi
 
             // Unregister for USB notifications
             UsbNotification.UnregisterUsbDeviceNotification();
+
+            // Save the window position
+            Properties.Settings.Default.WindowLocation = this.Location;
+            Properties.Settings.Default.Save();
         }
 
         /// <summary>
@@ -226,6 +233,16 @@ namespace Flash_Multi
         {
             // Check for a new version
             UpdateCheck.DoCheck(this);
+        }
+
+        private void FlashMulti_Load(object sender, EventArgs e)
+        {
+            // Restore the last window location
+            var windowLocation = Properties.Settings.Default.WindowLocation;
+            if (windowLocation.X != -1 && windowLocation.Y != -1)
+            {
+                this.Location = Properties.Settings.Default.WindowLocation;
+            }
         }
 
         /// <summary>
