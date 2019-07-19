@@ -413,15 +413,10 @@ namespace Flash_Multi
             // Determine if we should use Maple or serial interface
             MapleDevice mapleResult = MapleDevice.FindMaple();
 
-            if (mapleResult.DeviceFound == true)
-            {
-                this.AppendLog(string.Format("Maple device found in {0} mode\r\n", mapleResult.Mode));
-            }
-
             // Do the selected flash using the appropriate method
             if (mapleResult.DeviceFound == true)
             {
-                // MapleFlashWrite(textFileName.Text, comPort);
+                Debug.WriteLine($"Maple device found in {mapleResult.Mode} mode\r\n");
                 MapleDevice.WriteFlash(this, this.textFileName.Text, comPort);
             }
             else

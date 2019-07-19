@@ -60,7 +60,7 @@ namespace Flash_Multi
             // Sort the list of ports
             comPorts = comPorts.OrderBy(c => c.Length).ThenBy(c => c).ToList();
 
-            // Check if we there's a Maple device plugged in
+            // Check if we there's a Maple DFU device plugged in and add it to the list
             if (MapleDevice.FindMaple().DeviceFound)
             {
                 comPorts.Add("DFU Device");
@@ -76,17 +76,20 @@ namespace Flash_Multi
         /// <returns>Returns an ordered list of ports <see cref="ComPort"/>.</returns>
         public static List<ComPort> EnumeratePortList()
         {
+            // Get the start time so we can write how long this takes to the debug window
             DateTime start = DateTime.Now;
             Debug.WriteLine("Enumerating COM ports");
 
+            // Create a list to store the COM port names
             List<ComPort> comPorts = new List<ComPort>();
 
-            // Get all the COM ports
+            // Get all the COM port names
             string[] comPortNames = SerialPort.GetPortNames();
 
-            // Add all available to the list
+            // Add all the COM ports to the list
             foreach (string portName in comPortNames)
             {
+                // We only know the port name, so write that to all three properties
                 ComPort thisPort = new ComPort
                 {
                     Name = portName,
@@ -96,10 +99,10 @@ namespace Flash_Multi
                 comPorts.Add(thisPort);
             }
 
-            // Sort the list of ports
+            // Sort the list of ports by name
             comPorts = comPorts.OrderBy(c => c.Name.Length).ThenBy(c => c.Name).ToList();
 
-            // Check if we there's a Maple device in DFU mode plugged in
+            // Check if we there's a Maple DFU device plugged in and add it to the list
             if (MapleDevice.FindMaple().DfuMode)
             {
                 ComPort dfuPort = new ComPort
@@ -111,10 +114,11 @@ namespace Flash_Multi
                 comPorts.Add(dfuPort);
             }
 
+            // Get the time now and write how long that took
             DateTime end = DateTime.Now;
             Debug.WriteLine($"COM ports enumerated in {end - start}.");
 
-            // Return a list of COM ports
+            // Return the list of COM ports
             return comPorts;
         }
 

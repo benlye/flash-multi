@@ -145,7 +145,7 @@ namespace Flash_Multi
             string commandArgs;
             int returnCode = -1;
 
-            flashMulti.AppendLog("Starting Multimodule update\r\n");
+            flashMulti.AppendLog("Starting Multimodule update via native USB\r\n");
 
             string mapleMode = MapleDevice.FindMaple().Mode;
 
