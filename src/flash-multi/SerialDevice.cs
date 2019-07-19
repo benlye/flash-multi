@@ -43,7 +43,7 @@ namespace Flash_Multi
             string bootLoaderPath = ".\\bootloaders\\StmMulti4in1.bin";
 
             // Baud rate for serial flash commands
-            int serialBaud = 115200;
+            int serialBaud = Properties.Settings.Default.SerialBaudRate;
 
             // Arguments for the command line - will vary at each step of the process
             string commandArgs;

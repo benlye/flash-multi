@@ -232,7 +232,14 @@ namespace Flash_Multi
         private void FlashMulti_Shown(object sender, EventArgs e)
         {
             // Check for a new version
-            UpdateCheck.DoCheck(this);
+            if (Properties.Settings.Default.CheckForUpdates == true)
+            {
+                UpdateCheck.DoCheck(this);
+            }
+            else
+            {
+                Debug.WriteLine("Update check is disabled.");
+            }
         }
 
         private void FlashMulti_Load(object sender, EventArgs e)
