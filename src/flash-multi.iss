@@ -29,5 +29,5 @@ Name: "drivers"; Description: "Run Maple USB Driver Installer"; Types: full
 
 [Run]
 ; Install the drivers - https://github.com/pbatard/libwdi/blob/master/examples/wdi-simple.iss
-Filename: "{app}\drivers\wdi-simple.exe"; Flags: "runhidden"; Parameters: " --vid 0x1EAF --pid 0x0003 --type 1 --name ""Maple DFU"" --dest ""{tmp}\maple-dfu"" --progressbar={wizardhwnd} --timeout 120000"; StatusMsg: "Installing Maple DFU device driver (this may take a few seconds) ..."; Components: drivers
+Filename: "{app}\drivers\wdi-simple.exe"; Flags: "runhidden"; Parameters: " --vid 0x1EAF --pid 0x0003 --type 2 --name ""Maple DFU"" --dest ""{tmp}\maple-dfu"" --progressbar={wizardhwnd} --timeout 120000"; StatusMsg: "Installing Maple DFU device driver (this may take a few seconds) ..."; Components: drivers
 Filename: "{app}\drivers\wdi-simple.exe"; Flags: "runhidden"; Parameters: " --vid 0x1EAF --pid 0x0004 --type 3 --name ""Maple Serial"" --dest ""{tmp}\maple-serial"" --progressbar={wizardhwnd} --timeout 120000"; StatusMsg: "Installing Maple Serial device driver (this may take a few seconds) ..."; Components: drivers
