@@ -3,7 +3,7 @@
 
 Tool for flashing pre-compiled firmware to an STM32-based Multiprotocol TX module.  Firmware upload can be performed using the built-in USB connection or via an external USB-to-serial adapter.
 
-Just three steps are required to update your Jumper, iRangeX, or DIY, Multiprotocol TX module (full instructions are below):
+Just three steps are required to update your Jumper, iRangeX, or DIY Multiprotocol TX module (full instructions are below):
 1. [Download and install](#installing-flash-multi) Flash Multi and any required [device drivers](#additional-drivers)
 1. Download the appropriate [Multiprotocol firmware file](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/releases)
 1. [Flash](#using-flash-multi) the new firmware to your module
