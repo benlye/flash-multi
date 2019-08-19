@@ -390,16 +390,40 @@ namespace Flash_Multi
                 return;
             }
 
+            // Determine if we should use Maple or serial interface
+            MapleDevice mapleResult = MapleDevice.FindMaple();
+
             // Warn if Write Bootloader seems to be incorrect
             bool firmwareSupportsBootloader = this.CheckForBootloaderSupport();
             if (this.writeBootloader_No.Checked && firmwareSupportsBootloader)
             {
-                DialogResult response = MessageBox.Show("The firmware file appears to be compiled with bootloader support but 'Write Bootloader' is not selected.\r\n\r\nThe module will not function if the firmware requires the bootloader but the bootloader is not written.\r\n\r\nAre you sure you want to proceed?", "Write Bootloader", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                DialogResult response = MessageBox.Show("You have selected not to write the bootloader, but the selected firmware file was compiled with bootloader support.\r\n\r\nThe module will not function if the firmware requires the bootloader but the bootloader is not written.\r\n\r\nAre you sure you want to proceed?", "Write Bootloader", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                if (response != DialogResult.OK)
+                {
+                    return;
+                }
             }
 
             if (this.writeBootloader_Yes.Checked && !firmwareSupportsBootloader)
             {
-                DialogResult response = MessageBox.Show("'Write Bootloader' is selected but the firmware file appears to not be compiled with bootloader support.\r\n\r\nThe module will not function if the bootloader is written but the firmware does not support it.\r\n\r\nAre you sure you want to proceed?", "Write Bootloader", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                string msgBoxMessage = string.Empty;
+                DialogResult response = DialogResult.None;
+
+                if (mapleResult.DeviceFound)
+                {
+                    msgBoxMessage = "You are flashing via USB, but the selected firmware file was compiled without USB support.\r\n\r\nContinuing would prevent the module from functioning correctly.\r\n\r\nPlease select a different firmware file.";
+                    response = MessageBox.Show(msgBoxMessage, "Write Bootloader", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                else
+                {
+                    msgBoxMessage = "You have selected to write the bootloader, but the selected firmware file was compiled without bootloader support.\r\n\r\nThe module will not function if the bootloader is written but the firmware does not support it.\r\n\r\nAre you sure you want to proceed?";
+                    response = MessageBox.Show(msgBoxMessage, "Write Bootloader", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                    if (response != DialogResult.OK)
+                    {
+                        return;
+                    }
+                }
             }
 
             // Get the selected COM port
@@ -417,9 +441,6 @@ namespace Flash_Multi
             // Disable the buttons until this flash attempt is complete
             Debug.WriteLine("Disabling the controls...");
             this.EnableControls(false);
-
-            // Determine if we should use Maple or serial interface
-            MapleDevice mapleResult = MapleDevice.FindMaple();
 
             // Do the selected flash using the appropriate method
             if (mapleResult.DeviceFound == true)
