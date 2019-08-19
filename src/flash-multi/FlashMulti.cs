@@ -383,22 +383,23 @@ namespace Flash_Multi
                 return;
             }
 
-            // Check that the file size is OK
-            // Max size is 120,832B (118KB) with bootloader, 129,024B (126KB) without
-            int maxFileSize = 129024;
-            if (this.writeBootloader_Yes.Checked)
+            // Check the file size
+            if (!this.CheckFirmwareFileSize())
             {
-                maxFileSize = 120832;
-            }
-
-            long length = new System.IO.FileInfo(this.textFileName.Text).Length;
-
-            if (length > maxFileSize)
-            {
-                this.AppendLog(string.Format("Firmware file is too large.\r\nFile is {1:n0} KB, maximum size is {2:n0} KB.", this.textFileName.Text, length / 1024, maxFileSize / 1024));
-                MessageBox.Show("Firmware file is too large.", "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.EnableControls(true);
                 return;
+            }
+
+            // Warn if Write Bootloader seems to be incorrect
+            bool firmwareSupportsBootloader = this.CheckForBootloaderSupport();
+            if (this.writeBootloader_No.Checked && firmwareSupportsBootloader)
+            {
+                DialogResult response = MessageBox.Show("The firmware file appears to be compiled with bootloader support but 'Write Bootloader' is not selected.\r\n\r\nThe module will not function if the firmware requires the bootloader but the bootloader is not written.\r\n\r\nAre you sure you want to proceed?", "Write Bootloader", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            }
+
+            if (this.writeBootloader_Yes.Checked && !firmwareSupportsBootloader)
+            {
+                DialogResult response = MessageBox.Show("'Write Bootloader' is selected but the firmware file appears to not be compiled with bootloader support.\r\n\r\nThe module will not function if the bootloader is written but the firmware does not support it.\r\n\r\nAre you sure you want to proceed?", "Write Bootloader", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             }
 
             // Get the selected COM port
@@ -453,21 +454,77 @@ namespace Flash_Multi
                 }
             }
 
+            // Check the file size
+            if (!this.CheckFirmwareFileSize())
+            {
+                return;
+            }
+
             // Check if there is a Maple device
             bool mapleCheck = MapleDevice.FindMaple().DeviceFound;
 
-            // Check the file name and pre-set the Write Bootloader option
-            if (this.textFileName.Text.IndexOf("_FTDI_") > -1 && !mapleCheck)
+            // Check if the binary file contains support for the bootloader
+            if (this.CheckForBootloaderSupport())
             {
-                this.writeBootloader_No.Checked = true;
-            }
-            else if (this.textFileName.Text.IndexOf("_TXFLASH_") > -1 && !mapleCheck)
-            {
+                Debug.WriteLine("CHECK_FOR_BOOTLOADER is enabled in the firmware file.");
                 this.writeBootloader_Yes.Checked = true;
+            }
+            else
+            {
+                Debug.WriteLine("CHECK_FOR_BOOTLOADER is not enabled in the firmware file.");
+                this.writeBootloader_No.Checked = true;
             }
 
             // Check if the Upload button should be enabled yet
             this.CheckControls();
+        }
+
+        /// <summary>
+        /// Parses the binary file looking for a string which indicates that the compiled firmware images contains bootloader support.
+        /// The binary firmware file will contain the strings 'Maple' and 'LeafLabs' if it was compiled with CHECK_FOR_BOOTLOADER defined.
+        /// </summary>
+        /// <returns>A boolean value indicatating whether or not the firmware supports the bootloader.</returns>
+        private bool CheckForBootloaderSupport()
+        {
+            bool bootloaderCheckEnabled = false;
+            string fileName = this.textFileName.Text;
+
+            byte[] byteBuffer = File.ReadAllBytes(fileName);
+            string byteBufferAsString = System.Text.Encoding.ASCII.GetString(byteBuffer);
+            int offset = byteBufferAsString.IndexOf("M\0a\0p\0l\0e\0\u0012\u0003L\0e\0a\0f\0L\0a\0b\0s\0\u0012\u0001");
+
+            if (offset > 0)
+            {
+                bootloaderCheckEnabled = true;
+            }
+
+            return bootloaderCheckEnabled;
+        }
+
+        /// <summary>
+        /// Checks that the compiled firmware will fit on the module.
+        /// </summary>
+        /// <returns>Returns a boolean indicating whehter or not the firmware size is OK.</returns>
+        private bool CheckFirmwareFileSize()
+        {
+            // Check that the file size is OK
+            // Max size is 120,832B (118KB) with bootloader, 129,024B (126KB) without
+            int maxFileSize = 129024;
+            if (this.writeBootloader_Yes.Checked)
+            {
+                maxFileSize = 120832;
+            }
+
+            long length = new System.IO.FileInfo(this.textFileName.Text).Length;
+
+            if (length > maxFileSize)
+            {
+                this.AppendLog(string.Format("Firmware file is too large.\r\nFile is {1:n0} KB, maximum size is {2:n0} KB.", this.textFileName.Text, length / 1024, maxFileSize / 1024));
+                MessageBox.Show("Firmware file is too large.", "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
