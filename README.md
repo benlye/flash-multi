@@ -88,18 +88,26 @@ The bootloader does two things:
 1. Enables the native USB port on devices which have it
 1. Enables updating the Multiprotocol module's firmware from the radio (on radios which support this)
 
-The **Write Bootloader** option must match the `CHECK_FOR_BOOTLOADER` option in the firmware otherwise the module will not work. 
+The bootloader only works with firmware which has been compiled to support it. Bootloader support is determined by the **Upload Method** selected in the Arduino IDE when the firmware is compiled.
+
+**Write Bootloader** option must be set to:
+* **Yes** for firmware compiled with bootloader support
+* **No** for firmware compiled without bootloader support
+
+If the option is not set correctly the module will not function and the firmware must be re-flashed with the correct **Write Bootloader** setting.
 
 For pre-compiled firmware from the Github Release page:
-* If the file name contains `_TXFLASH_` then **Yes** will be selected automatically.
-* If the file name contains `_FTDI_` then **No** will be selected automatically.
+* If the file name contains `_TXFLASH_` then **Yes** will be selected automatically
+* If the file name contains `_FTDI_` then **No** will be selected automatically
 
 For self-compiled firmware:
-* If `CHECK_FOR_BOOTLOADER` is enabled (uncommented) in your config you must manually select **Yes**.
-* If `CHECK_FOR_BOOTLOADER` is disabled (commented) in your config you must manually  select **No**.
+* If the upload method is set to **Upload via Serial (FTDI)** when you compile in the Arduino IDE, you must manually select **No**.
+* If the upload method is set to any option other than **Upload via Serial (FTDI)** when you compile in the Arduino IDE, you must manually select **Yes**.
 
 For native USB uploads:
 * If a Maple USB device is detected the **Write Bootloader** controls will be disabled and **Yes** will be selected as the bootloader is already installed, and cannot be changed via a native USB upload.
+
+> _The next version of Flash Multi will automatically detect whether or not the compiled firmware requires the bootloader and will set the Write Bootloader option accordingly._
 
 ## Upload Output
 The output will vary depending on the type of module being flashed.
