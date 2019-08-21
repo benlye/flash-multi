@@ -402,6 +402,8 @@ namespace Flash_Multi
                 {
                     return;
                 }
+
+                this.AppendLog(string.Format("WARNING: Firmware image was compiled with bootloader support but Write Bootloader is not selected.\r\n\r\n"));
             }
 
             if (this.writeBootloader_Yes.Checked && !firmwareSupportsBootloader)
@@ -411,6 +413,7 @@ namespace Flash_Multi
 
                 if (mapleResult.DeviceFound)
                 {
+                    this.AppendLog(string.Format("ERROR: Attempted to upload firmware image without USB bootloader support via USB."));
                     msgBoxMessage = "You are flashing via USB, but the selected firmware file was compiled without USB support.\r\n\r\nContinuing would prevent the module from functioning correctly.\r\n\r\nPlease select a different firmware file.";
                     response = MessageBox.Show(msgBoxMessage, "Write Bootloader", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -423,6 +426,8 @@ namespace Flash_Multi
                     {
                         return;
                     }
+
+                    this.AppendLog(string.Format("WARNING: Firmware image was not compiled with bootloader support but Write Bootloader is selected.\r\n\r\n"));
                 }
             }
 
@@ -472,28 +477,28 @@ namespace Flash_Multi
                 {
                     // Set the text box to the selected file name
                     this.textFileName.Text = openFileDialog.FileName;
+
+                    // Check the file size
+                    if (!this.CheckFirmwareFileSize())
+                    {
+                        return;
+                    }
+
+                    // Check if there is a Maple device
+                    bool mapleCheck = MapleDevice.FindMaple().DeviceFound;
+
+                    // Check if the binary file contains support for the bootloader
+                    if (this.CheckForBootloaderSupport())
+                    {
+                        Debug.WriteLine("CHECK_FOR_BOOTLOADER is enabled in the firmware file.");
+                        this.writeBootloader_Yes.Checked = true;
+                    }
+                    else
+                    {
+                        Debug.WriteLine("CHECK_FOR_BOOTLOADER is not enabled in the firmware file.");
+                        this.writeBootloader_No.Checked = true;
+                    }
                 }
-            }
-
-            // Check the file size
-            if (!this.CheckFirmwareFileSize())
-            {
-                return;
-            }
-
-            // Check if there is a Maple device
-            bool mapleCheck = MapleDevice.FindMaple().DeviceFound;
-
-            // Check if the binary file contains support for the bootloader
-            if (this.CheckForBootloaderSupport())
-            {
-                Debug.WriteLine("CHECK_FOR_BOOTLOADER is enabled in the firmware file.");
-                this.writeBootloader_Yes.Checked = true;
-            }
-            else
-            {
-                Debug.WriteLine("CHECK_FOR_BOOTLOADER is not enabled in the firmware file.");
-                this.writeBootloader_No.Checked = true;
             }
 
             // Check if the Upload button should be enabled yet
@@ -540,7 +545,7 @@ namespace Flash_Multi
 
             if (length > maxFileSize)
             {
-                this.AppendLog(string.Format("Firmware file is too large.\r\nFile is {1:n0} KB, maximum size is {2:n0} KB.", this.textFileName.Text, length / 1024, maxFileSize / 1024));
+                this.AppendLog(string.Format("ERROR: Firmware file is too large.\r\nFile is {1:n0} KB, maximum size is {2:n0} KB.", this.textFileName.Text, length / 1024, maxFileSize / 1024));
                 MessageBox.Show("Firmware file is too large.", "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
