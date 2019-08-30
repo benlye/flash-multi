@@ -1,0 +1,171 @@
+#!/bin/bash
+# set -e
+
+# Write the script header
+printf "flash-multi 0.1 - https://github.com/benlye/flash-multi/\n\n"
+
+# Prepare simple help text to disply when needed
+USAGE="Usage: flash-multi -f [firmware file] -p [serial port]\n\n"
+
+# Get the command line options
+while getopts ":f:p:h" opt; do
+  case $opt in
+    f) FWFILE="$OPTARG"
+    ;;
+    p) PORT="$OPTARG"
+    ;;
+    h) printf "$USAGE"; exit 1
+    ;;
+    \?) printf "Invalid argument -$OPTARG\n\n"; >&2
+    ;;
+    :) printf "Missing value for argument -$OPTARG\n\n"; >&2
+    ;;
+  esac
+done
+
+# Show the usage and exit if no -f or -p arguments given
+if [ "x" == "x$FWFILE" ] || [ "x" == "x$PORT" ]; then
+  printf "$USAGE"
+  exit 1
+fi
+
+# Die if the firmware file doesn't exist
+if [ ! -f "$FWFILE" ]; then
+    printf "ERROR: $FWFILE does not exist!\n\n";
+    exit 2;
+fi
+
+# Die if the firmware file isn't readable
+if [ ! -r "$FWFILE" ]; then
+    printf "ERROR: $FWFILE cannot be read!\n\n";
+    exit 2;
+fi
+
+# Die if the serial port doesn't exist
+if [ ! -f "$PORT" ]; then
+    printf "ERROR: $PORT does not exist!\n\n";
+    exit 3;
+fi
+
+# Stop if the firmware file isn't readable
+if [ ! -w "$PORT" ]; then
+    printf "ERROR: Cannot write to $PORT!\n\n";
+    exit 2;
+fi
+
+
+# Get the directory where the script is running.
+# DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+DIR=$(dirname "$0")
+
+# Set the path to the bootloader file
+BOOTLOADERFILE="$DIR/bootloader/StmMulti4in1.bin"
+
+# Determine the binaries to use based on the platform architecture
+uname -m | grep "x86_64" 2>&1 1>/dev/null
+if [ $? -eq 0 ]; then
+  TOOLS_DIR="$DIR/bin/x64"
+else
+  TOOLS_DIR="$DIR/bin/x86"
+fi
+
+STM32_FLASH="$TOOLS_DIR/stm32flash/stm32flash"
+RESET_UTIL="$TOOLS_DIR/upload-reset"
+DFU_UTIL="$TOOLS_DIR/dfu-util/dfu-util"
+
+# Determine if the specified firmware file contains support for the STM32 USB port
+if grep -q 'libmaple/usb/stm32f1/usb.c' "$FWFILE"; then
+  HAS_USB_SUPPORT=true;
+else
+  HAS_USB_SUPPORT=false;
+fi
+
+# Check to see if a native STM32 USB device (Maple device) is attached
+MAPLE_USB_DEVICES=$(lsusb |grep "1eaf" | awk '{ print $NF}')
+# Find the mode of the leaf bootloader
+case $MAPLE_USB_DEVICES in 
+   "1eaf:0003")
+      MAPLE_DEVICE=DFU
+   ;;
+   "1eaf:0004")
+      MAPLE_DEVICE=Native
+   ;;
+   *)
+      MAPLE_DEVICE=Unknown
+   ;;
+esac
+
+# Run the Maple or serial flash function
+if [[ $MAPLE_DEVICE = "Unknown" ]]
+then
+  # No Maple device - run the serial flash
+  printf "Attempting serial upload using stm32flash\n\n"
+  
+  if [ ! -x $STM32_FLASH ]; then
+    printf "ERROR: Required tool $STM32_FLASH does not exist or is not executable!\n\n"; exit 3;
+  fi
+  
+  STEP=1
+  [ "$HAS_USB_SUPPORT" = true ] && NUM_STEPS=3 || NUM_STEPS=2;
+  
+  printf "[$STEP/$NUM_STEPS] Erasing flash...\n"
+  printf "$STM32_FLASH -o -S 0x8000000:129024 -b 115200 \"$PORT\"\n"
+  "${STM32_FLASH}" -o -S 0x8000000:129024 -b 115200 "$PORT"
+  [ $? -ne 0 ] && printf "ERROR: Failed to erase flash!\n\n"; exit 3;
+  STEP=$((STEP+1))
+  
+  if [ "$HAS_USB_SUPPORT" = true ] ; then
+    printf "[$STEP/$NUM_STEPS] Writing bootloader...\n"
+    printf "$STM32_FLASH -v -e 0 -g 0x8000000 -b 115200 -w \"$BOOTLOADERFILE\" \"$PORT\"\n"
+    "${STM32_FLASH}" -v -e 0 -g 0x8000000 -b 115200 -w "$BOOTLOADERFILE" "$PORT"
+    [ $? -ne 0 ] && printf "ERROR: Failed to write bootloader!\n\n"; exit 3;
+    STEP=$((STEP+1))
+  fi
+  
+  printf "[$STEP/$NUM_STEPS] Writing firmware...\n"
+  printf "$STM32_FLASH -v -s 8 -e 0 -g 0x8002000 -b 115200 -w \"$FWFILE\" \"$PORT\"\n"
+  "${STM32_FLASH}" -v -s 8 -e 0 -g 0x8002000 -b 115200 -w "$FWFILE" "$PORT"
+  [ $? -ne 0 ] && printf "ERROR: Failed to write firmware!\n\n"; exit 3;
+    
+else
+  # Maple board detected
+  printf "Attempting USB upload using dfu-util\n\n"
+
+  if [ ! -x $RESET_UTIL ]; then
+    printf "ERROR: Required tool $RESET_UTIL does not exist or is not executable!\n\n"; exit 3;
+  fi
+  
+  if [ ! -x $DFU_UTIL ]; then
+    printf "ERROR: Required tool $DFU_UTIL does not exist or is not executable!\n\n"; exit 3;
+  fi
+  
+  # Die if the firmware file doesn't contain USB code
+  if [ "$HAS_USB_SUPPORT" = false ]; then
+    printf "ERROR: Specified firmware file was not compiled with USB support. Flashing this file would make the Multiprotocol module unusable.\n\n"; 
+    exit 9;
+  fi
+  
+  STEP=1;
+  NUM_STEPS=1;
+  
+  if [[ $MAPLE_DEVICE = "Native" ]] ; then
+    NUM_STEPS=2;
+    
+    printf "[$STEP/$NUM_STEPS] Resetting to DFU mode...\n"
+    printf "$RESET_UTIL $PORT 750\n"
+    "${RESET_UTIL}" $PORT 750
+    printf "\n"
+    
+    # Give the board a chance to reset to DFU mode
+    sleep 0.5
+    
+    STEP=$((STEP+1))
+  fi
+  
+  printf "[$STEP/$NUM_STEPS] Writing firmware...\n"
+  printf "${DFU_UTIL} -d 1eaf:0003 -a 2 -D \"$FWFILE\" -R\n"
+  "${DFU_UTIL}" -d 1eaf:0003 -a 2 -D "$FWFILE" -R
+  [ $? -ne 0 ] && printf "\nERROR: Failed to write firmware!\n\n"; exit 3;
+fi
+
+printf "Firmware flashed successfully.\n\n"
