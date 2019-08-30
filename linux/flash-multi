@@ -53,7 +53,6 @@ if [ ! -w "$PORT" ]; then
     exit 2;
 fi
 
-
 # Get the directory where the script is running.
 # DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 DIR=$(dirname "$0")
@@ -64,14 +63,14 @@ BOOTLOADERFILE="$DIR/bootloader/StmMulti4in1.bin"
 # Determine the binaries to use based on the platform architecture
 uname -m | grep "x86_64" 2>&1 1>/dev/null
 if [ $? -eq 0 ]; then
-  TOOLS_DIR="$DIR/bin/x64"
+  TOOLS_DIR="$DIR/tools/64bit"
 else
-  TOOLS_DIR="$DIR/bin/x86"
+  TOOLS_DIR="$DIR/tools/32bit"
 fi
 
-STM32_FLASH="$TOOLS_DIR/stm32flash/stm32flash"
-RESET_UTIL="$TOOLS_DIR/upload-reset"
-DFU_UTIL="$TOOLS_DIR/dfu-util/dfu-util"
+STM32_FLASH="$TOOLS_DIR/stm32flash"
+RESET_UTIL="$TOOLS_DIR/maple-reset"
+DFU_UTIL="$TOOLS_DIR/dfu-util"
 
 # Determine if the specified firmware file contains support for the STM32 USB port
 if grep -q 'libmaple/usb/stm32f1/usb.c' "$FWFILE"; then
@@ -95,7 +94,7 @@ case $MAPLE_USB_DEVICES in
    ;;
 esac
 
-# Run the Maple or serial flash function
+# Run the Maple or serial flash
 if [[ $MAPLE_DEVICE = "Unknown" ]]
 then
   # No Maple device - run the serial flash
@@ -128,7 +127,7 @@ then
   [ $? -ne 0 ] && printf "ERROR: Failed to write firmware!\n\n"; exit 3;
     
 else
-  # Maple board detected
+  # Maple device detected
   printf "Attempting USB upload using dfu-util\n\n"
 
   if [ ! -x $RESET_UTIL ]; then
@@ -152,9 +151,9 @@ else
     NUM_STEPS=2;
     
     printf "[$STEP/$NUM_STEPS] Resetting to DFU mode...\n"
-    printf "$RESET_UTIL $PORT 750\n"
-    "${RESET_UTIL}" $PORT 750
-    printf "\n"
+    printf "$RESET_UTIL $PORT\n"
+    "${RESET_UTIL}" $PORT
+    [ $? -ne 0 ] && printf "ERROR: Failed to reset device!\n\n"; exit 3;
     
     # Give the board a chance to reset to DFU mode
     sleep 0.5
