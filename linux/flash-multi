@@ -74,8 +74,17 @@ DFU_UTIL="$TOOLS_DIR/dfu-util"
 # Determine if the specified firmware file contains support for the STM32 USB port
 if grep -q -Pa 'M\x00a\x00p\x00l\x00e\x00\x12\x03L\x00e\x00a\x00f\x00L\x00a\x00b\x00s' "$FWFILE"; then
   HAS_USB_SUPPORT=true;
+  MAX_FILE_SIZE=120832
 else
   HAS_USB_SUPPORT=false;
+  MAX_FILE_SIZE=129024
+fi
+
+# Check if the firmware will fit
+FWFILE_SIZE=`stat --printf="%s" "$FWFILE"`
+if [ $FWFILE_SIZE -gt $MAX_FILE_SIZE ]; then
+    printf "ERROR: Firmware file is too large. File is $FWFILE_SIZE, maximum is $MAX_FILE_SIZE.\n\n";
+    exit 2;
 fi
 
 # Check to see if a native STM32 USB device (Maple device) is attached
