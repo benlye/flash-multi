@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Write the script header
-printf "flash-multi 0.1\n\nThis program is Free Sofware and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
+printf "flash-multi 0.1.5\n\nThis program is Free Sofware and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
 
 # Prepare simple help text to disply when needed
 USAGE="Usage: flash-multi -f [firmware file] -p [serial device]\n\n"
