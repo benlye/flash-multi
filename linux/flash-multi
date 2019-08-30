@@ -1,11 +1,10 @@
 #!/bin/bash
-# set -e
 
 # Write the script header
-printf "flash-multi 0.1 - https://github.com/benlye/flash-multi/\n\n"
+printf "flash-multi 0.1\n\nThis program is Free Sofware and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
 
 # Prepare simple help text to disply when needed
-USAGE="Usage: flash-multi -f [firmware file] -p [serial port]\n\n"
+USAGE="Usage: flash-multi -f [firmware file] -p [serial device]\n\n"
 
 # Get the command line options
 while getopts ":f:p:h" opt; do
@@ -73,7 +72,7 @@ RESET_UTIL="$TOOLS_DIR/maple-reset"
 DFU_UTIL="$TOOLS_DIR/dfu-util"
 
 # Determine if the specified firmware file contains support for the STM32 USB port
-if grep -q 'libmaple/usb/stm32f1/usb.c' "$FWFILE"; then
+if grep -q -Pa 'M\x00a\x00p\x00l\x00e\x00\x12\x03L\x00e\x00a\x00f\x00L\x00a\x00b\x00s' "$FWFILE"; then
   HAS_USB_SUPPORT=true;
 else
   HAS_USB_SUPPORT=false;
