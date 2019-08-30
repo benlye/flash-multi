@@ -10,5 +10,5 @@ if sudo [ -w /etc/udev/rules.d ]; then
     echo "Adding current user to dialout group"
     sudo adduser $USER dialout
 else
-    echo "Couldn't copy to /etc/udev/rules.d/; you probably have to run this script as root? Or your distribution of Linux doesn't include udev; try running the IDE itself as root."
+    echo "Couldn't copy to /etc/udev/rules.d/; Did you run the script as root? Does your distribution of Linux include udev?"
 fi
