@@ -1,7 +1,7 @@
 # Flash-Multi
 <img src=https://img.shields.io/github/downloads/benlye/flash-multi/total.svg> <a href="https://scan.coverity.com/projects/benlye-flash-multi"><img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/18725.svg"/></a>
 
-Tool for flashing pre-compiled firmware to an STM32-based Multiprotocol TX module.  Firmware upload can be performed using the built-in USB connection or via an external USB-to-serial adapter.
+Tool for flashing pre-compiled firmware to an Jumper, iRangeX, Vantac, 'Banggood', or DIY STM32-based Multiprotocol TX module.  Firmware upload can be performed using the built-in USB connection or via an external USB-to-serial adapter.
 
 Just three steps are required to update your Jumper, iRangeX, or DIY Multiprotocol TX module (full instructions are below):
 1. [Download and install](#installing-flash-multi) Flash Multi and any required [device drivers](#additional-drivers)
@@ -77,37 +77,7 @@ Other drivers may be needed if you are using an external USB-to-serial adapter. 
    > _Tip: Flash Multi will automatically select the new COM port, if it's running when the module is plugged in._
 1. Click the **Browse** button and select a compiled firmware file
 1. If it wasn't automatically selected, select the appropriate COM port
-1. Select whether or not to write the bootloader - see [Writing the Bootloader](#writing-the-bootloader) below
-   > _Tip: If you are flashing a file which was downloaded from the Multiprotocol firmware Releases page, the **Write Bootloader** option will be set automatically, based on the file name._
 1. Click the **Upload** button
-
-## Writing the Bootloader
-When flashing via serial using either an external or internal USB-to-serial adapter, you must choose whether or not to write the bootloader.
-
-The bootloader does two things:
-1. Enables the native USB port on devices which have it
-1. Enables updating the Multiprotocol module's firmware from the radio (on radios which support this)
-
-The bootloader only works with firmware which has been compiled to support it. Bootloader support is determined by the **Upload Method** selected in the Arduino IDE when the firmware is compiled.
-
-**Write Bootloader** option must be set to:
-* **Yes** for firmware compiled with bootloader support
-* **No** for firmware compiled without bootloader support
-
-If the option is not set correctly the module will not function and the firmware must be re-flashed with the correct **Write Bootloader** setting.
-
-For pre-compiled firmware from the Github Release page:
-* If the file name contains `_TXFLASH_` then **Yes** will be selected automatically
-* If the file name contains `_FTDI_` then **No** will be selected automatically
-
-For self-compiled firmware:
-* If the upload method is set to **Upload via Serial (FTDI)** when you compile in the Arduino IDE, you must manually select **No**.
-* If the upload method is set to any option other than **Upload via Serial (FTDI)** when you compile in the Arduino IDE, you must manually select **Yes**.
-
-For native USB uploads:
-* If a Maple USB device is detected the **Write Bootloader** controls will be disabled and **Yes** will be selected as the bootloader is already installed, and cannot be changed via a native USB upload.
-
-> _The next version of Flash Multi will automatically detect whether or not the compiled firmware requires the bootloader and will set the Write Bootloader option accordingly._
 
 ## Upload Output
 The output will vary depending on the type of module being flashed.
@@ -121,6 +91,8 @@ Starting Multimodule update
 
 Multimodule updated sucessfully
 ```
+
+> _Note: Step 2, writing the bootloader, is not performed when writing firmware which was not compiled with support for the native USB / Flash from TX bootloader._
 
 Modules connected via USB (except the Jumper JP4IN1) will see output like this:
 ```
