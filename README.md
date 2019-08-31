@@ -1,7 +1,9 @@
 # Flash-Multi
 <img src=https://img.shields.io/github/downloads/benlye/flash-multi/total.svg> <a href="https://scan.coverity.com/projects/benlye-flash-multi"><img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/18725.svg"/></a>
 
-Tool for flashing pre-compiled firmware to an Jumper, iRangeX, Vantac, 'Banggood', or DIY STM32-based Multiprotocol TX module.  Firmware upload can be performed using the built-in USB connection or via an external USB-to-serial adapter.
+Tool for flashing pre-compiled firmware to a Jumper, iRangeX, Vantac, 'Banggood', or DIY STM32-based Multiprotocol TX module.
+
+Firmware upload can be performed using the built-in USB connection or via an external USB-to-serial adapter.
 
 Just three steps are required to update your Jumper, iRangeX, or DIY Multiprotocol TX module (full instructions are below):
 1. [Download and install](#installing-flash-multi) Flash Multi and any required [device drivers](#additional-drivers)
