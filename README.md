@@ -81,6 +81,13 @@ Other drivers may be needed if you are using an external USB-to-serial adapter. 
 1. If it wasn't automatically selected, select the appropriate COM port
 1. Click the **Upload** button
 
+## Writing the Bootloader
+The bootloader enables flashing the Multiprotocol module firmware from a radio which supports this (see [here](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/blob/master/docs/Flash_from_Tx.md)).  It also enables the native USB port on Multiprotocol modules which have one, facilitating firmware updates via native USB rather than an external USB-to-serial adapter.
+
+When flashing with a USB-to-serial adapter the bootloader will be written automatically if the selected firmware file was compiled with support for it.
+
+When flashing via the native USB port the firmware being flashed _must be compiled with support for the bootloader_ otherwise, to avoid rendering the module inoperable, Flash Multi will display an error and stop the flash attempt.
+
 ## Upload Output
 The output will vary depending on the type of module being flashed.
 
