@@ -62,7 +62,7 @@ namespace Flash_Multi
             // 
             this.dialogText.Location = new System.Drawing.Point(54, 13);
             this.dialogText.Name = "dialogText";
-            this.dialogText.Size = new System.Drawing.Size(315, 84);
+            this.dialogText.Size = new System.Drawing.Size(306, 84);
             this.dialogText.TabIndex = 0;
             this.dialogText.Text = "Could not find a Multiprotocol module in DFU mode.  \r\n\r\nPlease unplug and then re" +
     "-plug your module.\r\n\r\nFlashing will continue automatically when the module is pl" +
@@ -70,8 +70,7 @@ namespace Flash_Multi
             // 
             // buttonCancel
             // 
-            this.buttonCancel.Enabled = false;
-            this.buttonCancel.Location = new System.Drawing.Point(315, 155);
+            this.buttonCancel.Location = new System.Drawing.Point(320, 154);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(67, 24);
             this.buttonCancel.TabIndex = 1;
@@ -97,7 +96,7 @@ namespace Flash_Multi
             this.panel2.Controls.Add(this.warningIcon);
             this.panel2.Location = new System.Drawing.Point(-2, -1);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(405, 156);
+            this.panel2.Size = new System.Drawing.Size(405, 147);
             this.panel2.TabIndex = 4;
             // 
             // timerProgressBar
@@ -105,7 +104,7 @@ namespace Flash_Multi
             this.timerProgressBar.Location = new System.Drawing.Point(58, 100);
             this.timerProgressBar.Maximum = 30;
             this.timerProgressBar.Name = "timerProgressBar";
-            this.timerProgressBar.Size = new System.Drawing.Size(297, 23);
+            this.timerProgressBar.Size = new System.Drawing.Size(302, 23);
             this.timerProgressBar.Step = 1;
             this.timerProgressBar.TabIndex = 3;
             this.timerProgressBar.Value = 30;
@@ -114,7 +113,7 @@ namespace Flash_Multi
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(404, 152);
+            this.ClientSize = new System.Drawing.Size(404, 187);
             this.ControlBox = false;
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.panel2);

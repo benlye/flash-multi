@@ -56,9 +56,6 @@ namespace Flash_Multi
             this.label3 = new System.Windows.Forms.Label();
             this.buttonBrowse = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.writeBootloader_No = new System.Windows.Forms.RadioButton();
-            this.writeBootloader_Yes = new System.Windows.Forms.RadioButton();
-            this.label1 = new System.Windows.Forms.Label();
             this.buttonRefresh = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.showVerboseOutput = new System.Windows.Forms.CheckBox();
@@ -72,7 +69,7 @@ namespace Flash_Multi
             // 
             // buttonUpload
             // 
-            this.buttonUpload.Location = new System.Drawing.Point(373, 77);
+            this.buttonUpload.Location = new System.Drawing.Point(373, 48);
             this.buttonUpload.Name = "buttonUpload";
             this.buttonUpload.Size = new System.Drawing.Size(75, 22);
             this.buttonUpload.TabIndex = 6;
@@ -86,7 +83,7 @@ namespace Flash_Multi
             this.comPortSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comPortSelector.DropDownWidth = 90;
             this.comPortSelector.FormattingEnabled = true;
-            this.comPortSelector.Location = new System.Drawing.Point(101, 48);
+            this.comPortSelector.Location = new System.Drawing.Point(77, 48);
             this.comPortSelector.Name = "comPortSelector";
             this.comPortSelector.Size = new System.Drawing.Size(90, 21);
             this.comPortSelector.TabIndex = 2;
@@ -94,16 +91,16 @@ namespace Flash_Multi
             // 
             // textFileName
             // 
-            this.textFileName.Location = new System.Drawing.Point(101, 20);
+            this.textFileName.Location = new System.Drawing.Point(77, 20);
             this.textFileName.Name = "textFileName";
-            this.textFileName.Size = new System.Drawing.Size(270, 20);
+            this.textFileName.Size = new System.Drawing.Size(290, 20);
             this.textFileName.TabIndex = 0;
             this.textFileName.DoubleClick += new System.EventHandler(this.ButtonBrowse_Click);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(35, 24);
+            this.label2.Location = new System.Drawing.Point(14, 24);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(57, 13);
             this.label2.TabIndex = 7;
@@ -112,7 +109,7 @@ namespace Flash_Multi
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(35, 52);
+            this.label3.Location = new System.Drawing.Point(14, 52);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(58, 13);
             this.label3.TabIndex = 8;
@@ -130,9 +127,6 @@ namespace Flash_Multi
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.writeBootloader_No);
-            this.groupBox1.Controls.Add(this.writeBootloader_Yes);
-            this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.buttonRefresh);
             this.groupBox1.Controls.Add(this.buttonUpload);
             this.groupBox1.Controls.Add(this.buttonBrowse);
@@ -142,47 +136,14 @@ namespace Flash_Multi
             this.groupBox1.Controls.Add(this.textFileName);
             this.groupBox1.Location = new System.Drawing.Point(15, 37);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(454, 106);
+            this.groupBox1.Size = new System.Drawing.Size(454, 84);
             this.groupBox1.TabIndex = 11;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Settings";
             // 
-            // writeBootloader_No
-            // 
-            this.writeBootloader_No.AutoSize = true;
-            this.writeBootloader_No.Location = new System.Drawing.Point(152, 76);
-            this.writeBootloader_No.Name = "writeBootloader_No";
-            this.writeBootloader_No.Size = new System.Drawing.Size(39, 17);
-            this.writeBootloader_No.TabIndex = 5;
-            this.writeBootloader_No.TabStop = true;
-            this.writeBootloader_No.Text = "No";
-            this.writeBootloader_No.UseVisualStyleBackColor = true;
-            this.writeBootloader_No.CheckedChanged += new System.EventHandler(this.WriteBootloader_OnChange);
-            // 
-            // writeBootloader_Yes
-            // 
-            this.writeBootloader_Yes.AutoSize = true;
-            this.writeBootloader_Yes.Location = new System.Drawing.Point(101, 76);
-            this.writeBootloader_Yes.Name = "writeBootloader_Yes";
-            this.writeBootloader_Yes.Size = new System.Drawing.Size(43, 17);
-            this.writeBootloader_Yes.TabIndex = 4;
-            this.writeBootloader_Yes.TabStop = true;
-            this.writeBootloader_Yes.Text = "Yes";
-            this.writeBootloader_Yes.UseVisualStyleBackColor = true;
-            this.writeBootloader_Yes.CheckedChanged += new System.EventHandler(this.WriteBootloader_OnChange);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(4, 79);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(89, 13);
-            this.label1.TabIndex = 9;
-            this.label1.Text = "Write Bootloader:";
-            // 
             // buttonRefresh
             // 
-            this.buttonRefresh.Location = new System.Drawing.Point(197, 47);
+            this.buttonRefresh.Location = new System.Drawing.Point(173, 47);
             this.buttonRefresh.Name = "buttonRefresh";
             this.buttonRefresh.Size = new System.Drawing.Size(75, 23);
             this.buttonRefresh.TabIndex = 3;
@@ -235,12 +196,12 @@ namespace Flash_Multi
             // 
             this.textActivity.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.textActivity.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textActivity.Location = new System.Drawing.Point(15, 149);
+            this.textActivity.Location = new System.Drawing.Point(15, 127);
             this.textActivity.Multiline = true;
             this.textActivity.Name = "textActivity";
             this.textActivity.ReadOnly = true;
             this.textActivity.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textActivity.Size = new System.Drawing.Size(454, 111);
+            this.textActivity.Size = new System.Drawing.Size(454, 133);
             this.textActivity.TabIndex = 7;
             this.textActivity.TabStop = false;
             // 
@@ -311,9 +272,6 @@ namespace Flash_Multi
         private System.Windows.Forms.TextBox textActivity;
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.LinkLabel linkLabel2;
-        internal System.Windows.Forms.RadioButton writeBootloader_No;
-        internal System.Windows.Forms.RadioButton writeBootloader_Yes;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button buttonRefresh;
     }
 }
