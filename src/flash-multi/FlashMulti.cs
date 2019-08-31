@@ -145,19 +145,6 @@ namespace Flash_Multi
             this.textFileName.Enabled = arg;
             this.comPortSelector.Enabled = arg;
 
-            // Keep the Write Bootloader controls disabled if a Maple device is plugged in.
-            if (mapleCheck.DeviceFound)
-            {
-                this.writeBootloader_Yes.Checked = true;
-                this.writeBootloader_Yes.Enabled = false;
-                this.writeBootloader_No.Enabled = false;
-            }
-            else
-            {
-                this.writeBootloader_Yes.Enabled = arg;
-                this.writeBootloader_No.Enabled = arg;
-            }
-
             // Check a couple of things if we're re-enabling
             if (arg)
             {
@@ -254,11 +241,11 @@ namespace Flash_Multi
 
         /// <summary>
         /// Checks if the Upload button should be enabled or not.
-        /// Called by changes to the file name, COM port selector, or bootloader radio buttons.
+        /// Called by changes to the file name or COM port selector.
         /// </summary>
         private void CheckControls()
         {
-            if (this.textFileName.Text != string.Empty && this.comPortSelector.SelectedItem != null && (this.writeBootloader_No.Checked || this.writeBootloader_Yes.Checked))
+            if (this.textFileName.Text != string.Empty && this.comPortSelector.SelectedItem != null)
             {
                 this.buttonUpload.Enabled = true;
             }
@@ -340,21 +327,6 @@ namespace Flash_Multi
                 this.comPortSelector.SelectedItem = null;
             }
 
-            // Check if we there's a Maple device plugged in
-            if (mapleCheck.DeviceFound)
-            {
-                // Set the Write Bootloader radio button and disable the controls if a Maple device is present
-                // Required so that the firmware size is calculated correctly
-                this.writeBootloader_Yes.Checked = true;
-                this.writeBootloader_Yes.Enabled = false;
-                this.writeBootloader_No.Enabled = false;
-            }
-            else
-            {
-                this.writeBootloader_Yes.Enabled = true;
-                this.writeBootloader_No.Enabled = true;
-            }
-
             // Set the width of the dropdown
             // this.comPortSelector.DropDownWidth = comPorts.Select(c => c.DisplayName).ToList().Max(x => TextRenderer.MeasureText(x, this.comPortSelector.Font).Width);
 
@@ -393,42 +365,15 @@ namespace Flash_Multi
             // Determine if we should use Maple or serial interface
             MapleDevice mapleResult = MapleDevice.FindMaple();
 
-            // Warn if Write Bootloader seems to be incorrect
-            bool firmwareSupportsBootloader = this.CheckForBootloaderSupport();
-            if (this.writeBootloader_No.Checked && firmwareSupportsBootloader)
+            // Determine if the selected file contains USB / bootloader support
+            bool firmwareSupportsUsb = this.CheckForUsbSupport();
+
+            // Error if flashing non-USB firmware via native USB port
+            if (mapleResult.DeviceFound && !firmwareSupportsUsb)
             {
-                DialogResult response = MessageBox.Show("You have selected not to write the bootloader, but the selected firmware file was compiled with bootloader support.\r\n\r\nThe module will not function if the firmware requires the bootloader but the bootloader is not written.\r\n\r\nAre you sure you want to proceed?", "Write Bootloader", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-                if (response != DialogResult.OK)
-                {
-                    return;
-                }
-
-                this.AppendLog(string.Format("WARNING: Firmware image was compiled with bootloader support but Write Bootloader is not selected.\r\n\r\n"));
-            }
-
-            if (this.writeBootloader_Yes.Checked && !firmwareSupportsBootloader)
-            {
-                string msgBoxMessage = string.Empty;
-                DialogResult response = DialogResult.None;
-
-                if (mapleResult.DeviceFound)
-                {
-                    this.AppendLog(string.Format("ERROR: Attempted to upload firmware image without USB bootloader support via USB."));
-                    msgBoxMessage = "You are flashing via USB, but the selected firmware file was compiled without USB support.\r\n\r\nContinuing would prevent the module from functioning correctly.\r\n\r\nPlease select a different firmware file.";
-                    response = MessageBox.Show(msgBoxMessage, "Write Bootloader", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                else
-                {
-                    msgBoxMessage = "You have selected to write the bootloader, but the selected firmware file was compiled without bootloader support.\r\n\r\nThe module will not function if the bootloader is written but the firmware does not support it.\r\n\r\nAre you sure you want to proceed?";
-                    response = MessageBox.Show(msgBoxMessage, "Write Bootloader", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-                    if (response != DialogResult.OK)
-                    {
-                        return;
-                    }
-
-                    this.AppendLog(string.Format("WARNING: Firmware image was not compiled with bootloader support but Write Bootloader is selected.\r\n\r\n"));
-                }
+                string msgBoxMessage = "The selected firmware file was compiled without USB support.\r\n\r\nFlashing this firmware would prevent the Multiprotocol module from functioning correctly.\r\n\r\nPlease select a different firmware file.";
+                MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
             // Get the selected COM port
@@ -455,7 +400,7 @@ namespace Flash_Multi
             }
             else
             {
-                SerialDevice.WriteFlash(this, this.textFileName.Text, comPort);
+                SerialDevice.WriteFlash(this, this.textFileName.Text, comPort, firmwareSupportsUsb);
             }
         }
 
@@ -484,19 +429,14 @@ namespace Flash_Multi
                         return;
                     }
 
-                    // Check if there is a Maple device
-                    bool mapleCheck = MapleDevice.FindMaple().DeviceFound;
-
-                    // Check if the binary file contains support for the bootloader
-                    if (this.CheckForBootloaderSupport())
+                    // Check if the binary file contains USB / bootloader support
+                    if (this.CheckForUsbSupport())
                     {
-                        Debug.WriteLine("CHECK_FOR_BOOTLOADER is enabled in the firmware file.");
-                        this.writeBootloader_Yes.Checked = true;
+                        Debug.WriteLine("Firmware file compiled with USB support.");
                     }
                     else
                     {
-                        Debug.WriteLine("CHECK_FOR_BOOTLOADER is not enabled in the firmware file.");
-                        this.writeBootloader_No.Checked = true;
+                        Debug.WriteLine("Firmware file was not compiled with USB support.");
                     }
                 }
             }
@@ -506,13 +446,13 @@ namespace Flash_Multi
         }
 
         /// <summary>
-        /// Parses the binary file looking for a string which indicates that the compiled firmware images contains bootloader support.
-        /// The binary firmware file will contain the strings 'Maple' and 'LeafLabs' if it was compiled with CHECK_FOR_BOOTLOADER defined.
+        /// Parses the binary file looking for a string which indicates that the compiled firmware images contains USB support.
+        /// The binary firmware file will contain the strings 'Maple' and 'LeafLabs' if it was compiled with support for the USB / Flash from TX bootloader.
         /// </summary>
-        /// <returns>A boolean value indicatating whether or not the firmware supports the bootloader.</returns>
-        private bool CheckForBootloaderSupport()
+        /// <returns>A boolean value indicatating whether or not the firmware supports USB.</returns>
+        private bool CheckForUsbSupport()
         {
-            bool bootloaderCheckEnabled = false;
+            bool usbSupportEnabled = false;
             string fileName = this.textFileName.Text;
 
             byte[] byteBuffer = File.ReadAllBytes(fileName);
@@ -521,10 +461,10 @@ namespace Flash_Multi
 
             if (offset > 0)
             {
-                bootloaderCheckEnabled = true;
+                usbSupportEnabled = true;
             }
 
-            return bootloaderCheckEnabled;
+            return usbSupportEnabled;
         }
 
         /// <summary>
@@ -533,20 +473,23 @@ namespace Flash_Multi
         /// <returns>Returns a boolean indicating whehter or not the firmware size is OK.</returns>
         private bool CheckFirmwareFileSize()
         {
-            // Check that the file size is OK
-            // Max size is 120,832B (118KB) with bootloader, 129,024B (126KB) without
-            int maxFileSize = 129024;
-            if (this.writeBootloader_Yes.Checked)
+            // Get the file size
+            long length = new System.IO.FileInfo(this.textFileName.Text).Length;
+
+            // If the file is very large we don't want to check for USB support so throw a generic error
+            if (length > 256000)
             {
-                maxFileSize = 120832;
+                MessageBox.Show("Selected firmware file is too large.", "Firmware File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
 
-            long length = new System.IO.FileInfo(this.textFileName.Text).Length;
+            // If the file is smaller we can check if it has USB support and throw a more specific error
+            int maxFileSize = this.CheckForUsbSupport() ? 120832 : 129024;
 
             if (length > maxFileSize)
             {
-                this.AppendLog(string.Format("ERROR: Firmware file is too large.\r\nFile is {1:n0} KB, maximum size is {2:n0} KB.", this.textFileName.Text, length / 1024, maxFileSize / 1024));
-                MessageBox.Show("Firmware file is too large.", "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                string sizeMessage = $"Firmware file is too large.\r\n\r\nSelected file is {length / 1024:n0} KB, maximum size is {maxFileSize / 1024:n0} KB.";
+                MessageBox.Show(sizeMessage, "Firmware File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
@@ -566,12 +509,6 @@ namespace Flash_Multi
         /// Handles input in the firmware file name text box.
         /// </summary>
         private void TextFileName_OnChange(object sender, EventArgs e)
-        {
-            // Check if the Upload button should be enabled yet
-            this.CheckControls();
-        }
-
-        private void WriteBootloader_OnChange(object sender, EventArgs e)
         {
             // Check if the Upload button should be enabled yet
             this.CheckControls();

@@ -34,7 +34,8 @@ namespace Flash_Multi
         /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
         /// <param name="fileName">The path of the file to flash.</param>
         /// <param name="comPort">The COM port where the serial device can be found.</param>
-        public static async void WriteFlash(FlashMulti flashMulti, string fileName, string comPort)
+        /// <param name="writeBootloader">Indicates whether or not the bootloader should be written.</param>
+        public static async void WriteFlash(FlashMulti flashMulti, string fileName, string comPort, bool writeBootloader)
         {
             // Path to the flashing tool, stm32flash.exe
             string command = ".\\tools\\stm32flash.exe";
@@ -63,7 +64,7 @@ namespace Flash_Multi
             // Address where we will start execution after flashing
             string executionAddress = "0x8000000";
 
-            if (flashMulti.writeBootloader_Yes.Checked)
+            if (writeBootloader)
             {
                 // Increase the total number of steps
                 flashSteps = 3;
@@ -99,15 +100,15 @@ namespace Flash_Multi
 
             flashMulti.AppendLog(" done\r\n");
 
-            // Write the bootloader, if it was selected
-            if (flashMulti.writeBootloader_Yes.Checked)
+            // Write the bootloader if required
+            if (writeBootloader)
             {
                 // Increment the step counter and write to the log
                 flashStep++;
                 flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Writing bootloader...");
 
                 // Prepare the command line arguments for writing the bootloader
-                commandArgs = $"-v -e 0 -g {executionAddress} -b {serialBaud} -w \"{bootLoaderPath}\" {comPort}";
+                commandArgs = $"-v -e 0 -g 0x8000000 -b {serialBaud} -w \"{bootLoaderPath}\" {comPort}";
 
                 // Run the write command asynchronously and wait for it to finish
                 await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
