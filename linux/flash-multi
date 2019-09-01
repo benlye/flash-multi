@@ -41,15 +41,9 @@ if [ ! -r "$FWFILE" ]; then
 fi
 
 # Die if the serial port doesn't exist
-if [ ! -f "$PORT" ]; then
+if [ ! -c "$PORT" ]; then
     printf "ERROR: $PORT does not exist!\n\n";
     exit 3;
-fi
-
-# Stop if the firmware file isn't readable
-if [ ! -w "$PORT" ]; then
-    printf "ERROR: Cannot write to $PORT!\n\n";
-    exit 2;
 fi
 
 # Get the directory where the script is running.
@@ -75,9 +69,13 @@ DFU_UTIL="$TOOLS_DIR/dfu-util"
 if grep -q -Pa 'M\x00a\x00p\x00l\x00e\x00\x12\x03L\x00e\x00a\x00f\x00L\x00a\x00b\x00s' "$FWFILE"; then
   HAS_USB_SUPPORT=true;
   MAX_FILE_SIZE=120832
+  FLASH_START=8
+  EXEC_ADDR=0x8002000
 else
   HAS_USB_SUPPORT=false;
   MAX_FILE_SIZE=129024
+  FLASH_START=0
+  EXEC_ADDR=0x8000000
 fi
 
 # Check if the firmware will fit
@@ -118,21 +116,21 @@ then
   printf "[$STEP/$NUM_STEPS] Erasing flash...\n"
   printf "$STM32_FLASH -o -S 0x8000000:129024 -b 115200 \"$PORT\"\n"
   "${STM32_FLASH}" -o -S 0x8000000:129024 -b 115200 "$PORT"
-  [ $? -ne 0 ] && printf "ERROR: Failed to erase flash!\n\n"; exit 3;
+  [ $? -ne 0 ] && printf "ERROR: Failed to erase flash!\n\n" && exit 3;
   STEP=$((STEP+1))
   
   if [ "$HAS_USB_SUPPORT" = true ] ; then
     printf "[$STEP/$NUM_STEPS] Writing bootloader...\n"
     printf "$STM32_FLASH -v -e 0 -g 0x8000000 -b 115200 -w \"$BOOTLOADERFILE\" \"$PORT\"\n"
     "${STM32_FLASH}" -v -e 0 -g 0x8000000 -b 115200 -w "$BOOTLOADERFILE" "$PORT"
-    [ $? -ne 0 ] && printf "ERROR: Failed to write bootloader!\n\n"; exit 3;
+    [ $? -ne 0 ] && printf "ERROR: Failed to write bootloader!\n\n" && exit 3;
     STEP=$((STEP+1))
   fi
   
   printf "[$STEP/$NUM_STEPS] Writing firmware...\n"
-  printf "$STM32_FLASH -v -s 8 -e 0 -g 0x8002000 -b 115200 -w \"$FWFILE\" \"$PORT\"\n"
-  "${STM32_FLASH}" -v -s 8 -e 0 -g 0x8002000 -b 115200 -w "$FWFILE" "$PORT"
-  [ $? -ne 0 ] && printf "ERROR: Failed to write firmware!\n\n"; exit 3;
+  printf "$STM32_FLASH -v -s $FLASH_START -e 0 -g $EXEC_ADDR -b 115200 -w \"$FWFILE\" \"$PORT\"\n"
+  "${STM32_FLASH}" -v -s $FLASH_START -e 0 -g $EXEC_ADDR -b 115200 -w "$FWFILE" "$PORT"
+  [ $? -ne 0 ] && printf "ERROR: Failed to write firmware!\n\n" && exit 3;
     
 else
   # Maple device detected
@@ -161,7 +159,7 @@ else
     printf "[$STEP/$NUM_STEPS] Resetting to DFU mode...\n"
     printf "$RESET_UTIL $PORT\n"
     "${RESET_UTIL}" $PORT
-    [ $? -ne 0 ] && printf "ERROR: Failed to reset device!\n\n"; exit 3;
+    [ $? -ne 0 ] && printf "ERROR: Failed to reset device!\n\n" && exit 4;
     
     # Give the board a chance to reset to DFU mode
     sleep 0.5
@@ -172,7 +170,7 @@ else
   printf "[$STEP/$NUM_STEPS] Writing firmware...\n"
   printf "${DFU_UTIL} -d 1eaf:0003 -a 2 -D \"$FWFILE\" -R\n"
   "${DFU_UTIL}" -d 1eaf:0003 -a 2 -D "$FWFILE" -R
-  [ $? -ne 0 ] && printf "\nERROR: Failed to write firmware!\n\n"; exit 3;
+  [ $? -ne 0 ] && printf "\nERROR: Failed to write firmware!\n\n" && exit 5;
 fi
 
 printf "Firmware flashed successfully.\n\n"
