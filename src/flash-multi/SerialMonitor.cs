@@ -34,9 +34,11 @@ namespace Flash_Multi
 
     public partial class SerialMonitor : Form
     {
+        public SerialPort serialPort;
+
+        public bool serialConnected;
+
         private string serialPortName = string.Empty;
-        private SerialPort serialPort;
-        private bool serialConnected = false;
 
         public SerialMonitor(string serialPortName)
         {
@@ -63,13 +65,16 @@ namespace Flash_Multi
 
         private void ButtonClose_Click(object sender, EventArgs e)
         {
+            // Disconnect the serial port
             this.SerialDisconnect();
 
+            // Close the serial monitor windows
             this.Close();
         }
 
         private void ButtonClear_Click(object sender, EventArgs e)
         {
+            // Clear the serial ouput
             this.serialOutput.Clear();
         }
 
@@ -77,7 +82,7 @@ namespace Flash_Multi
         {
             if (!this.serialConnected)
             {
-                this.serialConnected = SerialConnect(this.serialPortName);
+                this.serialConnected = this.SerialConnect(this.serialPortName);
                 if (!this.serialConnected)
                 {
                     Debug.WriteLine("Failed to connect.");
@@ -88,7 +93,7 @@ namespace Flash_Multi
             }
         }
 
-        public void AppendOutput(string data)
+        private void AppendOutput(string data)
         {
             // Check if we're called from another thread
             if (this.InvokeRequired)
@@ -101,7 +106,7 @@ namespace Flash_Multi
             this.serialOutput.AppendText(data);
         }
 
-        private bool SerialConnect(string serialPortName)
+        public bool SerialConnect(string serialPortName)
         {
             try
             {
@@ -112,7 +117,7 @@ namespace Flash_Multi
                 serialPort.RtsEnable = true;
                 serialPort.Open();
 
-                serialPort.DataReceived += new SerialDataReceivedEventHandler(SerialPortDataReceived);
+                serialPort.DataReceived += new SerialDataReceivedEventHandler(this.SerialPortDataReceived);
 
                 this.serialPort = serialPort;
                 serialPort.Write("\r\n");
@@ -132,7 +137,7 @@ namespace Flash_Multi
             }
         }
 
-        private void SerialDisconnect()
+        public void SerialDisconnect()
         {
             SerialPort serialPort = this.serialPort;
             if (serialPort != null && serialPort.IsOpen)

@@ -32,6 +32,8 @@ namespace Flash_Multi
     /// </summary>
     public partial class FlashMulti : Form
     {
+        private SerialMonitor serialMonitor;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FlashMulti"/> class.
         /// </summary>
@@ -388,6 +390,14 @@ namespace Flash_Multi
             // Get the selected COM port
             string comPort = this.comPortSelector.SelectedValue.ToString();
 
+            // Stop the serial monitor if it's active
+            bool reconnectSerialMonitor = false;
+            if (this.serialMonitor.serialConnected)
+            {
+                reconnectSerialMonitor = true;
+                this.serialMonitor.SerialDisconnect();
+            }
+
             // Check if the port can be opened
             if (!ComPort.CheckPort(comPort))
             {
@@ -410,6 +420,11 @@ namespace Flash_Multi
             else
             {
                 SerialDevice.WriteFlash(this, this.textFileName.Text, comPort, firmwareSupportsUsb);
+            }
+
+            if (reconnectSerialMonitor)
+            {
+                this.serialMonitor.SerialConnect(comPort);
             }
         }
 
@@ -578,9 +593,14 @@ namespace Flash_Multi
             this.OpenLink("https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/releases");
         }
 
+        /// <summary>
+        /// Handlse the Serial Monitor button being clicked.
+        /// Opens the Serial Monitor window.
+        /// </summary>
         private void ButtonSerialMonitor_Click(object sender, EventArgs e)
         {
             SerialMonitor serialMonitor = new SerialMonitor(this.comPortSelector.SelectedValue.ToString());
+            this.serialMonitor = serialMonitor;
             serialMonitor.Show();
         }
     }
