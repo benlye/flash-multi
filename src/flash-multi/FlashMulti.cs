@@ -253,6 +253,15 @@ namespace Flash_Multi
             {
                 this.buttonUpload.Enabled = false;
             }
+
+            if (this.comPortSelector.SelectedItem != null)
+            {
+                this.buttonSerialMonitor.Enabled = true;
+            }
+            else
+            {
+                this.buttonSerialMonitor.Enabled = false;
+            }
         }
 
         private async void PopulateComPortsAsync()
@@ -567,6 +576,12 @@ namespace Flash_Multi
         private void ReleasesLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             this.OpenLink("https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/releases");
+        }
+
+        private void ButtonSerialMonitor_Click(object sender, EventArgs e)
+        {
+            SerialMonitor serialMonitor = new SerialMonitor(this.comPortSelector.SelectedValue.ToString());
+            serialMonitor.Show();
         }
     }
 }
