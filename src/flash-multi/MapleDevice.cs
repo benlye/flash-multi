@@ -156,12 +156,12 @@ namespace Flash_Multi
             {
                 Debug.WriteLine("Serial monitor window is open");
                 serialMonitor = Application.OpenForms.OfType<SerialMonitor>().First();
-                if (serialMonitor != null && serialMonitor.serialPort != null && serialMonitor.serialPort.IsOpen)
+                if (serialMonitor != null && serialMonitor.SerialPort != null && serialMonitor.SerialPort.IsOpen)
                 {
                     reconnectSerialMonitor = true;
-                    Debug.WriteLine($"Serial monitor is connected to {serialMonitor.serialPort.PortName}");
+                    Debug.WriteLine($"Serial monitor is connected to {serialMonitor.SerialPort.PortName}");
 
-                    Debug.WriteLine($"Closing serial monitor connection to {serialMonitor.serialPort.PortName}");
+                    Debug.WriteLine($"Closing serial monitor connection to {serialMonitor.SerialPort.PortName}");
                     serialMonitor.SerialDisconnect();
                 }
             }
