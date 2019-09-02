@@ -24,6 +24,8 @@ namespace Flash_Multi
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.IO.Ports;
+    using System.Linq;
     using System.Threading.Tasks;
     using System.Windows.Forms;
 
@@ -580,8 +582,16 @@ namespace Flash_Multi
         /// </summary>
         private void ButtonSerialMonitor_Click(object sender, EventArgs e)
         {
-            SerialMonitor serialMonitor = new SerialMonitor(this.comPortSelector.SelectedValue.ToString());
-            serialMonitor.Show();
+            if (Application.OpenForms.OfType<SerialMonitor>().Any())
+            {
+                SerialMonitor serialMonitor = Application.OpenForms.OfType<SerialMonitor>().FirstOrDefault();
+                serialMonitor.BringToFront();
+            }
+            else
+            {
+                SerialMonitor serialMonitor = new SerialMonitor(this.comPortSelector.SelectedValue.ToString());
+                serialMonitor.Show();
+            }
         }
     }
 }

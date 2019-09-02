@@ -24,6 +24,7 @@ namespace Flash_Multi
     using System.Diagnostics;
     using System.IO;
     using System.IO.Ports;
+    using System.Linq;
     using System.Windows.Forms;
 
     /// <summary>
@@ -31,8 +32,6 @@ namespace Flash_Multi
     /// </summary>
     public partial class SerialMonitor : Form
     {
-        private string serialPortName = string.Empty;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SerialMonitor"/> class.
         /// </summary>
@@ -45,14 +44,19 @@ namespace Flash_Multi
             this.Load += this.SerialMonitor_Load;
 
             this.Text = $"Flash Multi Serial Monitor - {serialPortName}";
-            this.serialPortName = serialPortName;
-            this.SerialConnect(this.serialPortName);
+            this.SerialPortName = serialPortName;
+            this.SerialConnect(this.SerialPortName);
         }
 
         /// <summary>
         /// Gets the <see cref="SerialPort"/> object being monitored.
         /// </summary>
         public SerialPort SerialPort { get; private set; }
+
+        /// <summary>
+        /// Gets the name of the serial port being monitored.
+        /// </summary>
+        public string SerialPortName { get; private set; }
 
         /// <summary>
         /// Connects to the specified serial port and registers a handler for data received.
@@ -113,7 +117,7 @@ namespace Flash_Multi
 
             this.Text = $"Flash Multi Serial Monitor (Disconnected)";
 
-            Debug.WriteLine($"Disconnected from {this.serialPortName}.");
+            Debug.WriteLine($"Disconnected from {this.SerialPortName}.");
         }
 
         /// <summary>
@@ -176,7 +180,7 @@ namespace Flash_Multi
         {
             if (this.SerialPort == null || !this.SerialPort.IsOpen)
             {
-                if (!this.SerialConnect(this.serialPortName))
+                if (!this.SerialConnect(this.SerialPortName))
                 {
                     Debug.WriteLine("Failed to connect.");
                     return;

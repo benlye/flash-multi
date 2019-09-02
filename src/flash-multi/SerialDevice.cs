@@ -182,7 +182,7 @@ namespace Flash_Multi
             flashMulti.AppendLog("\r\nMultimodule updated sucessfully");
 
             // Reconnect the serial monitor if it was connected before
-            if (serialMonitor != null && reconnectSerialMonitor)
+            if (serialMonitor != null && serialMonitor.IsDisposed != true && reconnectSerialMonitor)
             {
                 serialMonitor.SerialConnect(comPort);
             }
