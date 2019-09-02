@@ -1,7 +1,7 @@
 # Flash-Multi
 <img src=https://img.shields.io/github/downloads/benlye/flash-multi/total.svg> <a href="https://scan.coverity.com/projects/benlye-flash-multi"><img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/18725.svg"/></a>
 
-Tool for flashing pre-compiled firmware to a Jumper, iRangeX, Vantac, 'Banggood', or DIY STM32-based Multiprotocol TX module.
+Tool for flashing pre-compiled firmware to a Jumper, iRangeX, Vantac, 'Banggood', or DIY STM32-based Multiprotocol TX module.  A GUI application is available for Windows and a shell script for Linux.
 
 Firmware upload can be performed using the built-in USB connection or via an external USB-to-serial adapter.
 
@@ -18,6 +18,7 @@ Just three steps are required to update your Jumper, iRangeX, or DIY Multiprotoc
 1. [Supported Modules](#supported-modules)
 1. [Flash Multi Requirements](#flash-multi-requirements)
 1. [Installing Flash Multi](#installing-flash-multi)
+   1. [Linux](#linux)
    1. [Using the Installer](#using-the-installer)
    1. [Manual Installation](#manual-installation)
    1. [Additional Drivers](#additional-drivers)
@@ -44,10 +45,12 @@ Flash Multi requires .Net Framework 4.5 or newer.  You probably already have a c
 > _Tip: When you launch Flash Multi it will tell you if you need to install or upgrade your .Net Framework._
 
 # Installing Flash Multi
-
-**Note:** Make sure your Multiprotocol module is not plugged in when you run the Flash Multi installer, or when you run the manual Maple USB driver installer.  This is to avoid potential problems with the driver installation.
+## Linux
+Please refer to the [Linux instructions](doc/Linux.md).
 
 ## Using the Installer
+**Note:** Make sure your Multiprotocol module is not plugged in when you run the Flash Multi installer, or when you run the manual Maple USB driver installer.  This is to avoid potential problems with the driver installation.
+
 1. Download the latest installer (`flash-multi-[version].exe`) from the [Releases](https://github.com/benlye/flash-multi/releases) page
 1. Run the installer to install the application and the Maple USB device drivers - **the Maple USB device drivers must be selected for installation at least once**. They do not need to be installed on subsequent reinstalls or upgrades (but reinstalling them won't do any harm).
 1. Launch 'Flash Multi' from the Start menu
