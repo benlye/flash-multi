@@ -2,7 +2,7 @@
 
 if sudo [ -w /etc/udev/rules.d ]; then
     echo "Copying Maple-specific udev rules..."
-    sudo cp -v 45-maple.rules /etc/udev/rules.d/45-maple.rules
+    sudo cp -v $(dirname "$0")/45-maple.rules /etc/udev/rules.d/45-maple.rules
     sudo chown root:root /etc/udev/rules.d/45-maple.rules
     sudo chmod 644 /etc/udev/rules.d/45-maple.rules
     echo "Reloading udev rules"

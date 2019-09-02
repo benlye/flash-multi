@@ -1,7 +1,27 @@
 #!/bin/bash
 
+# *********************************************************************
+# Copyright (C) 2019 Ben Lye
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# *********************************************************************
+
+# Define the script version
+VERSION=0.1.5
+
 # Write the script header
-printf "flash-multi 0.1.5\n\nThis program is Free Sofware and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
+printf "flash-multi $VERSION\n\nThis program is Free Sofware and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
 
 # Prepare simple help text to disply when needed
 USAGE="Usage: flash-multi -f [firmware file] -p [serial device]\n\n"
@@ -22,8 +42,8 @@ while getopts ":f:p:h" opt; do
   esac
 done
 
-# Show the usage and exit if no -f or -p arguments given
-if [ "x" == "x$FWFILE" ] || [ "x" == "x$PORT" ]; then
+# Show the usage and exit if no -f argument given
+if [ "x" == "x$FWFILE" ]; then
   printf "$USAGE"
   exit 1
 fi
@@ -40,10 +60,34 @@ if [ ! -r "$FWFILE" ]; then
     exit 2;
 fi
 
-# Die if the serial port doesn't exist
-if [ ! -c "$PORT" ]; then
-    printf "ERROR: $PORT does not exist!\n\n";
-    exit 3;
+# Check to see if a native STM32 USB device (Maple device) is attached
+MAPLE_USB_DEVICES=$(lsusb |grep "1eaf" | awk '{ print $NF}')
+case $MAPLE_USB_DEVICES in 
+   "1eaf:0003")
+      MAPLE_DEVICE=DFU
+   ;;
+   "1eaf:0004")
+      MAPLE_DEVICE=Native
+   ;;
+   *)
+      MAPLE_DEVICE=Unknown
+   ;;
+esac
+
+# Check if port exists for Maple USB or serial - there is no port needed for DFU
+if [ $MAPLE_DEVICE = "Native" ] || [ $MAPLE_DEVICE = "Unknown" ]
+then
+  # Die if a serial port wasn't specified
+  if [ "x" == "x$PORT" ]; then
+    printf "$USAGE"
+    exit 1
+  fi
+
+  # Die if the serial port doesn't exist
+  if [ ! -c "$PORT" ]; then
+      printf "ERROR: $PORT does not exist!\n\n";
+      exit 3;
+  fi
 fi
 
 # Get the directory where the script is running.
@@ -84,21 +128,6 @@ if [ $FWFILE_SIZE -gt $MAX_FILE_SIZE ]; then
     printf "ERROR: Firmware file is too large. File is $FWFILE_SIZE, maximum is $MAX_FILE_SIZE.\n\n";
     exit 2;
 fi
-
-# Check to see if a native STM32 USB device (Maple device) is attached
-MAPLE_USB_DEVICES=$(lsusb |grep "1eaf" | awk '{ print $NF}')
-# Find the mode of the leaf bootloader
-case $MAPLE_USB_DEVICES in 
-   "1eaf:0003")
-      MAPLE_DEVICE=DFU
-   ;;
-   "1eaf:0004")
-      MAPLE_DEVICE=Native
-   ;;
-   *)
-      MAPLE_DEVICE=Unknown
-   ;;
-esac
 
 # Run the Maple or serial flash
 if [[ $MAPLE_DEVICE = "Unknown" ]]
@@ -146,7 +175,7 @@ else
   
   # Die if the firmware file doesn't contain USB code
   if [ "$HAS_USB_SUPPORT" = false ]; then
-    printf "ERROR: Specified firmware file was not compiled with USB support. Flashing this file would make the Multiprotocol module unusable.\n\n"; 
+    printf "ERROR: Specified firmware file was not compiled with USB support.\nFlashing this file would make the Multiprotocol module unusable.\n\n"; 
     exit 9;
   fi
   
@@ -162,7 +191,7 @@ else
     [ $? -ne 0 ] && printf "ERROR: Failed to reset device!\n\n" && exit 4;
     
     # Give the board a chance to reset to DFU mode
-    sleep 0.5
+    sleep 1
     
     STEP=$((STEP+1))
   fi
