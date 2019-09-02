@@ -38,12 +38,12 @@ sudo usermod -a -G dialout $USER
 
    For example:
    
-   `./flash-multi -p /dev/ttyUSB0 -f /tmp/Multi-STM_TXFLASH_INV_OPENTX-v1.2.1.71.bin`
+   `./flash-multi -f /tmp/Multi-STM_TXFLASH_INV_OPENTX-v1.2.1.71.bin -p /dev/ttyUSB0 `
    
 The ouput will look similar to this:
 
 ```
-ben@ben-ubuntu:~/flash-multi-0.1.5$ ./flash-multi -p /dev/ttyUSB0 -f /tmp/Multi-STM_TXFLASH_INV_OPENTX-v1.2.1.71.bin 
+ben@ben-ubuntu:~/flash-multi-0.1.5$ ./flash-multi -f /tmp/Multi-STM_TXFLASH_INV_OPENTX-v1.2.1.71.bin -p /dev/ttyUSB0
 flash-multi 0.1.5
 
 This program is Free Sofware and has NO WARRANTY.
