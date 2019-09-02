@@ -134,7 +134,7 @@ namespace Flash_Multi
         }
 
         /// <summary>
-        /// Handle the Serial Monitor window loading.
+        /// Event handler for the Serial Monitor window loading.
         /// </summary>
         /// <param name="e">The event.</param>
         private void SerialMonitor_Load(object sender, EventArgs e)

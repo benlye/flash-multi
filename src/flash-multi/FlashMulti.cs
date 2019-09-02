@@ -57,7 +57,7 @@ namespace Flash_Multi
             // Register a handler to run on loading the form
             this.Load += this.FlashMulti_Load;
 
-            // Resgister a handler to be notified when USB devices are added or removed
+            // Register a handler to be notified when USB devices are added or removed
             UsbNotification.RegisterUsbDeviceNotification(this.Handle);
         }
 
@@ -230,6 +230,10 @@ namespace Flash_Multi
             }
         }
 
+        /// <summary>
+        /// Event handler for the application window loading.
+        /// </summary>
+        /// <param name="e">The event.</param>
         private void FlashMulti_Load(object sender, EventArgs e)
         {
             // Restore the last window location
