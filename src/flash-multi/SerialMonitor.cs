@@ -21,15 +21,9 @@
 namespace Flash_Multi
 {
     using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Data;
     using System.Diagnostics;
-    using System.Drawing;
+    using System.IO;
     using System.IO.Ports;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using System.Windows.Forms;
 
     public partial class SerialMonitor : Form
@@ -102,8 +96,15 @@ namespace Flash_Multi
                 return;
             }
 
-            // Append the text
-            this.serialOutput.AppendText(data);
+            // Append the text if we autoscroll is enabled
+            if (this.checkBoxAutoScroll.Checked)
+            {
+                this.serialOutput.AppendText(data);
+            }
+            else
+            {
+                this.serialOutput.Text += data;
+            }
         }
 
         public bool SerialConnect(string serialPortName)
@@ -111,7 +112,6 @@ namespace Flash_Multi
             try
             {
                 SerialPort serialPort = new SerialPort(serialPortName, 115200, Parity.None, 8, StopBits.One);
-                serialPort.NewLine = "\r\n";
                 serialPort.Handshake = Handshake.XOnXOff;
                 serialPort.DtrEnable = true;
                 serialPort.RtsEnable = true;
@@ -120,7 +120,6 @@ namespace Flash_Multi
                 serialPort.DataReceived += new SerialDataReceivedEventHandler(this.SerialPortDataReceived);
 
                 this.serialPort = serialPort;
-                serialPort.Write("\r\n");
 
                 this.buttonConnect.Enabled = false;
                 this.buttonDisconnect.Enabled = true;
@@ -142,7 +141,10 @@ namespace Flash_Multi
             SerialPort serialPort = this.serialPort;
             if (serialPort != null && serialPort.IsOpen)
             {
+                serialPort.DtrEnable = false;
+                serialPort.RtsEnable = false;
                 serialPort.Close();
+                serialPort.Dispose();
             }
 
             this.serialConnected = false;
@@ -156,6 +158,25 @@ namespace Flash_Multi
         private void ButtonDisconnect_Click(object sender, EventArgs e)
         {
             this.SerialDisconnect();
+        }
+
+        private void buttonSave_Click(object sender, EventArgs e)
+        {
+            // Create the file open dialog
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                // Title for the dialog
+                saveFileDialog.Title = "Save log file";
+
+                // Filter for .bin files
+                saveFileDialog.Filter = ".log File|*.log";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    // Save the log data to the selected file name
+                    File.WriteAllText(saveFileDialog.FileName, this.serialOutput.Text);
+                }
+            }
         }
     }
 }

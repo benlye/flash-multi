@@ -24,6 +24,7 @@ namespace Flash_Multi
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Threading.Tasks;
     using System.Windows.Forms;
 
@@ -32,8 +33,6 @@ namespace Flash_Multi
     /// </summary>
     public partial class FlashMulti : Form
     {
-        private SerialMonitor serialMonitor;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="FlashMulti"/> class.
         /// </summary>
@@ -349,7 +348,7 @@ namespace Flash_Multi
         /// Main method where all the action happens.
         /// Called by the Upload button.
         /// </summary>
-        private void ButtonUpload_Click(object sender, EventArgs e)
+        private async void ButtonUpload_Click(object sender, EventArgs e)
         {
             // Clear the output box
             Debug.WriteLine("Clearing the output textboxes...");
@@ -390,23 +389,6 @@ namespace Flash_Multi
             // Get the selected COM port
             string comPort = this.comPortSelector.SelectedValue.ToString();
 
-            // Stop the serial monitor if it's active
-            bool reconnectSerialMonitor = false;
-            if (this.serialMonitor.serialConnected)
-            {
-                reconnectSerialMonitor = true;
-                this.serialMonitor.SerialDisconnect();
-            }
-
-            // Check if the port can be opened
-            if (!ComPort.CheckPort(comPort))
-            {
-                this.AppendLog(string.Format("Couldn't open port {0}", comPort));
-                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                this.EnableControls(true);
-                return;
-            }
-
             // Disable the buttons until this flash attempt is complete
             Debug.WriteLine("Disabling the controls...");
             this.EnableControls(false);
@@ -415,16 +397,11 @@ namespace Flash_Multi
             if (mapleResult.DeviceFound == true)
             {
                 Debug.WriteLine($"Maple device found in {mapleResult.Mode} mode\r\n");
-                MapleDevice.WriteFlash(this, this.textFileName.Text, comPort);
+                await MapleDevice.WriteFlash(this, this.textFileName.Text, comPort);
             }
             else
             {
-                SerialDevice.WriteFlash(this, this.textFileName.Text, comPort, firmwareSupportsUsb);
-            }
-
-            if (reconnectSerialMonitor)
-            {
-                this.serialMonitor.SerialConnect(comPort);
+                await SerialDevice.WriteFlash(this, this.textFileName.Text, comPort, firmwareSupportsUsb);
             }
         }
 
@@ -600,7 +577,6 @@ namespace Flash_Multi
         private void ButtonSerialMonitor_Click(object sender, EventArgs e)
         {
             SerialMonitor serialMonitor = new SerialMonitor(this.comPortSelector.SelectedValue.ToString());
-            this.serialMonitor = serialMonitor;
             serialMonitor.Show();
         }
     }

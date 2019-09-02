@@ -44,6 +44,7 @@
             this.serialOutput.Location = new System.Drawing.Point(3, 3);
             this.serialOutput.Multiline = true;
             this.serialOutput.Name = "serialOutput";
+            this.serialOutput.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.serialOutput.Size = new System.Drawing.Size(578, 320);
             this.serialOutput.TabIndex = 0;
             // 
@@ -79,6 +80,7 @@
             this.buttonSave.TabIndex = 3;
             this.buttonSave.Text = "Save";
             this.buttonSave.UseVisualStyleBackColor = true;
+            this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
             // 
             // buttonDisconnect
             // 
@@ -107,7 +109,9 @@
             // 
             this.checkBoxAutoScroll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.checkBoxAutoScroll.AutoSize = true;
-            this.checkBoxAutoScroll.Location = new System.Drawing.Point(13, 337);
+            this.checkBoxAutoScroll.Checked = true;
+            this.checkBoxAutoScroll.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxAutoScroll.Location = new System.Drawing.Point(13, 335);
             this.checkBoxAutoScroll.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
             this.checkBoxAutoScroll.Name = "checkBoxAutoScroll";
             this.checkBoxAutoScroll.Size = new System.Drawing.Size(72, 17);
