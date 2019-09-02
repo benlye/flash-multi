@@ -41,6 +41,9 @@ namespace Flash_Multi
         {
             this.InitializeComponent();
 
+            // Register a handler to run on loading the form
+            this.Load += this.SerialMonitor_Load;
+
             this.Text = $"Flash Multi Serial Monitor - {serialPortName}";
             this.serialPortName = serialPortName;
             this.SerialConnect(this.serialPortName);
@@ -114,8 +117,7 @@ namespace Flash_Multi
         }
 
         /// <summary>
-        /// Override method to handle the application closing.
-        /// Unregisters device change notifications.
+        /// Override method to handle the Serial Monitor window closing.
         /// </summary>
         /// <param name="e">The event.</param>
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -123,9 +125,26 @@ namespace Flash_Multi
             // Call the base method
             base.OnFormClosing(e);
 
+            // Save the window position
+            Properties.Settings.Default.SerialMonitorWindowLocation = this.Location;
+            Properties.Settings.Default.Save();
+
             // Close the serial port
             this.SerialDisconnect();
+        }
 
+        /// <summary>
+        /// Handle the Serial Monitor window loading.
+        /// </summary>
+        /// <param name="e">The event.</param>
+        private void SerialMonitor_Load(object sender, EventArgs e)
+        {
+            // Restore the last window location
+            var windowLocation = Properties.Settings.Default.SerialMonitorWindowLocation;
+            if (windowLocation.X != -1 && windowLocation.Y != -1)
+            {
+                this.Location = Properties.Settings.Default.SerialMonitorWindowLocation;
+            }
         }
 
         /// <summary>

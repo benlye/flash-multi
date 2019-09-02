@@ -142,6 +142,7 @@ namespace Flash_Multi
             this.buttonUpload.Enabled = arg;
             this.buttonBrowse.Enabled = arg;
             this.buttonRefresh.Enabled = arg;
+            this.buttonSerialMonitor.Enabled = arg;
             this.textFileName.Enabled = arg;
             this.comPortSelector.Enabled = arg;
 
@@ -349,6 +350,10 @@ namespace Flash_Multi
         /// </summary>
         private async void ButtonUpload_Click(object sender, EventArgs e)
         {
+            // Disable the buttons until this flash attempt is complete
+            Debug.WriteLine("Disabling the controls...");
+            this.EnableControls(false);
+
             // Clear the output box
             Debug.WriteLine("Clearing the output textboxes...");
             this.textActivity.Clear();
@@ -387,10 +392,6 @@ namespace Flash_Multi
 
             // Get the selected COM port
             string comPort = this.comPortSelector.SelectedValue.ToString();
-
-            // Disable the buttons until this flash attempt is complete
-            Debug.WriteLine("Disabling the controls...");
-            this.EnableControls(false);
 
             // Do the selected flash using the appropriate method
             if (mapleResult.DeviceFound == true)
