@@ -4,11 +4,14 @@ VERSION=$(grep "^VERSION=[0-9].[0-9].[0-9]" "../linux/flash-multi" | awk -F = '{
 
 echo
 echo "Version: $VERSION"
-echo "Creating archive 'flashmulti-$VERSION.tar.gz'"
-tar -czf /tmp/flashmulti-$VERSION.tar.gz --transform s/linux/flashmulti-$VERSION/ ../linux/*
+echo "Creating archive 'flash-multi-$VERSION.tar.gz'"
+tar -czf /tmp/flash-multi-$VERSION.tar.gz --transform s/linux/flash-multi-$VERSION/ ../linux/*
 sleep 1s
+
+SHA=`(sha256sum /tmp/flash-multi-$VERSION.tar.gz | awk -v N=1 '{print $N}')`
+
 echo
-echo "Package: /tmp/flashmulti-$VERSION.tar.gz"
-echo "SHA256:  `(sha256sum /tmp/flashmulti-$VERSION.tar.gz | awk -v N=1 '{print $N}')`"
-echo "Size:    `(ls -al /tmp/flashmulti-$VERSION.tar.gz | awk -v N=5 '{print $N}')`"
+echo "Package: flash-multi-$VERSION.tar.gz"
+echo "SHA256:  ${SHA^^}"
+echo "Size:    `(ls -al /tmp/flash-multi-$VERSION.tar.gz | awk -v N=5 '{print $N}')`"
 echo
