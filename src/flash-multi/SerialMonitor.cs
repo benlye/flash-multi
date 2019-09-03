@@ -43,6 +43,9 @@ namespace Flash_Multi
             // Register a handler to run on loading the form
             this.Load += this.SerialMonitor_Load;
 
+            // Register a handler to be notified when USB devices are added or removed
+            // UsbNotification.RegisterUsbDeviceNotification(this.Handle);
+
             this.Text = $"Flash Multi Serial Monitor - {serialPortName}";
             this.SerialPortName = serialPortName;
             this.SerialConnect(this.SerialPortName);
@@ -135,6 +138,30 @@ namespace Flash_Multi
 
             // Close the serial port
             this.SerialDisconnect();
+        }
+
+        /// <summary>
+        /// Re-populate the COM port list when a USB device is plugged or unplugged.
+        /// </summary>
+        /// <param name="m">The message.</param>
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+            if (m.Msg == UsbNotification.WmDevicechange)
+            {
+                switch ((int)m.WParam)
+                {
+                    case UsbNotification.DbtDeviceremovecomplete:
+                        Debug.WriteLine($"Serial monitor saw USB device removal");
+                        this.SerialDisconnect();
+                        this.SerialConnect(this.SerialPortName);
+                        break;
+                    case UsbNotification.DbtDevicearrival:
+                        // Update the COM port list
+                        Debug.WriteLine($"Serial monitor saw USB device arrival");
+                        break;
+                }
+            }
         }
 
         /// <summary>
