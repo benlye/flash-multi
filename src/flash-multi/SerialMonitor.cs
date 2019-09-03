@@ -158,7 +158,7 @@ namespace Flash_Multi
                 {
                     case UsbNotification.DbtDeviceremovecomplete:
                         Debug.WriteLine($"Serial monitor saw USB device removal");
-                        if (this.buttonDisconnect.Enabled)
+                        if (this.buttonDisconnect.Enabled && this.SerialPort.IsOpen == false)
                         {
                             this.SerialDisconnect();
                             this.SerialConnect(this.SerialPortName);
