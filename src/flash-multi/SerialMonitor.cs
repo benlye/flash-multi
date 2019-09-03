@@ -25,6 +25,8 @@ namespace Flash_Multi
     using System.IO;
     using System.IO.Ports;
     using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows.Forms;
 
     /// <summary>
@@ -44,9 +46,9 @@ namespace Flash_Multi
             this.Load += this.SerialMonitor_Load;
 
             // Register a handler to be notified when USB devices are added or removed
-            // UsbNotification.RegisterUsbDeviceNotification(this.Handle);
+            UsbNotification.RegisterUsbDeviceNotification(this.Handle);
 
-            this.Text = $"Flash Multi Serial Monitor - {serialPortName}";
+            this.Text = $"Flash Multi Serial Monitor - {this.SerialPortName} (Disconnected)";
             this.SerialPortName = serialPortName;
             this.SerialConnect(this.SerialPortName);
         }
@@ -85,7 +87,7 @@ namespace Flash_Multi
                 this.buttonConnect.Enabled = false;
                 this.buttonDisconnect.Enabled = true;
 
-                this.Text = $"Flash Multi Serial Monitor (Connected to {serialPortName})";
+                this.Text = $"Flash Multi Serial Monitor - {serialPortName} (Connected)";
 
                 Debug.WriteLine($"Connected to {serialPortName}.");
                 return true;
@@ -94,7 +96,6 @@ namespace Flash_Multi
             {
                 Debug.WriteLine($"Unable to open port:\n{ex.Message}");
                 MessageBox.Show(ex.Message, "Serial Monitor Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
                 return false;
             }
         }
@@ -106,11 +107,15 @@ namespace Flash_Multi
         {
             SerialPort serialPort = this.SerialPort;
 
-            if (serialPort != null && serialPort.IsOpen)
+            if (serialPort != null)
             {
                 serialPort.DtrEnable = false;
                 serialPort.RtsEnable = false;
-                serialPort.Close();
+                if (serialPort.IsOpen)
+                {
+                    serialPort.Close();
+                }
+
                 serialPort.Dispose();
             }
 
@@ -118,7 +123,7 @@ namespace Flash_Multi
             this.buttonConnect.Enabled = true;
             this.buttonDisconnect.Enabled = false;
 
-            this.Text = $"Flash Multi Serial Monitor (Disconnected)";
+            this.Text = $"Flash Multi Serial Monitor - {this.SerialPortName} (Disconnected)";
 
             Debug.WriteLine($"Disconnected from {this.SerialPortName}.");
         }
@@ -153,8 +158,12 @@ namespace Flash_Multi
                 {
                     case UsbNotification.DbtDeviceremovecomplete:
                         Debug.WriteLine($"Serial monitor saw USB device removal");
-                        this.SerialDisconnect();
-                        this.SerialConnect(this.SerialPortName);
+                        if (this.buttonDisconnect.Enabled)
+                        {
+                            this.SerialDisconnect();
+                            this.SerialConnect(this.SerialPortName);
+                        }
+
                         break;
                     case UsbNotification.DbtDevicearrival:
                         // Update the COM port list

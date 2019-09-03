@@ -64,9 +64,27 @@ namespace Flash_Multi
         }
 
         /// <summary>
-        /// Delegation method.
+        /// General purpose delegation method.
         /// </summary>
         public delegate void InvokeDelegate();
+
+        /// <summary>
+        /// Delegation method for selecing a COM port in the dropdown list.
+        /// </summary>
+        /// <param name="port">The port to select.</param>
+        private delegate void ComPortSelectorDelegate(object port);
+
+        /// <summary>
+        /// Delegation method to get the currently selected COM port.
+        /// </summary>
+        /// <returns>A <see cref="ComPort"/> object.</returns>
+        private delegate object SelectedComPortDelegate();
+
+        /// <summary>
+        /// Delegation method to populate the COM port dropdown list.
+        /// </summary>
+        /// <param name="ports">A list of <see cref="ComPort"/> objects.</param>
+        private delegate void PopulateComPortSelectorDelegate(List<ComPort> ports);
 
         /// <summary>
         /// Handles the standard and error output from a running command.
@@ -134,7 +152,7 @@ namespace Flash_Multi
             if (arg)
             {
                 // Populate the COM ports
-                this.PopulateComPortsAsync();
+                _ = this.PopulateComPortsAsync();
             }
 
             // Check if there is a Maple device attached
@@ -185,11 +203,13 @@ namespace Flash_Multi
                 {
                     case UsbNotification.DbtDeviceremovecomplete:
                         // Update the COM port list
-                        this.BeginInvoke(new InvokeDelegate(this.PopulateComPortsAsync));
+                        Debug.WriteLine($"Flash multi saw device removal");
+                        _ = this.PopulateComPortsAsync();
                         break;
                     case UsbNotification.DbtDevicearrival:
                         // Update the COM port list
-                        this.BeginInvoke(new InvokeDelegate(this.PopulateComPortsAsync));
+                        Debug.WriteLine($"Flash multi saw device arrival");
+                        _ = this.PopulateComPortsAsync();
                         break;
                 }
             }
@@ -252,6 +272,12 @@ namespace Flash_Multi
         /// </summary>
         private void CheckControls()
         {
+            if (this.InvokeRequired)
+            {
+               this.Invoke(new Action(this.CheckControls));
+               return;
+            }
+
             if (this.textFileName.Text != string.Empty && this.comPortSelector.SelectedItem != null)
             {
                 this.buttonUpload.Enabled = true;
@@ -271,7 +297,7 @@ namespace Flash_Multi
             }
         }
 
-        private async void PopulateComPortsAsync()
+        private async Task PopulateComPortsAsync()
         {
             await Task.Run(() => { this.PopulateComPorts(); });
         }
@@ -281,12 +307,6 @@ namespace Flash_Multi
         /// </summary>
         private void PopulateComPorts()
         {
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action(this.PopulateComPorts));
-                return;
-            }
-
             // Don't refresh if the control is not enabled
             if (!this.comPortSelector.Enabled)
             {
@@ -298,7 +318,7 @@ namespace Flash_Multi
 
             // Cache the selected item so we can try to re-select it later
             object selectedValue = null;
-            selectedValue = this.comPortSelector.SelectedValue;
+            selectedValue = this.GetSelectedPort();
 
             // Enumerate the COM ports and bind the COM port selector
             List<ComPort> comPorts = new List<ComPort>();
@@ -307,9 +327,8 @@ namespace Flash_Multi
             // Check if we have a Maple device
             MapleDevice mapleCheck = MapleDevice.FindMaple();
 
-            this.comPortSelector.DataSource = comPorts;
-            this.comPortSelector.DisplayMember = "Name";
-            this.comPortSelector.ValueMember = "Name";
+            // Populate the COM port selector
+            this.PopulatePortSelector(comPorts);
 
             // If we had an old list, compare it to the new one and pick the first item which is new
             if (oldPortList.Count > 0)
@@ -334,20 +353,61 @@ namespace Flash_Multi
             }
 
             // Re-select the previously selected item
-            if (selectedValue != null)
-            {
-                this.comPortSelector.SelectedValue = selectedValue;
-            }
-            else
-            {
-                this.comPortSelector.SelectedItem = null;
-            }
+            this.SelectPort(selectedValue);
 
             // Set the width of the dropdown
             // this.comPortSelector.DropDownWidth = comPorts.Select(c => c.DisplayName).ToList().Max(x => TextRenderer.MeasureText(x, this.comPortSelector.Font).Width);
 
             // Make sure the Update button is disabled if there is no port selected
             this.CheckControls();
+        }
+
+        private void SelectPort(object selectedPort)
+        {
+            if (this.comPortSelector.InvokeRequired)
+            {
+                this.comPortSelector.Invoke(new ComPortSelectorDelegate(this.SelectPort), new object[] { selectedPort });
+            }
+            else
+            {
+                if (selectedPort != null)
+                {
+                    this.comPortSelector.SelectedValue = selectedPort;
+                }
+                else
+                {
+                    this.comPortSelector.SelectedItem = null;
+                }
+            }
+        }
+
+        private object GetSelectedPort()
+        {
+            object selectedValue = null;
+            if (this.comPortSelector.InvokeRequired)
+            {
+                selectedValue = this.comPortSelector.Invoke(new SelectedComPortDelegate(this.GetSelectedPort));
+            }
+            else
+            {
+                selectedValue = this.comPortSelector.SelectedValue;
+            }
+
+            return selectedValue;
+        }
+
+        private void PopulatePortSelector(List<ComPort> comPorts)
+        {
+            if (this.comPortSelector.InvokeRequired)
+            {
+                this.comPortSelector.Invoke(new PopulateComPortSelectorDelegate(this.PopulatePortSelector), new object[] { comPorts });
+            }
+            else
+            {
+                this.comPortSelector.DataSource = comPorts;
+                this.comPortSelector.DisplayMember = "Name";
+                this.comPortSelector.ValueMember = "Name";
+            }
         }
 
         /// <summary>
@@ -555,9 +615,11 @@ namespace Flash_Multi
         /// Handles the refresh button being clicked.
         /// Updates the list of COM ports in the drop down.
         /// </summary>
-        private void ButtonRefresh_Click(object sender, EventArgs e)
+        private async void ButtonRefresh_Click(object sender, EventArgs e)
         {
-            this.PopulateComPortsAsync();
+            Debug.WriteLine("ButtonRefresh clicked");
+            await this.PopulateComPortsAsync();
+            Debug.WriteLine("ButtonRefresh handled");
         }
 
         /// <summary>
