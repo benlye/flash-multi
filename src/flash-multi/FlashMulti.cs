@@ -24,7 +24,6 @@ namespace Flash_Multi
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.IO.Ports;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows.Forms;

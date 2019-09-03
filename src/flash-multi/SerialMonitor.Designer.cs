@@ -134,6 +134,8 @@
             this.Controls.Add(this.serialOutput);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(520, 250);
             this.Name = "SerialMonitor";
             this.Padding = new System.Windows.Forms.Padding(3, 3, 3, 38);

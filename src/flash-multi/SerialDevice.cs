@@ -177,15 +177,15 @@ namespace Flash_Multi
                 return;
             }
 
-            // Write a success message to the log
-            flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMultimodule updated sucessfully");
-
             // Reconnect the serial monitor if it was connected before
             if (serialMonitor != null && serialMonitor.IsDisposed != true && reconnectSerialMonitor)
             {
                 serialMonitor.SerialConnect(comPort);
             }
+
+            // Write a success message to the log
+            flashMulti.AppendLog(" done\r\n");
+            flashMulti.AppendLog("\r\nMultimodule updated sucessfully");
 
             // Show a success message box
             MessageBox.Show("Multimodule updated sucessfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
