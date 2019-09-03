@@ -40,11 +40,13 @@
             // 
             // serialOutput
             // 
+            this.serialOutput.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.serialOutput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.serialOutput.Font = new System.Drawing.Font("Lucida Console", 9F);
             this.serialOutput.Location = new System.Drawing.Point(3, 3);
             this.serialOutput.Multiline = true;
             this.serialOutput.Name = "serialOutput";
+            this.serialOutput.ReadOnly = true;
             this.serialOutput.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.serialOutput.Size = new System.Drawing.Size(578, 320);
             this.serialOutput.TabIndex = 0;
