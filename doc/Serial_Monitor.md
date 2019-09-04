@@ -4,7 +4,7 @@ The Serial Monitor can be used to view debug information emitted by a Multimodul
 This can be useful when debugging complex firmware issues, or when capturing data using the Multimodule's [XN297L dump](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/blob/master/docs/Advanced_XN297Ldump.md) feature to capture data from new transmitters so that new protocols can be added.
 
 <p align="center">
-  <img src="img/serial-monitor.jpg">
+  <img src="/img/serial-monitor.jpg">
 </p>
 
 ## Use
