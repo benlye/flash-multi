@@ -64,14 +64,15 @@ namespace Flash_Multi
             this.textActivity = new System.Windows.Forms.TextBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.linkLabel2 = new System.Windows.Forms.LinkLabel();
+            this.buttonSerialMonitor = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonUpload
             // 
-            this.buttonUpload.Location = new System.Drawing.Point(373, 48);
+            this.buttonUpload.Location = new System.Drawing.Point(373, 47);
             this.buttonUpload.Name = "buttonUpload";
-            this.buttonUpload.Size = new System.Drawing.Size(75, 22);
+            this.buttonUpload.Size = new System.Drawing.Size(75, 23);
             this.buttonUpload.TabIndex = 6;
             this.buttonUpload.Text = "Upload";
             this.buttonUpload.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
@@ -127,6 +128,7 @@ namespace Flash_Multi
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.buttonSerialMonitor);
             this.groupBox1.Controls.Add(this.buttonRefresh);
             this.groupBox1.Controls.Add(this.buttonUpload);
             this.groupBox1.Controls.Add(this.buttonBrowse);
@@ -145,9 +147,9 @@ namespace Flash_Multi
             // 
             this.buttonRefresh.Location = new System.Drawing.Point(173, 47);
             this.buttonRefresh.Name = "buttonRefresh";
-            this.buttonRefresh.Size = new System.Drawing.Size(75, 23);
+            this.buttonRefresh.Size = new System.Drawing.Size(80, 23);
             this.buttonRefresh.TabIndex = 3;
-            this.buttonRefresh.Text = "Refresh";
+            this.buttonRefresh.Text = "Refresh Ports";
             this.buttonRefresh.UseVisualStyleBackColor = true;
             this.buttonRefresh.Click += new System.EventHandler(this.ButtonRefresh_Click);
             // 
@@ -230,6 +232,16 @@ namespace Flash_Multi
             this.linkLabel2.UseCompatibleTextRendering = true;
             this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ReleasesLink_LinkClicked);
             // 
+            // buttonSerialMonitor
+            // 
+            this.buttonSerialMonitor.Location = new System.Drawing.Point(259, 47);
+            this.buttonSerialMonitor.Name = "buttonSerialMonitor";
+            this.buttonSerialMonitor.Size = new System.Drawing.Size(80, 23);
+            this.buttonSerialMonitor.TabIndex = 15;
+            this.buttonSerialMonitor.Text = "Serial Monitor";
+            this.buttonSerialMonitor.UseVisualStyleBackColor = true;
+            this.buttonSerialMonitor.Click += new System.EventHandler(this.ButtonSerialMonitor_Click);
+            // 
             // FlashMulti
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -273,6 +285,7 @@ namespace Flash_Multi
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.LinkLabel linkLabel2;
         private System.Windows.Forms.Button buttonRefresh;
+        private System.Windows.Forms.Button buttonSerialMonitor;
     }
 }
 

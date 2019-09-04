@@ -84,7 +84,7 @@ namespace Flash_Multi
             List<ComPort> comPorts = new List<ComPort>();
 
             // Get all the COM port names
-            string[] comPortNames = SerialPort.GetPortNames();
+            string[] comPortNames = SerialPort.GetPortNames().Distinct().ToArray();
 
             // Add all the COM ports to the list
             foreach (string portName in comPortNames)

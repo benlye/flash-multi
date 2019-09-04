@@ -58,5 +58,17 @@ namespace Flash_Multi.Properties {
                 this["SerialBaudRate"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1, -1")]
+        public global::System.Drawing.Point SerialMonitorWindowLocation {
+            get {
+                return ((global::System.Drawing.Point)(this["SerialMonitorWindowLocation"]));
+            }
+            set {
+                this["SerialMonitorWindowLocation"] = value;
+            }
+        }
     }
 }
