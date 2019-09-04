@@ -1,4 +1,5 @@
 #!/bin/bash
+shopt -s extglob
 
 # *********************************************************************
 # Copyright (C) 2019 Ben Lye
@@ -21,9 +22,9 @@
 VERSION=0.1.6
 
 # Write the script header
-printf "flash-multi $VERSION\n\nThis program is Free Sofware and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
+printf "flash-multi $VERSION\n\nThis program is Free Software and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
 
-# Prepare simple help text to disply when needed
+# Prepare simple help text to display when needed
 USAGE="Usage: flash-multi -f [firmware file] -p [serial device]\n\n"
 
 # Get the command line options
@@ -60,13 +61,42 @@ if [ ! -r "$FWFILE" ]; then
     exit 2;
 fi
 
+function list_usb()
+{
+while IFS=: read key value; do
+  key="${key##+( )}"
+  value="${value##+( )}"
+  case "$key" in
+    "Product ID")
+        p="${value% *}"
+        ;;
+    "Vendor ID")
+        v="${value%% *}"
+        ;;
+    "Manufacturer")
+        m="${value}"
+        ;;
+    "Location ID")
+        l="${value}"
+        printf "%s:%s %s (%s)\n" "$v" "$p" "$l" "$m"
+        ;;
+  esac
+done < <( system_profiler SPUSBDataType )
+}
+
 # Check to see if a native STM32 USB device (Maple device) is attached
-MAPLE_USB_DEVICES=$(lsusb |grep "1eaf" | awk '{ print $NF}')
+uname -a | grep "Darwin" 2>&1 1>/dev/null
+if [ $? -eq 0 ]; then
+  MAPLE_USB_DEVICES=$(echo "$(list_usb)" | grep "1eaf" | awk '{ print $1}')
+else
+  MAPLE_USB_DEVICES=$(lsusb | grep "1eaf" | awk '{ print $NF}')
+fi
+
 case $MAPLE_USB_DEVICES in 
-   "1eaf:0003")
+   ?(0x)1eaf:?(0x)0003)
       MAPLE_DEVICE=DFU
    ;;
-   "1eaf:0004")
+   ?(0x)1eaf:?(0x)0004)
       MAPLE_DEVICE=Native
    ;;
    *)
@@ -98,11 +128,21 @@ DIR=$(dirname "$0")
 BOOTLOADERFILE="$DIR/bootloader/StmMulti4in1.bin"
 
 # Determine the binaries to use based on the platform architecture
-uname -m | grep "x86_64" 2>&1 1>/dev/null
+uname -a | grep "Darwin" 2>&1 1>/dev/null
 if [ $? -eq 0 ]; then
-  TOOLS_DIR="$DIR/tools/64bit"
+  TOOLS_DIR="$DIR/tools/macos"
+  GREP_ARGS=""
+  STAT_ARGS="-f %z"
 else
-  TOOLS_DIR="$DIR/tools/32bit"
+  uname -m | grep "x86_64" 2>&1 1>/dev/null
+  if [ $? -eq 0 ]; then
+    TOOLS_DIR="$DIR/tools/64bit"
+  else
+    TOOLS_DIR="$DIR/tools/32bit"
+  fi
+
+  GREP_ARGS="-Pa"
+  STAT_ARGS="--printf=%s"
 fi
 
 STM32_FLASH="$TOOLS_DIR/stm32flash"
@@ -110,7 +150,7 @@ RESET_UTIL="$TOOLS_DIR/maple-reset"
 DFU_UTIL="$TOOLS_DIR/dfu-util"
 
 # Determine if the specified firmware file contains support for the STM32 USB port
-if grep -q -Pa 'M\x00a\x00p\x00l\x00e\x00\x12\x03L\x00e\x00a\x00f\x00L\x00a\x00b\x00s' "$FWFILE"; then
+if grep -q $GREP_ARGS 'M\x00a\x00p\x00l\x00e\x00\x12\x03L\x00e\x00a\x00f\x00L\x00a\x00b\x00s' "$FWFILE"; then
   HAS_USB_SUPPORT=true;
   MAX_FILE_SIZE=120832
   FLASH_START=8
@@ -123,7 +163,7 @@ else
 fi
 
 # Check if the firmware will fit
-FWFILE_SIZE=`stat --printf="%s" "$FWFILE"`
+FWFILE_SIZE=`stat $STAT_ARGS "$FWFILE"`
 if [ $FWFILE_SIZE -gt $MAX_FILE_SIZE ]; then
     printf "ERROR: Firmware file is too large. File is $FWFILE_SIZE, maximum is $MAX_FILE_SIZE.\n\n";
     exit 2;
