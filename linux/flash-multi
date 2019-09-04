@@ -18,7 +18,7 @@
 # *********************************************************************
 
 # Define the script version
-VERSION=0.1.5
+VERSION=0.1.6
 
 # Write the script header
 printf "flash-multi $VERSION\n\nThis program is Free Sofware and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
@@ -200,6 +200,7 @@ else
   printf "${DFU_UTIL} -d 1eaf:0003 -a 2 -D \"$FWFILE\" -R\n"
   "${DFU_UTIL}" -d 1eaf:0003 -a 2 -D "$FWFILE" -R
   [ $? -ne 0 ] && printf "\nERROR: Failed to write firmware!\n\n" && exit 5;
+  printf "\n";
 fi
 
 printf "Firmware flashed successfully.\n\n"
