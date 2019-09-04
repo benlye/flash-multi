@@ -1,7 +1,7 @@
 # Flashing From Linux or Mac
-A bash script and toolchain is provided for flashing Multiprotocol modules from Linux operating systems.  
+A bash script and toolchain is provided for flashing Multiprotocol modules from Linux and Mac operating systems.  
 
-Like the Flash Multi Window application, the Linux script will automatically determine which upload method to use, will preserve the EEPROM data during flashes, and will write the bootloader as needed.
+Like the Flash Multi Window application, the Linux and Mac script will automatically determine which upload method to use, will preserve the EEPROM data during flashes, and will write the bootloader as needed.
 
 ## Installing
 1. Download and extract the latest Linux release, for example:
