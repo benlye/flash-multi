@@ -1,4 +1,4 @@
-# Flashing From Linux
+# Flashing From Linux or Mac
 A bash script and toolchain is provided for flashing Multiprotocol modules from Linux operating systems.  
 
 Like the Flash Multi Window application, the Linux script will automatically determine which upload method to use, will preserve the EEPROM data during flashes, and will write the bootloader as needed.
@@ -28,6 +28,16 @@ sudo udevadm control --reload-rules
 sudo usermod -a -G plugdev $USER
 sudo usermod -a -G dialout $USER
 ```
+### Mac
+macOS requires the libusb library to be installed. The easiest way to install the library is using the Homebrew package manager for macOS by running the two commands below in a Terminal.
+
+1. Install Homebrew
+
+   `/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
+
+1. Use Homebrew to install libusb
+
+   `brew install libusb`
 
 ## Use
 1. Download the latest pre-compiled firmware from https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/releases
