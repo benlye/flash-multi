@@ -142,7 +142,7 @@ else
   fi
 
   GREP_ARGS="-Pa"
-  STAT_ARGS="--printf=\"%s\""
+  STAT_ARGS="--printf=%s"
 fi
 
 STM32_FLASH="$TOOLS_DIR/stm32flash"
