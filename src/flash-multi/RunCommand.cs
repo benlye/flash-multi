@@ -66,7 +66,13 @@ namespace Flash_Multi
 
             // Read the output
             myProcess.BeginOutputReadLine();
-            myProcess.BeginErrorReadLine();
+            //myProcess.BeginErrorReadLine();
+
+            while (!myProcess.StandardOutput.EndOfStream)
+            {
+                var line = myProcess.StandardOutput.Read();
+                Debug.Write((char)line);
+            }
 
             // Loop until the process finishes
             myProcess.WaitForExit();

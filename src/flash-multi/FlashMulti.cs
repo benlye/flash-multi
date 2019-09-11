@@ -25,6 +25,7 @@ namespace Flash_Multi
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using System.Windows.Forms;
 
@@ -96,6 +97,17 @@ namespace Flash_Multi
             // Append to the verbose log box
             this.AppendVerbose(eventArgs.Data);
             Debug.WriteLine(eventArgs.Data);
+
+            // Update the progress bar if there is a percentage in the output
+            Regex regexSerialProgress = new Regex(@"\((\d+)\.\d\d\%\)");
+            if (eventArgs.Data != null)
+            {
+                Match match = regexSerialProgress.Match(eventArgs.Data);
+                if (match.Success)
+                {
+                    this.UpdateProgress(int.Parse(match.Groups[1].Value));
+                }
+            }
         }
 
         /// <summary>
@@ -602,11 +614,11 @@ namespace Flash_Multi
         {
             if (this.showVerboseOutput.Checked == true)
             {
-                this.Height = 520;
+                this.Height = 543;
             }
             else
             {
-                this.Height = 330;
+                this.Height = 359;
             }
         }
 

@@ -56,6 +56,7 @@ namespace Flash_Multi
             this.label3 = new System.Windows.Forms.Label();
             this.buttonBrowse = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.buttonSerialMonitor = new System.Windows.Forms.Button();
             this.buttonRefresh = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.showVerboseOutput = new System.Windows.Forms.CheckBox();
@@ -64,7 +65,6 @@ namespace Flash_Multi
             this.textActivity = new System.Windows.Forms.TextBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.linkLabel2 = new System.Windows.Forms.LinkLabel();
-            this.buttonSerialMonitor = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -143,6 +143,16 @@ namespace Flash_Multi
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Settings";
             // 
+            // buttonSerialMonitor
+            // 
+            this.buttonSerialMonitor.Location = new System.Drawing.Point(259, 47);
+            this.buttonSerialMonitor.Name = "buttonSerialMonitor";
+            this.buttonSerialMonitor.Size = new System.Drawing.Size(80, 23);
+            this.buttonSerialMonitor.TabIndex = 15;
+            this.buttonSerialMonitor.Text = "Serial Monitor";
+            this.buttonSerialMonitor.UseVisualStyleBackColor = true;
+            this.buttonSerialMonitor.Click += new System.EventHandler(this.ButtonSerialMonitor_Click);
+            // 
             // buttonRefresh
             // 
             this.buttonRefresh.Location = new System.Drawing.Point(173, 47);
@@ -156,7 +166,7 @@ namespace Flash_Multi
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(339, 268);
+            this.label4.Location = new System.Drawing.Point(338, 296);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(114, 13);
             this.label4.TabIndex = 12;
@@ -165,7 +175,7 @@ namespace Flash_Multi
             // showVerboseOutput
             // 
             this.showVerboseOutput.AutoSize = true;
-            this.showVerboseOutput.Location = new System.Drawing.Point(454, 269);
+            this.showVerboseOutput.Location = new System.Drawing.Point(453, 297);
             this.showVerboseOutput.Name = "showVerboseOutput";
             this.showVerboseOutput.Size = new System.Drawing.Size(15, 14);
             this.showVerboseOutput.TabIndex = 8;
@@ -177,7 +187,7 @@ namespace Flash_Multi
             this.textVerbose.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.textVerbose.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.textVerbose.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textVerbose.Location = new System.Drawing.Point(15, 292);
+            this.textVerbose.Location = new System.Drawing.Point(14, 320);
             this.textVerbose.Multiline = true;
             this.textVerbose.Name = "textVerbose";
             this.textVerbose.ReadOnly = true;
@@ -188,11 +198,10 @@ namespace Flash_Multi
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(15, 237);
+            this.progressBar1.Location = new System.Drawing.Point(14, 265);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(454, 23);
             this.progressBar1.TabIndex = 12;
-            this.progressBar1.Visible = false;
             // 
             // textActivity
             // 
@@ -203,14 +212,14 @@ namespace Flash_Multi
             this.textActivity.Name = "textActivity";
             this.textActivity.ReadOnly = true;
             this.textActivity.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textActivity.Size = new System.Drawing.Size(454, 133);
+            this.textActivity.Size = new System.Drawing.Size(454, 132);
             this.textActivity.TabIndex = 7;
             this.textActivity.TabStop = false;
             // 
             // linkLabel1
             // 
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(15, 269);
+            this.linkLabel1.Location = new System.Drawing.Point(14, 297);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(182, 13);
             this.linkLabel1.TabIndex = 7;
@@ -232,21 +241,11 @@ namespace Flash_Multi
             this.linkLabel2.UseCompatibleTextRendering = true;
             this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ReleasesLink_LinkClicked);
             // 
-            // buttonSerialMonitor
-            // 
-            this.buttonSerialMonitor.Location = new System.Drawing.Point(259, 47);
-            this.buttonSerialMonitor.Name = "buttonSerialMonitor";
-            this.buttonSerialMonitor.Size = new System.Drawing.Size(80, 23);
-            this.buttonSerialMonitor.TabIndex = 15;
-            this.buttonSerialMonitor.Text = "Serial Monitor";
-            this.buttonSerialMonitor.UseVisualStyleBackColor = true;
-            this.buttonSerialMonitor.Click += new System.EventHandler(this.ButtonSerialMonitor_Click);
-            // 
             // FlashMulti
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(484, 291);
+            this.ClientSize = new System.Drawing.Size(484, 320);
             this.Controls.Add(this.linkLabel2);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.label4);
