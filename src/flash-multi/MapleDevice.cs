@@ -196,6 +196,7 @@ namespace Flash_Multi
                 }
 
                 flashMulti.AppendLog(" done\r\n");
+                flashMulti.AppendVerbose(string.Empty);
 
                 // Check for a Maple DFU device
                 flashMulti.AppendLog("Waiting for DFU device ...");

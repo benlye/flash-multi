@@ -27,6 +27,7 @@ namespace Flash_Multi
     using System.Linq;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
+    using System.Timers;
     using System.Windows.Forms;
 
     /// <summary>
@@ -38,6 +39,8 @@ namespace Flash_Multi
         /// Buffer for verbose output logging.
         /// </summary>
         private string outputLineBuffer = string.Empty;
+
+        private int progressPercent = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FlashMulti"/> class.
@@ -66,6 +69,11 @@ namespace Flash_Multi
 
             // Register a handler to be notified when USB devices are added or removed
             UsbNotification.RegisterUsbDeviceNotification(this.Handle);
+        }
+
+        private void ProgressTimer_Tick(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -99,8 +107,13 @@ namespace Flash_Multi
         /// <param name="eventArgs">The data from the event.</param>
         public void OutputHandler(object sendingProcess, DataReceivedEventArgs eventArgs)
         {
-            // Append to the verbose log box
-            this.AppendVerbose(eventArgs.Data);
+            // Ignore the meaningless DFU error we get on every upload
+            if (eventArgs.Data != "error resetting after download: usb_reset: could not reset device, win error: The system cannot find the file specified.")
+            {
+                // Append to the verbose log box
+                this.AppendVerbose(eventArgs.Data);
+            }
+
             Debug.WriteLine(eventArgs.Data);
 
             // Update the progress bar if there is a percentage in the output
@@ -120,11 +133,17 @@ namespace Flash_Multi
             this.outputLineBuffer = this.outputLineBuffer + (char)data;
 
             // Write complete lines to verbose output box
-            if (data == '\r')
+            // Match a 'normal' end of line, or the end of line used by stm32flash
+            if (this.outputLineBuffer.EndsWith("\r\n") || this.outputLineBuffer.EndsWith(") \r"))
             {
-                this.AppendVerbose(this.outputLineBuffer);
+                // Suppress writing the dfu-util finished line
+                if (this.outputLineBuffer != "Starting download: [##################################################] finished!\r\n")
+                {
+                    this.outputLineBuffer = this.outputLineBuffer.TrimEnd();
+                    this.AppendVerbose(this.outputLineBuffer);
+                }
 
-                // Update the progress bar if there is a percentage in the output
+                // Update the progress bar if there is a percentage in the output (stm32flash)
                 Regex regexSerialProgress = new Regex(@"\((\d+)\.\d\d\%\)");
                 if (this.outputLineBuffer != string.Empty)
                 {
@@ -135,25 +154,36 @@ namespace Flash_Multi
                     }
                 }
 
+                // Clear the buffer
                 this.outputLineBuffer = string.Empty;
             }
             else
             {
-                if (this.outputLineBuffer == "\nStarting download: [")
+                // Handle progress from dfu-util
+                if (this.outputLineBuffer == "Starting download: [")
                 {
-                    // this.AppendVerbose(this.outputLineBuffer, false);
+                    this.AppendVerbose(this.outputLineBuffer, false);
                 }
 
-                if (this.outputLineBuffer.StartsWith("\nStarting download: ["))
+                if (this.outputLineBuffer.StartsWith("Starting download: [#"))
                 {
                     if (data == '#')
                     {
-                        int dfuProgress = (this.outputLineBuffer.Length - 21) * 2;
+                        // Convert number of hashes in string to progress bar percentage
+                        int dfuProgress = (this.outputLineBuffer.Length - 20) * 2;
+
+                        // Update the progress bar
                         this.UpdateProgress(dfuProgress);
-                        // Debug.WriteLine($"{this.outputLineBuffer.Length} : {dfuProgress}");
                     }
 
-                    // this.AppendVerbose(((char)data).ToString(), false);
+                    // Append the character to the output
+                    this.AppendVerbose(((char)data).ToString(), false);
+
+                    // Progress line is finished so end it with a newline
+                    if (this.outputLineBuffer == "Starting download: [##################################################] finished!")
+                    {
+                        this.AppendVerbose(string.Empty);
+                    }
                 }
             }
         }
@@ -192,7 +222,7 @@ namespace Flash_Multi
             // Append the text
             if (newline)
             {
-                text = text + "\r\n";
+                text = text + "\n";
             }
 
             this.textVerbose.AppendText(text);
@@ -674,7 +704,15 @@ namespace Flash_Multi
                 return;
             }
 
-            this.progressBar1.Value = value;
+            // Value must be between 0 and 100
+            if (value > 0 && value <= 100)
+            {
+                // Hack to make the progress bar jump to the next value rather than animate
+                // The animation makes the bar look weird when it goes to 100% because the bar is still moving when the work is done.
+                this.progressBar1.Value = value * 10;
+                this.progressBar1.Value = (value * 10) - 1;
+                this.progressBar1.Value = value * 10;
+            }
         }
 
         /// <summary>
