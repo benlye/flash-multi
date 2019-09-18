@@ -35,6 +35,11 @@ namespace Flash_Multi
     public partial class FlashMulti : Form
     {
         /// <summary>
+        /// Buffer for verbose output logging.
+        /// </summary>
+        private string outputLineBuffer = string.Empty;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="FlashMulti"/> class.
         /// </summary>
         public FlashMulti()
@@ -110,21 +115,87 @@ namespace Flash_Multi
             }
         }
 
+        public void CharOutputHandler(char data)
+        {
+            this.outputLineBuffer = this.outputLineBuffer + (char)data;
+
+            // Write complete lines to verbose output box
+            if (data == '\r')
+            {
+                this.AppendVerbose(this.outputLineBuffer);
+
+                // Update the progress bar if there is a percentage in the output
+                Regex regexSerialProgress = new Regex(@"\((\d+)\.\d\d\%\)");
+                if (this.outputLineBuffer != string.Empty)
+                {
+                    Match match = regexSerialProgress.Match(this.outputLineBuffer);
+                    if (match.Success)
+                    {
+                        this.UpdateProgress(int.Parse(match.Groups[1].Value));
+                    }
+                }
+
+                this.outputLineBuffer = string.Empty;
+            }
+            else
+            {
+                if (this.outputLineBuffer == "\nStarting download: [")
+                {
+                    // this.AppendVerbose(this.outputLineBuffer, false);
+                }
+
+                if (this.outputLineBuffer.StartsWith("\nStarting download: ["))
+                {
+                    if (data == '#')
+                    {
+                        int dfuProgress = (this.outputLineBuffer.Length - 21) * 2;
+                        this.UpdateProgress(dfuProgress);
+                        // Debug.WriteLine($"{this.outputLineBuffer.Length} : {dfuProgress}");
+                    }
+
+                    // this.AppendVerbose(((char)data).ToString(), false);
+                }
+            }
+        }
+
         /// <summary>
         /// Appends a string to the verbose output text box.
         /// </summary>
         /// <param name="text">String to append.</param>
-        public void AppendVerbose(string text)
+        public void AppendVerbose(char text)
         {
             // Check if we're called from another thread
             if (this.InvokeRequired)
             {
-                this.Invoke(new Action<string>(this.AppendVerbose), new object[] { text });
+                this.Invoke(new Action<char>(this.AppendVerbose), new object[] { text });
                 return;
             }
 
             // Append the text
-            this.textVerbose.AppendText(text + "\r\n");
+            this.textVerbose.AppendText(text.ToString());
+        }
+
+        /// <summary>
+        /// Appends a string to the verbose output text box.
+        /// </summary>
+        /// <param name="text">String to append.</param>
+        /// <param name="newline">Boolean indeicating whtether or not append a newline.</param>
+        public void AppendVerbose(string text, bool newline = true)
+        {
+            // Check if we're called from another thread
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<string, bool>(this.AppendVerbose), new object[] { text, newline });
+                return;
+            }
+
+            // Append the text
+            if (newline)
+            {
+                text = text + "\r\n";
+            }
+
+            this.textVerbose.AppendText(text);
         }
 
         /// <summary>

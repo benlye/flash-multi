@@ -57,21 +57,22 @@ namespace Flash_Multi
             myProcess.StartInfo.RedirectStandardError = true;
             myProcess.StartInfo.CreateNoWindow = true;
 
-            // Set your output and error (asynchronous) handlers
-            myProcess.OutputDataReceived += new DataReceivedEventHandler(flashMulti.OutputHandler);
+            // Hande error output asynchronously
+            // myProcess.OutputDataReceived += new DataReceivedEventHandler(flashMulti.OutputHandler);
             myProcess.ErrorDataReceived += new DataReceivedEventHandler(flashMulti.OutputHandler);
 
             // Start process and handlers
             myProcess.Start();
 
-            // Read the output
-            myProcess.BeginOutputReadLine();
-            //myProcess.BeginErrorReadLine();
+            // Read the error output asynchronously
+            myProcess.BeginErrorReadLine();
 
+            // Read the standard output synchronously
             while (!myProcess.StandardOutput.EndOfStream)
             {
-                var line = myProcess.StandardOutput.Read();
-                Debug.Write((char)line);
+                var data = myProcess.StandardOutput.Read();
+                flashMulti.CharOutputHandler((char)data);
+                //Debug.Write((char)data);
             }
 
             // Loop until the process finishes
