@@ -71,11 +71,6 @@ namespace Flash_Multi
             UsbNotification.RegisterUsbDeviceNotification(this.Handle);
         }
 
-        private void ProgressTimer_Tick(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// General purpose delegation method.
         /// </summary>
@@ -222,7 +217,7 @@ namespace Flash_Multi
             // Append the text
             if (newline)
             {
-                text = text + "\n";
+                text = text + "\r\n";
             }
 
             this.textVerbose.AppendText(text);
@@ -723,11 +718,25 @@ namespace Flash_Multi
         {
             if (this.showVerboseOutput.Checked == true)
             {
-                this.Height = 543;
+                this.tableLayoutPanel1.SuspendLayout();
+                this.tableLayoutPanel1.RowStyles[0].SizeType = SizeType.Absolute;
+                this.tableLayoutPanel1.RowStyles[0].Height = 126;
+                this.tableLayoutPanel1.RowStyles[3].SizeType = SizeType.Percent;
+                this.tableLayoutPanel1.RowStyles[3].Height = 50;
+                this.MinimumSize = new System.Drawing.Size(500, 505);
+                this.tableLayoutPanel1.ResumeLayout();
             }
             else
             {
-                this.Height = 359;
+                this.tableLayoutPanel1.SuspendLayout();
+                this.MinimumSize = new System.Drawing.Size(500, 359);
+                this.Size = new System.Drawing.Size(this.Width, 359);
+                this.tableLayoutPanel1.RowStyles[0].SizeType = SizeType.Percent;
+                this.tableLayoutPanel1.RowStyles[0].Height = 100;
+                this.tableLayoutPanel1.RowStyles[3].SizeType = SizeType.Absolute;
+                this.tableLayoutPanel1.RowStyles[3].Height = 0;
+                this.tableLayoutPanel1.ResumeLayout();
+
             }
         }
 
