@@ -58,6 +58,7 @@
     <Compile Include="DfuRecoveryDialog.Designer.cs">
       <DependentUpon>DfuRecoveryDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="FileUtils.cs" />
     <Compile Include="FlashMulti.cs">
       <SubType>Form</SubType>
     </Compile>

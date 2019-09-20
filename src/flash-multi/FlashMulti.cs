@@ -40,8 +40,6 @@ namespace Flash_Multi
         /// </summary>
         private string outputLineBuffer = string.Empty;
 
-        private int progressPercent = 0;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="FlashMulti"/> class.
         /// </summary>
@@ -123,6 +121,10 @@ namespace Flash_Multi
             }
         }
 
+        /// <summary>
+        /// Appends a character to the verbose output text box.
+        /// </summary>
+        /// <param name="data">String to append.</param>
         public void CharOutputHandler(char data)
         {
             this.outputLineBuffer = this.outputLineBuffer + (char)data;
@@ -543,7 +545,7 @@ namespace Flash_Multi
             }
 
             // Check the file size
-            if (!this.CheckFirmwareFileSize())
+            if (!FileUtils.CheckFirmwareFileSize(this.textFileName.Text))
             {
                 this.EnableControls(true);
                 return;
@@ -553,7 +555,7 @@ namespace Flash_Multi
             MapleDevice mapleResult = MapleDevice.FindMaple();
 
             // Determine if the selected file contains USB / bootloader support
-            bool firmwareSupportsUsb = this.CheckForUsbSupport();
+            bool firmwareSupportsUsb = FileUtils.CheckForUsbSupport(this.textFileName.Text);
 
             // Error if flashing non-USB firmware via native USB port
             if (mapleResult.DeviceFound && !firmwareSupportsUsb)
@@ -594,17 +596,36 @@ namespace Flash_Multi
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
+                    // Clear the output boxes
+                    this.textActivity.Clear();
+                    this.textVerbose.Clear();
+
                     // Set the text box to the selected file name
                     this.textFileName.Text = openFileDialog.FileName;
 
                     // Check the file size
-                    if (!this.CheckFirmwareFileSize())
+                    if (!FileUtils.CheckFirmwareFileSize(this.textFileName.Text))
                     {
                         return;
                     }
 
+                    // Get the signature from the firmware file
+                    FileUtils.FirmwareFile fileDetails = FileUtils.GetFirmwareSignature(this.textFileName.Text);
+
+                    // If we got details from the signature write them to the log window
+                    if (fileDetails != null)
+                    {
+                        this.AppendLog($"Firmware File Name:       {this.textFileName.Text.Substring(this.textFileName.Text.LastIndexOf("\\") + 1)}\r\n");
+                        this.AppendLog($"Multi Firmware Version:   {fileDetails.Version} ({fileDetails.ModuleType})\r\n");
+                        this.AppendLog($"Multi Telemetry Type:     {fileDetails.MultiTelemetryType}\r\n");
+                        this.AppendLog($"Invert Telemetry Enabled: {fileDetails.InvertTelemetry}\r\n");
+                        this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader}\r\n");
+                        this.AppendLog($"Bootloader Enabled:       {fileDetails.BootloaderSupport}\r\n");
+                        this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}\r\n");
+                    }
+
                     // Check if the binary file contains USB / bootloader support
-                    if (this.CheckForUsbSupport())
+                    if (FileUtils.CheckForUsbSupport(this.textFileName.Text))
                     {
                         Debug.WriteLine("Firmware file compiled with USB support.");
                     }
@@ -617,57 +638,6 @@ namespace Flash_Multi
 
             // Check if the Upload button should be enabled yet
             this.CheckControls();
-        }
-
-        /// <summary>
-        /// Parses the binary file looking for a string which indicates that the compiled firmware images contains USB support.
-        /// The binary firmware file will contain the strings 'Maple' and 'LeafLabs' if it was compiled with support for the USB / Flash from TX bootloader.
-        /// </summary>
-        /// <returns>A boolean value indicatating whether or not the firmware supports USB.</returns>
-        private bool CheckForUsbSupport()
-        {
-            bool usbSupportEnabled = false;
-            string fileName = this.textFileName.Text;
-
-            byte[] byteBuffer = File.ReadAllBytes(fileName);
-            string byteBufferAsString = System.Text.Encoding.ASCII.GetString(byteBuffer);
-            int offset = byteBufferAsString.IndexOf("M\0a\0p\0l\0e\0\u0012\u0003L\0e\0a\0f\0L\0a\0b\0s\0\u0012\u0001");
-
-            if (offset > 0)
-            {
-                usbSupportEnabled = true;
-            }
-
-            return usbSupportEnabled;
-        }
-
-        /// <summary>
-        /// Checks that the compiled firmware will fit on the module.
-        /// </summary>
-        /// <returns>Returns a boolean indicating whehter or not the firmware size is OK.</returns>
-        private bool CheckFirmwareFileSize()
-        {
-            // Get the file size
-            long length = new System.IO.FileInfo(this.textFileName.Text).Length;
-
-            // If the file is very large we don't want to check for USB support so throw a generic error
-            if (length > 256000)
-            {
-                MessageBox.Show("Selected firmware file is too large.", "Firmware File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            // If the file is smaller we can check if it has USB support and throw a more specific error
-            int maxFileSize = this.CheckForUsbSupport() ? 120832 : 129024;
-
-            if (length > maxFileSize)
-            {
-                string sizeMessage = $"Firmware file is too large.\r\n\r\nSelected file is {length / 1024:n0} KB, maximum size is {maxFileSize / 1024:n0} KB.";
-                MessageBox.Show(sizeMessage, "Firmware File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            return true;
         }
 
         /// <summary>
@@ -736,7 +706,6 @@ namespace Flash_Multi
                 this.tableLayoutPanel1.RowStyles[3].SizeType = SizeType.Absolute;
                 this.tableLayoutPanel1.RowStyles[3].Height = 0;
                 this.tableLayoutPanel1.ResumeLayout();
-
             }
         }
 
