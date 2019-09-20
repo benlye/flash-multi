@@ -88,7 +88,7 @@ namespace Flash_Multi
 
             // Use WMI to find all the Maple devices
             ManagementObjectCollection collection;
-            using (var searcher = new ManagementObjectSearcher(@"Select * From Win32_PnPEntity WHERE DeviceID like '%VID_1EAF&%'"))
+            using (var searcher = new ManagementObjectSearcher(@"Select * From Win32_PnPEntity WHERE DeviceID like '%VID_1EAF&%' OR DeviceID like '%VID_16C0%'"))
             using (collection = searcher.Get())
             {
                 foreach (var device in collection)

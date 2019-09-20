@@ -551,17 +551,24 @@ namespace Flash_Multi
                 return;
             }
 
-            // Determine if we should use Maple or serial interface
+            // Determine if we should use Maple device
             MapleDevice mapleResult = MapleDevice.FindMaple();
+
+            // Determine if we should use a USBasp device
+            UsbAspDevice usbaspResult = UsbAspDevice.FindUsbAsp();
 
             // Determine if the selected file contains USB / bootloader support
             bool firmwareSupportsUsb = FileUtils.CheckForUsbSupport(this.textFileName.Text);
+
+            // Get the signature from the firmware file
+            FileUtils.FirmwareFile fileSignature = FileUtils.GetFirmwareSignature(this.textFileName.Text);
 
             // Error if flashing non-USB firmware via native USB port
             if (mapleResult.DeviceFound && !firmwareSupportsUsb)
             {
                 string msgBoxMessage = "The selected firmware file was compiled without USB support.\r\n\r\nFlashing this firmware would prevent the Multiprotocol module from functioning correctly.\r\n\r\nPlease select a different firmware file.";
                 MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.EnableControls(true);
                 return;
             }
 
@@ -573,6 +580,26 @@ namespace Flash_Multi
             {
                 Debug.WriteLine($"Maple device found in {mapleResult.Mode} mode\r\n");
                 await MapleDevice.WriteFlash(this, this.textFileName.Text, comPort);
+            }
+            else if (usbaspResult.DeviceFound == true && comPort == "USBasp")
+            {
+                if (fileSignature == null)
+                {
+                    string msgBoxMessage = "Unable to check the specified firmware file for compatibility with this upload method.";
+                    MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.EnableControls(true);
+                    return;
+                }
+
+                if (fileSignature.ModuleType != "AVR")
+                {
+                    string msgBoxMessage = "The specified firmware file is not compatible with this upload method.";
+                    MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.EnableControls(true);
+                    return;
+                }
+
+                await UsbAspDevice.WriteFlash(this, this.textFileName.Text, fileSignature.BootloaderSupport);
             }
             else
             {
