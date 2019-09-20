@@ -20,14 +20,13 @@
 
 namespace Flash_Multi
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
     using System.Windows.Forms;
 
-    class UsbAspDevice
+    /// <summary>
+    /// Class for working with a USBasp device.
+    /// </summary>
+    internal class UsbAspDevice
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="UsbAspDevice"/> class.
@@ -99,7 +98,6 @@ namespace Flash_Multi
             int flashSteps = 2;
 
             // Fuses
-            string lockBits = "0x0F";
             string unlockBits = "0x3F";
             string extendedFuses = "0xFD";
             string highFuses = "0xD7";
@@ -121,7 +119,7 @@ namespace Flash_Multi
             flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Writing firmware...");
 
             // Set the avrdude.exe command line arguments
-            commandArgs = $"-C.\\tools\\avrdude.conf -patmega328p -cusbasp -e -Ulock:w:{unlockBits}:m -Uefuse:w:{extendedFuses}:m -Uhfuse:w:{highFuses}:m -Ulfuse:w:{lowFuses}:m -Uflash:w:{bootLoaderPath}:i -Uflash:w:{fileName}:a";
+            commandArgs = $"-C.\\tools\\avrdude.conf -patmega328p -cusbasp -Ulock:w:{unlockBits}:m -Uefuse:w:{extendedFuses}:m -Uhfuse:w:{highFuses}:m -Ulfuse:w:{lowFuses}:m -Uflash:w:{bootLoaderPath}:i -Uflash:w:{fileName}:a";
 
             // Run the erase command asynchronously and wait for it to finish
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
@@ -136,70 +134,7 @@ namespace Flash_Multi
             }
 
             flashMulti.AppendLog(" done\r\n");
-            
-            /*
-            // Write the bootloader if required
-            if (writeBootloader)
-            {
-                // Increment the step counter and write to the log
-                flashStep++;
-                flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Writing bootloader...");
-
-                // Prepare the command line arguments for writing the bootloader
-                commandArgs = $"-C.\\tools\\avrdude.conf -patmega328p -cusbasp -Ulock:w:{unlockBits}:m -Uefuse:w:{extendedFuses}:m -Uhfuse:w:{highFuses}:m -Ulfuse:w:{lowFuses}:m  -Uflash:w:{bootLoaderPath}:i";
-
-                // Run the write command asynchronously and wait for it to finish
-                await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
-
-                // Show an error message if the command failed for any reason
-                if (returnCode != 0)
-                {
-                    flashMulti.EnableControls(true);
-                    flashMulti.AppendLog(" failed!");
-                    MessageBox.Show("Failed to write the bootloader.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                flashMulti.AppendLog(" done\r\n");
-            }
-
-            /*
-            // Increment the step counter and write to the log
-            flashStep++;
-            flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Writing Multimodule firmware...");
-
-            // Prepare the command line arguments for writing the firmware
-            commandArgs = $"-v -s {flashStart} -e 0 -g {executionAddress} -b {serialBaud} -w \"{fileName}\" {comPort}";
-
-            // Run the write command asynchronously and wait for it to finish
-            await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
-
-            // Show an error message if the command failed for any reason
-            if (returnCode != 0)
-            {
-                flashMulti.EnableControls(true);
-                flashMulti.AppendLog(" failed!");
-                MessageBox.Show("Failed to write the firmware.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            // Reconnect the serial monitor if it was connected before
-            if (serialMonitor != null && serialMonitor.IsDisposed != true && reconnectSerialMonitor)
-            {
-                serialMonitor.SerialConnect(comPort);
-            }
-
-            // Write a success message to the log
-            flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMultimodule updated sucessfully");
-
-            // Show a success message box
-            MessageBox.Show("Multimodule updated sucessfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-    */
-            // Re-enable the form controls
             flashMulti.EnableControls(true);
         }
-
     }
 }
