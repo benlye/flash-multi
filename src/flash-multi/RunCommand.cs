@@ -57,16 +57,44 @@ namespace Flash_Multi
             myProcess.StartInfo.RedirectStandardError = true;
             myProcess.StartInfo.CreateNoWindow = true;
 
-            // Set your output and error (asynchronous) handlers
-            myProcess.OutputDataReceived += new DataReceivedEventHandler(flashMulti.OutputHandler);
-            myProcess.ErrorDataReceived += new DataReceivedEventHandler(flashMulti.OutputHandler);
+            // avrdude sends all output to stderr, so reverse the sync/async processing
+            if (command.EndsWith("avrdude.exe"))
+            {
+                // Hande error output asynchronously
+                myProcess.OutputDataReceived += new DataReceivedEventHandler(flashMulti.OutputHandler);
 
-            // Start process and handlers
-            myProcess.Start();
+                // Start process and handlers
+                myProcess.Start();
 
-            // Read the output
-            myProcess.BeginOutputReadLine();
-            myProcess.BeginErrorReadLine();
+                // Read the error output asynchronously, handle it by line
+                myProcess.BeginOutputReadLine();
+
+                // Read the standard output synchronously, handle it character-by-character
+                while (!myProcess.StandardError.EndOfStream)
+                {
+                    var data = myProcess.StandardError.Read();
+                    flashMulti.CharOutputHandler((char)data);
+                }
+            }
+            else
+            {
+                // Hande error output asynchronously
+                myProcess.ErrorDataReceived += new DataReceivedEventHandler(flashMulti.OutputHandler);
+
+                // Start process and handlers
+                myProcess.Start();
+
+                // Read the error output asynchronously, handle it by line
+                myProcess.BeginErrorReadLine();
+
+                // Read the standard output synchronously, handle it character-by-character
+                while (!myProcess.StandardOutput.EndOfStream)
+                {
+                    var data = myProcess.StandardOutput.Read();
+                    flashMulti.CharOutputHandler((char)data);
+                }
+            }
+
 
             // Loop until the process finishes
             myProcess.WaitForExit();

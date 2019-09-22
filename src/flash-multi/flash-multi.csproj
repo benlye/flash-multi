@@ -58,6 +58,7 @@
     <Compile Include="DfuRecoveryDialog.Designer.cs">
       <DependentUpon>DfuRecoveryDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="FileUtils.cs" />
     <Compile Include="FlashMulti.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -76,6 +77,7 @@
       <DependentUpon>SerialMonitor.cs</DependentUpon>
     </Compile>
     <Compile Include="UpdateCheck.cs" />
+    <Compile Include="UsbAspDevice.cs" />
     <Compile Include="UsbDeviceInfo.cs" />
     <Compile Include="UsbNotification.cs" />
     <EmbeddedResource Include="DfuRecoveryDialog.resx">

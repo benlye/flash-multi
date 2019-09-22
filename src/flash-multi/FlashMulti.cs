@@ -25,7 +25,9 @@ namespace Flash_Multi
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
+    using System.Timers;
     using System.Windows.Forms;
 
     /// <summary>
@@ -33,6 +35,26 @@ namespace Flash_Multi
     /// </summary>
     public partial class FlashMulti : Form
     {
+        /// <summary>
+        /// Buffer for verbose output logging.
+        /// </summary>
+        private string outputLineBuffer = string.Empty;
+
+        /// <summary>
+        /// Keep track of the current avrdude activity.
+        /// </summary>
+        private string avrdudeActivity = string.Empty;
+
+        /// <summary>
+        ///  The number of steps required for an avrdude flash.
+        /// </summary>
+        internal int AvrdudeSteps = 0;
+
+        /// <summary>
+        /// The current avrdude flash step.
+        /// </summary>
+        internal int AvrdudeFlashStep = 1;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FlashMulti"/> class.
         /// </summary>
@@ -93,26 +115,208 @@ namespace Flash_Multi
         /// <param name="eventArgs">The data from the event.</param>
         public void OutputHandler(object sendingProcess, DataReceivedEventArgs eventArgs)
         {
-            // Append to the verbose log box
-            this.AppendVerbose(eventArgs.Data);
+            // Ignore the meaningless DFU error we get on every upload
+            if (eventArgs.Data != "error resetting after download: usb_reset: could not reset device, win error: The system cannot find the file specified.")
+            {
+                // Append to the verbose log box
+                this.AppendVerbose(eventArgs.Data);
+            }
+
             Debug.WriteLine(eventArgs.Data);
+
+            // Update the progress bar if there is a percentage in the output
+            Regex regexSerialProgress = new Regex(@"\((\d+)\.\d\d\%\)");
+            if (eventArgs.Data != null)
+            {
+                Match match = regexSerialProgress.Match(eventArgs.Data);
+                if (match.Success)
+                {
+                    this.UpdateProgress(int.Parse(match.Groups[1].Value));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Appends a character to the verbose output text box.
+        /// </summary>
+        /// <param name="data">String to append.</param>
+        public void CharOutputHandler(char data)
+        {
+            this.outputLineBuffer = this.outputLineBuffer + (char)data;
+
+            // Write complete lines to verbose output box
+            // Match a 'normal' end of line, or the end of line used by stm32flash
+            if (this.outputLineBuffer.EndsWith("\r\n") || this.outputLineBuffer.EndsWith(") \r"))
+            {
+                // Suppress writing the dfu-util finished line and the avrdude reading/writing finished lines
+                if (this.outputLineBuffer != "Starting download: [##################################################] finished!\r\n")
+                {
+                    if ((this.outputLineBuffer.StartsWith("Reading | #") && this.outputLineBuffer.EndsWith("\r\n")) || (this.outputLineBuffer.StartsWith("Writing | #") && this.outputLineBuffer.EndsWith("\r\n")))
+                    {
+                        this.AppendVerbose(string.Empty);
+                    }
+                    else
+                    {
+                        this.outputLineBuffer = this.outputLineBuffer.TrimEnd();
+                        this.AppendVerbose(this.outputLineBuffer);
+                    }
+                }
+
+                // Update the progress bar if there is a percentage in the output (stm32flash)
+                Regex regexSerialProgress = new Regex(@"\((\d+)\.\d\d\%\)");
+                if (this.outputLineBuffer != string.Empty)
+                {
+                    Match match = regexSerialProgress.Match(this.outputLineBuffer);
+                    if (match.Success)
+                    {
+                        this.UpdateProgress(int.Parse(match.Groups[1].Value));
+                    }
+                }
+
+                // Clear the buffer
+                this.outputLineBuffer = string.Empty;
+            }
+            else
+            {
+                // Handle progress from dfu-util
+                if (this.outputLineBuffer == "Starting download: [")
+                {
+                    this.AppendVerbose(this.outputLineBuffer, false);
+                }
+
+                if (this.outputLineBuffer.StartsWith("Starting download: [#"))
+                {
+                    if (data == '#')
+                    {
+                        // Convert number of hashes in string to progress bar percentage
+                        int dfuProgress = (this.outputLineBuffer.Length - 20) * 2;
+
+                        // Update the progress bar
+                        this.UpdateProgress(dfuProgress);
+                    }
+
+                    // Append the character to the output
+                    this.AppendVerbose(((char)data).ToString(), false);
+
+                    // Progress line is finished so end it with a newline
+                    if (this.outputLineBuffer == "Starting download: [##################################################] finished!")
+                    {
+                        this.AppendVerbose(string.Empty);
+                    }
+                }
+
+                // Handle progress from avrdude
+                if (this.outputLineBuffer == "avrdude.exe: erasing chip")
+                {
+                    this.AppendLog($"[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Erasing flash ... ");
+                    this.avrdudeActivity = "erasing";
+                    this.AvrdudeFlashStep++;
+                }
+
+                if (this.outputLineBuffer == "avrdude.exe: writing lock (1 bytes):" && this.avrdudeActivity == "erasing")
+                {
+                    this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Setting fuses ... ");
+                    this.avrdudeActivity = "fuses";
+                    this.AvrdudeFlashStep++;
+                }
+
+                if (this.outputLineBuffer.StartsWith("avrdude.exe: writing flash ") && this.outputLineBuffer.EndsWith("):"))
+                {
+                    if (this.avrdudeActivity == "writebootloader" && this.AvrdudeSteps == 5)
+                    {
+                        // Writing firmware after bootloader
+                        this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Writing firmware ... ");
+                        this.avrdudeActivity = "writefirmware";
+                        this.AvrdudeFlashStep++;
+                    }
+                    else if (this.avrdudeActivity == "fuses" && this.AvrdudeSteps == 4)
+                    {
+                        // Writing firmware after fuses
+                        this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Writing flash ... ");
+                        this.avrdudeActivity = "writefirmware";
+                        this.AvrdudeFlashStep++;
+                    }
+                    else if (this.avrdudeActivity == "fuses" && this.AvrdudeSteps == 5)
+                    {
+                        // Writing bootloader after fuses
+                        this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Writing bootloader ... ");
+                        this.avrdudeActivity = "writebootloader";
+                        this.AvrdudeFlashStep++;
+                    }
+                }
+
+                if (this.outputLineBuffer == "avrdude.exe: reading on-chip flash data:" && this.avrdudeActivity == "writefirmware")
+                {
+                    this.avrdudeActivity = "verifyfirmware";
+                    this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Verifying flash ...");
+                    this.AvrdudeFlashStep++;
+                }
+
+                if (this.outputLineBuffer == "avrdude.exe done.  Thank you." && this.avrdudeActivity == "verifyfirmware")
+                {
+                    this.avrdudeActivity = string.Empty;
+                    this.AppendLog(" done\r\n");
+                }
+
+                if (this.outputLineBuffer == "Reading | " || this.outputLineBuffer == "Writing | ")
+                {
+                    this.AppendVerbose(this.outputLineBuffer, false);
+                }
+
+                if (this.outputLineBuffer.StartsWith("Reading | #") || this.outputLineBuffer.StartsWith("Writing | #"))
+                {
+                    // Update the progress bar only when writing and verifying the firmware
+                    if (data == '#' && (this.avrdudeActivity == "writefirmware" || this.avrdudeActivity == "verifyfirmware"))
+                    {
+                        // Convert number of hashes in string to progress bar percentage
+                        int avrdudeProgress = (this.outputLineBuffer.Length - 10) * 2;
+                        this.UpdateProgress(avrdudeProgress);
+                    }
+
+                    // Append the character to the output
+                    this.AppendVerbose(((char)data).ToString(), false);
+                }
+            }
         }
 
         /// <summary>
         /// Appends a string to the verbose output text box.
         /// </summary>
         /// <param name="text">String to append.</param>
-        public void AppendVerbose(string text)
+        public void AppendVerbose(char text)
         {
             // Check if we're called from another thread
             if (this.InvokeRequired)
             {
-                this.Invoke(new Action<string>(this.AppendVerbose), new object[] { text });
+                this.Invoke(new Action<char>(this.AppendVerbose), new object[] { text });
                 return;
             }
 
             // Append the text
-            this.textVerbose.AppendText(text + "\r\n");
+            this.textVerbose.AppendText(text.ToString());
+        }
+
+        /// <summary>
+        /// Appends a string to the verbose output text box.
+        /// </summary>
+        /// <param name="text">String to append.</param>
+        /// <param name="newline">Boolean indeicating whtether or not append a newline.</param>
+        public void AppendVerbose(string text, bool newline = true)
+        {
+            // Check if we're called from another thread
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<string, bool>(this.AppendVerbose), new object[] { text, newline });
+                return;
+            }
+
+            // Append the text
+            if (newline)
+            {
+                text = text + "\r\n";
+            }
+
+            this.textVerbose.AppendText(text);
         }
 
         /// <summary>
@@ -286,7 +490,7 @@ namespace Flash_Multi
                 this.buttonUpload.Enabled = false;
             }
 
-            if (this.comPortSelector.SelectedItem != null)
+            if (this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() != "USBasp" && this.comPortSelector.SelectedValue.ToString() != "DFU Device")
             {
                 this.buttonSerialMonitor.Enabled = true;
             }
@@ -435,23 +639,30 @@ namespace Flash_Multi
             }
 
             // Check the file size
-            if (!this.CheckFirmwareFileSize())
+            if (!FileUtils.CheckFirmwareFileSize(this.textFileName.Text))
             {
                 this.EnableControls(true);
                 return;
             }
 
-            // Determine if we should use Maple or serial interface
+            // Determine if we should use Maple device
             MapleDevice mapleResult = MapleDevice.FindMaple();
 
+            // Determine if we should use a USBasp device
+            UsbAspDevice usbaspResult = UsbAspDevice.FindUsbAsp();
+
             // Determine if the selected file contains USB / bootloader support
-            bool firmwareSupportsUsb = this.CheckForUsbSupport();
+            bool firmwareSupportsUsb = FileUtils.CheckForUsbSupport(this.textFileName.Text);
+
+            // Get the signature from the firmware file
+            FileUtils.FirmwareFile fileSignature = FileUtils.GetFirmwareSignature(this.textFileName.Text);
 
             // Error if flashing non-USB firmware via native USB port
             if (mapleResult.DeviceFound && !firmwareSupportsUsb)
             {
                 string msgBoxMessage = "The selected firmware file was compiled without USB support.\r\n\r\nFlashing this firmware would prevent the Multiprotocol module from functioning correctly.\r\n\r\nPlease select a different firmware file.";
                 MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.EnableControls(true);
                 return;
             }
 
@@ -463,6 +674,26 @@ namespace Flash_Multi
             {
                 Debug.WriteLine($"Maple device found in {mapleResult.Mode} mode\r\n");
                 await MapleDevice.WriteFlash(this, this.textFileName.Text, comPort);
+            }
+            else if (usbaspResult.DeviceFound == true && comPort == "USBasp")
+            {
+                if (fileSignature == null)
+                {
+                    string msgBoxMessage = "Unable to check the specified firmware file for compatibility with this upload method.";
+                    MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.EnableControls(true);
+                    return;
+                }
+
+                if (fileSignature.ModuleType != "AVR")
+                {
+                    string msgBoxMessage = "The selected firmware file is not compatible with this upload method.";
+                    MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.EnableControls(true);
+                    return;
+                }
+
+                await UsbAspDevice.WriteFlash(this, this.textFileName.Text, fileSignature.BootloaderSupport);
             }
             else
             {
@@ -486,17 +717,36 @@ namespace Flash_Multi
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
+                    // Clear the output boxes
+                    this.textActivity.Clear();
+                    this.textVerbose.Clear();
+
                     // Set the text box to the selected file name
                     this.textFileName.Text = openFileDialog.FileName;
 
                     // Check the file size
-                    if (!this.CheckFirmwareFileSize())
+                    if (!FileUtils.CheckFirmwareFileSize(this.textFileName.Text))
                     {
                         return;
                     }
 
+                    // Get the signature from the firmware file
+                    FileUtils.FirmwareFile fileDetails = FileUtils.GetFirmwareSignature(this.textFileName.Text);
+
+                    // If we got details from the signature write them to the log window
+                    if (fileDetails != null)
+                    {
+                        this.AppendLog($"Firmware File Name:       {this.textFileName.Text.Substring(this.textFileName.Text.LastIndexOf("\\") + 1)}\r\n");
+                        this.AppendLog($"Multi Firmware Version:   {fileDetails.Version} ({fileDetails.ModuleType})\r\n");
+                        this.AppendLog($"Multi Telemetry Type:     {fileDetails.MultiTelemetryType}\r\n");
+                        this.AppendLog($"Invert Telemetry Enabled: {fileDetails.InvertTelemetry}\r\n");
+                        this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader}\r\n");
+                        this.AppendLog($"Bootloader Enabled:       {fileDetails.BootloaderSupport}\r\n");
+                        this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}\r\n");
+                    }
+
                     // Check if the binary file contains USB / bootloader support
-                    if (this.CheckForUsbSupport())
+                    if (FileUtils.CheckForUsbSupport(this.textFileName.Text))
                     {
                         Debug.WriteLine("Firmware file compiled with USB support.");
                     }
@@ -509,57 +759,6 @@ namespace Flash_Multi
 
             // Check if the Upload button should be enabled yet
             this.CheckControls();
-        }
-
-        /// <summary>
-        /// Parses the binary file looking for a string which indicates that the compiled firmware images contains USB support.
-        /// The binary firmware file will contain the strings 'Maple' and 'LeafLabs' if it was compiled with support for the USB / Flash from TX bootloader.
-        /// </summary>
-        /// <returns>A boolean value indicatating whether or not the firmware supports USB.</returns>
-        private bool CheckForUsbSupport()
-        {
-            bool usbSupportEnabled = false;
-            string fileName = this.textFileName.Text;
-
-            byte[] byteBuffer = File.ReadAllBytes(fileName);
-            string byteBufferAsString = System.Text.Encoding.ASCII.GetString(byteBuffer);
-            int offset = byteBufferAsString.IndexOf("M\0a\0p\0l\0e\0\u0012\u0003L\0e\0a\0f\0L\0a\0b\0s\0\u0012\u0001");
-
-            if (offset > 0)
-            {
-                usbSupportEnabled = true;
-            }
-
-            return usbSupportEnabled;
-        }
-
-        /// <summary>
-        /// Checks that the compiled firmware will fit on the module.
-        /// </summary>
-        /// <returns>Returns a boolean indicating whehter or not the firmware size is OK.</returns>
-        private bool CheckFirmwareFileSize()
-        {
-            // Get the file size
-            long length = new System.IO.FileInfo(this.textFileName.Text).Length;
-
-            // If the file is very large we don't want to check for USB support so throw a generic error
-            if (length > 256000)
-            {
-                MessageBox.Show("Selected firmware file is too large.", "Firmware File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            // If the file is smaller we can check if it has USB support and throw a more specific error
-            int maxFileSize = this.CheckForUsbSupport() ? 120832 : 129024;
-
-            if (length > maxFileSize)
-            {
-                string sizeMessage = $"Firmware file is too large.\r\n\r\nSelected file is {length / 1024:n0} KB, maximum size is {maxFileSize / 1024:n0} KB.";
-                MessageBox.Show(sizeMessage, "Firmware File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            return true;
         }
 
         /// <summary>
@@ -591,7 +790,15 @@ namespace Flash_Multi
                 return;
             }
 
-            this.progressBar1.Value = value;
+            // Value must be between 0 and 100
+            if (value > 0 && value <= 100)
+            {
+                // Hack to make the progress bar jump to the next value rather than animate
+                // The animation makes the bar look weird when it goes to 100% because the bar is still moving when the work is done.
+                this.progressBar1.Value = value * 10;
+                this.progressBar1.Value = (value * 10) - 1;
+                this.progressBar1.Value = value * 10;
+            }
         }
 
         /// <summary>
@@ -602,11 +809,24 @@ namespace Flash_Multi
         {
             if (this.showVerboseOutput.Checked == true)
             {
-                this.Height = 520;
+                this.tableLayoutPanel1.SuspendLayout();
+                this.tableLayoutPanel1.RowStyles[0].SizeType = SizeType.Absolute;
+                this.tableLayoutPanel1.RowStyles[0].Height = 126;
+                this.tableLayoutPanel1.RowStyles[3].SizeType = SizeType.Percent;
+                this.tableLayoutPanel1.RowStyles[3].Height = 50;
+                this.MinimumSize = new System.Drawing.Size(500, 505);
+                this.tableLayoutPanel1.ResumeLayout();
             }
             else
             {
-                this.Height = 330;
+                this.tableLayoutPanel1.SuspendLayout();
+                this.MinimumSize = new System.Drawing.Size(500, 359);
+                this.Size = new System.Drawing.Size(this.Width, 359);
+                this.tableLayoutPanel1.RowStyles[0].SizeType = SizeType.Percent;
+                this.tableLayoutPanel1.RowStyles[0].Height = 100;
+                this.tableLayoutPanel1.RowStyles[3].SizeType = SizeType.Absolute;
+                this.tableLayoutPanel1.RowStyles[3].Height = 0;
+                this.tableLayoutPanel1.ResumeLayout();
             }
         }
 
