@@ -41,6 +41,21 @@ namespace Flash_Multi
         private string outputLineBuffer = string.Empty;
 
         /// <summary>
+        /// Keep track of the current avrdude activity.
+        /// </summary>
+        private string avrdudeActivity = string.Empty;
+
+        /// <summary>
+        ///  The number of steps required for an avrdude flash.
+        /// </summary>
+        internal int AvrdudeSteps = 0;
+
+        /// <summary>
+        /// The current avrdude flash step.
+        /// </summary>
+        internal int AvrdudeFlashStep = 1;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="FlashMulti"/> class.
         /// </summary>
         public FlashMulti()
@@ -133,11 +148,18 @@ namespace Flash_Multi
             // Match a 'normal' end of line, or the end of line used by stm32flash
             if (this.outputLineBuffer.EndsWith("\r\n") || this.outputLineBuffer.EndsWith(") \r"))
             {
-                // Suppress writing the dfu-util finished line
+                // Suppress writing the dfu-util finished line and the avrdude reading/writing finished lines
                 if (this.outputLineBuffer != "Starting download: [##################################################] finished!\r\n")
                 {
-                    this.outputLineBuffer = this.outputLineBuffer.TrimEnd();
-                    this.AppendVerbose(this.outputLineBuffer);
+                    if ((this.outputLineBuffer.StartsWith("Reading | #") && this.outputLineBuffer.EndsWith("\r\n")) || (this.outputLineBuffer.StartsWith("Writing | #") && this.outputLineBuffer.EndsWith("\r\n")))
+                    {
+                        this.AppendVerbose(string.Empty);
+                    }
+                    else
+                    {
+                        this.outputLineBuffer = this.outputLineBuffer.TrimEnd();
+                        this.AppendVerbose(this.outputLineBuffer);
+                    }
                 }
 
                 // Update the progress bar if there is a percentage in the output (stm32flash)
@@ -181,6 +203,78 @@ namespace Flash_Multi
                     {
                         this.AppendVerbose(string.Empty);
                     }
+                }
+
+                // Handle progress from avrdude
+                if (this.outputLineBuffer == "avrdude.exe: erasing chip")
+                {
+                    this.AppendLog($"[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Erasing module ... ");
+                    this.avrdudeActivity = "erasing";
+                    this.AvrdudeFlashStep++;
+                }
+
+                if (this.outputLineBuffer == "avrdude.exe: writing lock (1 bytes):" && this.avrdudeActivity == "erasing")
+                {
+                    this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Setting fuses ... ");
+                    this.avrdudeActivity = "fuses";
+                    this.AvrdudeFlashStep++;
+                }
+
+                if (this.outputLineBuffer.StartsWith("avrdude.exe: writing flash ") && this.outputLineBuffer.EndsWith("):"))
+                {
+                    if (this.avrdudeActivity == "writebootloader" && this.AvrdudeSteps == 5)
+                    {
+                        // Writing firmware after bootloader
+                        this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Writing firmware ... ");
+                        this.avrdudeActivity = "writefirmware";
+                        this.AvrdudeFlashStep++;
+                    }
+                    else if (this.avrdudeActivity == "fuses" && this.AvrdudeSteps == 4)
+                    {
+                        // Writing firmware after fuses
+                        this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Writing flash ... ");
+                        this.avrdudeActivity = "writefirmware";
+                        this.AvrdudeFlashStep++;
+                    }
+                    else if (this.avrdudeActivity == "fuses" && this.AvrdudeSteps == 5)
+                    {
+                        // Writing bootloader after fuses
+                        this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Writing bootloader ... ");
+                        this.avrdudeActivity = "writebootloader";
+                        this.AvrdudeFlashStep++;
+                    }
+                }
+
+                if (this.outputLineBuffer == "avrdude.exe: reading on-chip flash data:" && this.avrdudeActivity == "writefirmware")
+                {
+                    this.avrdudeActivity = "verifyfirmware";
+                    this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Verifying flash ...");
+                    this.AvrdudeFlashStep++;
+                }
+
+                if (this.outputLineBuffer == "avrdude.exe done.  Thank you." && this.avrdudeActivity == "verifyfirmware")
+                {
+                    this.avrdudeActivity = string.Empty;
+                    this.AppendLog(" done\r\n");
+                }
+
+                if (this.outputLineBuffer == "Reading | " || this.outputLineBuffer == "Writing | ")
+                {
+                    this.AppendVerbose(this.outputLineBuffer, false);
+                }
+
+                if (this.outputLineBuffer.StartsWith("Reading | #") || this.outputLineBuffer.StartsWith("Writing | #"))
+                {
+                    // Update the progress bar only when writing and verifying the firmware
+                    if (data == '#' && (this.avrdudeActivity == "writefirmware" || this.avrdudeActivity == "verifyfirmware"))
+                    {
+                        // Convert number of hashes in string to progress bar percentage
+                        int avrdudeProgress = (this.outputLineBuffer.Length - 10) * 2;
+                        this.UpdateProgress(avrdudeProgress);
+                    }
+
+                    // Append the character to the output
+                    this.AppendVerbose(((char)data).ToString(), false);
                 }
             }
         }

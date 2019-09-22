@@ -92,48 +92,48 @@ namespace Flash_Multi
             int returnCode = -1;
 
             // First step in flash process
-            int flashStep = 1;
+            flashMulti.AvrdudeFlashStep = 1;
 
             // Total number of steps in flash process
-            int flashSteps = 2;
+            flashMulti.AvrdudeSteps = 4;
 
             // Fuses
             string unlockBits = "0x3F";
+            string lockBits = "0x0F";
             string extendedFuses = "0xFD";
             string highFuses = "0xD7";
             string lowFuses = "0xFF";
 
+            // Default avrdude command arguments (no bootloader)
+            commandArgs = $"-C.\\tools\\avrdude.conf -patmega328p -cusbasp -Ulock:w:{unlockBits}:m -Uefuse:w:{extendedFuses}:m -Uhfuse:w:{highFuses}:m -Ulfuse:w:{lowFuses}:m -Uflash:w:{fileName}:a";
+
             if (writeBootloader)
             {
                 // Increase the total number of steps
-                flashSteps = 3;
+                flashMulti.AvrdudeSteps = 5;
 
                 // Set the high fuses
                 highFuses = "0xD6";
+
+                commandArgs = $"-C.\\tools\\avrdude.conf -patmega328p -cusbasp -Ulock:w:{unlockBits}:m -Uefuse:w:{extendedFuses}:m -Uhfuse:w:{highFuses}:m -Ulfuse:w:{lowFuses}:m -Uflash:w:{bootLoaderPath}:i -Ulock:w:{lockBits}:m -Uflash:w:{fileName}:a";
             }
 
             // Write to the log
-            flashMulti.AppendLog("Starting Multimodule update via Usbasp\r\n");
+            flashMulti.AppendLog("Starting Multimodule update via USBasp\r\n");
 
-            // Erase the flash
-            flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Writing firmware...");
-
-            // Set the avrdude.exe command line arguments
-            commandArgs = $"-C.\\tools\\avrdude.conf -patmega328p -cusbasp -Ulock:w:{unlockBits}:m -Uefuse:w:{extendedFuses}:m -Uhfuse:w:{highFuses}:m -Ulfuse:w:{lowFuses}:m -Uflash:w:{bootLoaderPath}:i -Uflash:w:{fileName}:a";
-
-            // Run the erase command asynchronously and wait for it to finish
+            // Run the command asynchronously and wait for it to finish
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
 
             // Show an error message if the command failed for any reason
             if (returnCode != 0)
             {
                 flashMulti.EnableControls(true);
-                flashMulti.AppendLog(" failed!");
+                flashMulti.AppendLog("\r\nFirmware update failed!");
                 MessageBox.Show("Failed to write flash memory.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            flashMulti.AppendLog(" done\r\n");
+            flashMulti.AppendLog("\r\nDone.");
             flashMulti.EnableControls(true);
         }
     }
