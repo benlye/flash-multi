@@ -687,7 +687,7 @@ namespace Flash_Multi
 
                 if (fileSignature.ModuleType != "AVR")
                 {
-                    string msgBoxMessage = "The specified firmware file is not compatible with this upload method.";
+                    string msgBoxMessage = "The selected firmware file is not compatible with this upload method.";
                     MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     this.EnableControls(true);
                     return;
