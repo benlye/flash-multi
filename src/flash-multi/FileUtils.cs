@@ -113,15 +113,17 @@ namespace Flash_Multi
             Match match = regexSerialProgress.Match(signature);
             if (match.Success)
             {
-                FirmwareFile file = new FirmwareFile();
-                file.Signature = signature;
-                file.ModuleType = match.Groups[1].Value == "avr" ? "AVR" : match.Groups[1].Value == "stm" ? "STM32" : match.Groups[1].Value == "orx" ? "OrangeRX" : "Unkown";
-                file.BootloaderSupport = match.Groups[2].Value.Substring(0, 1) == "b" ? true : false;
-                file.CheckForBootloader = match.Groups[2].Value.Substring(1, 1) == "c" ? true : false;
-                file.MultiTelemetryType = match.Groups[2].Value.Substring(2, 1) == "t" ? "OpenTX" : match.Groups[2].Value.Substring(2, 1) == "s" ? "erskyTx" : "Undefined";
-                file.InvertTelemetry = match.Groups[2].Value.Substring(3, 1) == "i" ? true : false;
-                file.DebugSerial = match.Groups[2].Value.Substring(4, 1) == "d" ? true : false;
-                file.Version = match.Groups[3].Value.Substring(0, 2).TrimStart('0') + "." + match.Groups[3].Value.Substring(2, 2).TrimStart('0') + "." + match.Groups[3].Value.Substring(4, 2).TrimStart('0') + "." + match.Groups[3].Value.Substring(6, 2).TrimStart('0');
+                FirmwareFile file = new FirmwareFile
+                {
+                    Signature = signature,
+                    ModuleType = match.Groups[1].Value == "avr" ? "AVR" : match.Groups[1].Value == "stm" ? "STM32" : match.Groups[1].Value == "orx" ? "OrangeRX" : "Unkown",
+                    BootloaderSupport = match.Groups[2].Value.Substring(0, 1) == "b" ? true : false,
+                    CheckForBootloader = match.Groups[2].Value.Substring(1, 1) == "c" ? true : false,
+                    MultiTelemetryType = match.Groups[2].Value.Substring(2, 1) == "t" ? "OpenTX" : match.Groups[2].Value.Substring(2, 1) == "s" ? "erskyTx" : "Undefined",
+                    InvertTelemetry = match.Groups[2].Value.Substring(3, 1) == "i" ? true : false,
+                    DebugSerial = match.Groups[2].Value.Substring(4, 1) == "d" ? true : false,
+                    Version = match.Groups[3].Value.Substring(0, 2).TrimStart('0') + "." + match.Groups[3].Value.Substring(2, 2).TrimStart('0') + "." + match.Groups[3].Value.Substring(4, 2).TrimStart('0') + "." + match.Groups[3].Value.Substring(6, 2).TrimStart('0'),
+                };
                 return file;
             }
             else
