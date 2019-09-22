@@ -208,7 +208,7 @@ namespace Flash_Multi
                 // Handle progress from avrdude
                 if (this.outputLineBuffer == "avrdude.exe: erasing chip")
                 {
-                    this.AppendLog($"[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Erasing module ... ");
+                    this.AppendLog($"[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Erasing flash ... ");
                     this.avrdudeActivity = "erasing";
                     this.AvrdudeFlashStep++;
                 }
@@ -490,7 +490,7 @@ namespace Flash_Multi
                 this.buttonUpload.Enabled = false;
             }
 
-            if (this.comPortSelector.SelectedItem != null)
+            if (this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() != "USBasp" && this.comPortSelector.SelectedValue.ToString() != "DFU Device")
             {
                 this.buttonSerialMonitor.Enabled = true;
             }
