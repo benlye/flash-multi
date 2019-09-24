@@ -744,6 +744,11 @@ namespace Flash_Multi
                         this.AppendLog($"Bootloader Enabled:       {fileDetails.BootloaderSupport}\r\n");
                         this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}\r\n");
                     }
+                    else
+                    {
+                        this.AppendLog($"Firmware File Name: {this.textFileName.Text.Substring(this.textFileName.Text.LastIndexOf("\\") + 1)}\r\n\r\n");
+                        this.AppendLog($"Firmware signature not found in file, extended information is not available. This is normal for firmware prior to v1.2.1.79.\r\n");
+                    }
 
                     // Check if the binary file contains USB / bootloader support
                     if (FileUtils.CheckForUsbSupport(this.textFileName.Text))
