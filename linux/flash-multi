@@ -84,6 +84,95 @@ while IFS=: read key value; do
 done < <( system_profiler SPUSBDataType )
 }
 
+function module_type()
+{
+  case "$1" in
+    "avr")
+      b="AVR"
+      ;;
+    "stm")
+      b="STM32"
+      ;;
+    "orx")
+      b="OrangeRX"
+      ;;
+  esac
+  printf "$b"
+}
+
+function get_signature()
+{
+  FW_FILE=$1;
+  FW_SIGNATURE=$(tail -c24 $FW_FILE);
+
+  SIG_REGEX="^multi-(stm|avr|orx)-(\\w{5})-([0-9]{8})$"
+  if [[ $FW_SIGNATURE =~ $SIG_REGEX ]]; then
+    SIG_BOARD=${BASH_REMATCH[1]}
+    SIG_FLAGS=${BASH_REMATCH[2]}
+    SIG_VERSION=${BASH_REMATCH[3]}
+
+    SIG_BOARD_TYPE_NAME=$(module_type $SIG_BOARD);
+
+    SIG_FLAG_REGEX="^(\\w)(\\w)(\\w)(\\w)(\\w)$"
+    if [[ $SIG_FLAGS =~ $SIG_FLAG_REGEX ]]; then
+      SIG_BOOTLOADER_FLAG=${BASH_REMATCH[1]}
+      SIG_CHECK_FOR_BOOTLOADER_FLAG=${BASH_REMATCH[2]}
+      SIG_TELEMETRY_TYPE_FLAG=${BASH_REMATCH[3]}
+      SIG_TELEMETRY_INVERT_FLAG=${BASH_REMATCH[4]}
+      SIG_DEBUG_SERIAL_FLAG=${BASH_REMATCH[5]}
+    fi
+
+    FW_BOOTLOADER_SUPPORT="False"
+    if [[ "$SIG_BOOTLOADER_FLAG" == "b" ]]; then
+      FW_BOOTLOADER_SUPPORT="True";
+    fi
+
+    FW_CHECK_FOR_BOOTLOADER_ENABLED="False"
+    if [[ "$SIG_CHECK_FOR_BOOTLOADER_FLAG" == "c" ]]; then
+      FW_CHECK_FOR_BOOTLOADER_ENABLED="True";
+    fi
+
+    FW_TELEMETRY_TYPE="Unknown"
+    if [[ "$SIG_TELEMETRY_TYPE_FLAG" == "t" ]]; then
+      FW_TELEMETRY_TYPE="OpenTX";
+    elif [[ "$SIG_TELEMETRY_TYPE_FLAG" == "s" ]]; then
+      FW_TELEMETRY_TYPE="erSkyTX";
+    fi
+
+    FW_INVERT_TELEMETRY_ENABLED="False"
+    if [[ "$SIG_TELEMETRY_INVERT_FLAG" == "i" ]]; then
+      FW_INVERT_TELEMETRY_ENABLED="True";
+    fi
+
+    FW_DEBUG_SERIAL_ENABLED="False"
+    if [[ "$SIG_DEBUG_SERIAL_FLAG" == "d" ]]; then
+      FW_DEBUG_SERIAL_ENABLED="True";
+    fi
+
+    SIG_VERSION_REGEX="^([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})$"
+    if [[ $SIG_VERSION =~ $SIG_VERSION_REGEX ]]; then
+      SIG_VERSION_MAJOR=${BASH_REMATCH[1]##+(0)}
+      SIG_VERSION_MINOR=${BASH_REMATCH[2]##+(0)}
+      SIG_VERSION_REVISION=${BASH_REMATCH[3]##+(0)}
+      SIG_VERSION_PATCH=${BASH_REMATCH[4]##+(0)}
+      
+      SIG_VERSION_STRING="$SIG_VERSION_MAJOR.$SIG_VERSION_MINOR.$SIG_VERSION_REVISION.$SIG_VERSION_PATCH"
+    fi
+
+    printf "Multi Firmware Version:    $SIG_VERSION_STRING ($SIG_BOARD_TYPE_NAME)\n";
+    printf "Multi Telemetry Type:      $FW_TELEMETRY_TYPE\n";
+    printf "Invert Telemetry Enabled:  $FW_INVERT_TELEMETRY_ENABLED\n";
+    printf "Flash From Radio Enabled:  $FW_CHECK_FOR_BOOTLOADER_ENABLED\n";
+    printf "Bootloader Enabled:        $FW_BOOTLOADER_SUPPORT\n";
+    printf "Serial Debug Enabled:      $FW_DEBUG_SERIAL_ENABLED\n\n";
+  else
+    printf "Firmware signature not found.\n\n";
+  fi
+}
+
+# Display information about the firmware file
+get_signature $FWFILE
+
 # Check to see if a native STM32 USB device (Maple device) is attached
 uname -a | grep "Darwin" 2>&1 1>/dev/null
 if [ $? -eq 0 ]; then
