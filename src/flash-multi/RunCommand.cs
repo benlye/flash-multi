@@ -95,7 +95,6 @@ namespace Flash_Multi
                 }
             }
 
-
             // Loop until the process finishes
             myProcess.WaitForExit();
 

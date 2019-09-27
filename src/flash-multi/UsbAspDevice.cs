@@ -92,10 +92,10 @@ namespace Flash_Multi
             int returnCode = -1;
 
             // First step in flash process
-            flashMulti.AvrdudeFlashStep = 1;
+            flashMulti.FlashStep = 1;
 
             // Total number of steps in flash process
-            flashMulti.AvrdudeSteps = 4;
+            flashMulti.FlashSteps = 4;
 
             // Fuses
             string unlockBits = "0x3F";
@@ -110,7 +110,7 @@ namespace Flash_Multi
             if (writeBootloader)
             {
                 // Increase the total number of steps
-                flashMulti.AvrdudeSteps = 5;
+                flashMulti.FlashSteps = 5;
 
                 // Set the high fuses
                 highFuses = "0xD6";

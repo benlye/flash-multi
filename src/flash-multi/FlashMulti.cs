@@ -36,6 +36,16 @@ namespace Flash_Multi
     public partial class FlashMulti : Form
     {
         /// <summary>
+        ///  The number of steps required for a flash.
+        /// </summary>
+        internal int FlashSteps = 0;
+
+        /// <summary>
+        /// The current flash step.
+        /// </summary>
+        internal int FlashStep = 1;
+
+        /// <summary>
         /// Buffer for verbose output logging.
         /// </summary>
         private string outputLineBuffer = string.Empty;
@@ -44,16 +54,6 @@ namespace Flash_Multi
         /// Keep track of the current avrdude activity.
         /// </summary>
         private string avrdudeActivity = string.Empty;
-
-        /// <summary>
-        ///  The number of steps required for an avrdude flash.
-        /// </summary>
-        internal int AvrdudeSteps = 0;
-
-        /// <summary>
-        /// The current avrdude flash step.
-        /// </summary>
-        internal int AvrdudeFlashStep = 1;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FlashMulti"/> class.
@@ -208,48 +208,48 @@ namespace Flash_Multi
                 // Handle progress from avrdude
                 if (this.outputLineBuffer == "avrdude.exe: erasing chip")
                 {
-                    this.AppendLog($"[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Erasing flash ... ");
+                    this.AppendLog($"[{this.FlashStep}/{this.FlashSteps}] Erasing flash ... ");
                     this.avrdudeActivity = "erasing";
-                    this.AvrdudeFlashStep++;
+                    this.FlashStep++;
                 }
 
                 if (this.outputLineBuffer == "avrdude.exe: writing lock (1 bytes):" && this.avrdudeActivity == "erasing")
                 {
-                    this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Setting fuses ... ");
+                    this.AppendLog($"done\r\n[{this.FlashStep}/{this.FlashSteps}] Setting fuses ... ");
                     this.avrdudeActivity = "fuses";
-                    this.AvrdudeFlashStep++;
+                    this.FlashStep++;
                 }
 
                 if (this.outputLineBuffer.StartsWith("avrdude.exe: writing flash ") && this.outputLineBuffer.EndsWith("):"))
                 {
-                    if (this.avrdudeActivity == "writebootloader" && this.AvrdudeSteps == 5)
+                    if (this.avrdudeActivity == "writebootloader" && this.FlashSteps == 5)
                     {
                         // Writing firmware after bootloader
-                        this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Writing firmware ... ");
+                        this.AppendLog($"done\r\n[{this.FlashStep}/{this.FlashSteps}] Writing firmware ... ");
                         this.avrdudeActivity = "writefirmware";
-                        this.AvrdudeFlashStep++;
+                        this.FlashStep++;
                     }
-                    else if (this.avrdudeActivity == "fuses" && this.AvrdudeSteps == 4)
+                    else if (this.avrdudeActivity == "fuses" && this.FlashSteps == 4)
                     {
                         // Writing firmware after fuses
-                        this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Writing flash ... ");
+                        this.AppendLog($"done\r\n[{this.FlashStep}/{this.FlashSteps}] Writing flash ... ");
                         this.avrdudeActivity = "writefirmware";
-                        this.AvrdudeFlashStep++;
+                        this.FlashStep++;
                     }
-                    else if (this.avrdudeActivity == "fuses" && this.AvrdudeSteps == 5)
+                    else if (this.avrdudeActivity == "fuses" && this.FlashSteps == 5)
                     {
                         // Writing bootloader after fuses
-                        this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Writing bootloader ... ");
+                        this.AppendLog($"done\r\n[{this.FlashStep}/{this.FlashSteps}] Writing bootloader ... ");
                         this.avrdudeActivity = "writebootloader";
-                        this.AvrdudeFlashStep++;
+                        this.FlashStep++;
                     }
                 }
 
                 if (this.outputLineBuffer == "avrdude.exe: reading on-chip flash data:" && this.avrdudeActivity == "writefirmware")
                 {
                     this.avrdudeActivity = "verifyfirmware";
-                    this.AppendLog($"done\r\n[{this.AvrdudeFlashStep}/{this.AvrdudeSteps}] Verifying flash ...");
-                    this.AvrdudeFlashStep++;
+                    this.AppendLog($"done\r\n[{this.FlashStep}/{this.FlashSteps}] Verifying flash ...");
+                    this.FlashStep++;
                 }
 
                 if (this.outputLineBuffer == "avrdude.exe done.  Thank you." && this.avrdudeActivity == "verifyfirmware")
