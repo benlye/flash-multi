@@ -185,50 +185,42 @@ namespace Flash_Multi
             {
                 flashMulti.AppendLog("Switching Multimodule into DFU mode ...");
                 command = ".\\tools\\maple-reset.exe";
-                commandArgs = comPort;
+                commandArgs = $"{comPort} 2000";
                 await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
-                if (returnCode != 0)
+                if (returnCode == 0)
                 {
-                    flashMulti.EnableControls(true);
-                    flashMulti.AppendLog(" failed!");
-                    MessageBox.Show("Failed to get module to DFU mode.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                flashMulti.AppendLog(" done\r\n");
-                flashMulti.AppendVerbose(string.Empty);
-
-                // Check for a Maple DFU device
-                flashMulti.AppendLog("Waiting for DFU device ...");
-                bool dfuCheck = false;
-
-                await Task.Run(() => { dfuCheck = WaitForDFU(2000); });
-
-                if (dfuCheck)
-                {
-                    flashMulti.AppendLog(" got it\r\n");
+                    flashMulti.AppendLog(" done\r\n");
+                    flashMulti.AppendVerbose(string.Empty);
                 }
                 else
                 {
-                    flashMulti.AppendLog(" failed!\r\n");
-                    flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
-
-                    // Show the recovery mode dialog
-                    DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
-                    var recoveryResult = recoveryDialog.ShowDialog();
-
-                    // Stop if we didn't made it into recovery mode
-                    if (recoveryResult == DialogResult.Cancel)
+                    if (MapleDevice.FindMaple().DfuMode == false)
                     {
-                        flashMulti.AppendLog("DFU Recovery cancelled.");
-                        flashMulti.EnableControls(true);
-                        return;
+                        flashMulti.AppendLog(" failed!\r\n");
+                        flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
+
+                        // Show the recovery mode dialog
+                        DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
+                        var recoveryResult = recoveryDialog.ShowDialog();
+
+                        // Stop if we didn't make it into recovery mode
+                        if (recoveryResult == DialogResult.Cancel)
+                        {
+                            flashMulti.AppendLog("DFU Recovery cancelled.");
+                            flashMulti.EnableControls(true);
+                            return;
+                        }
+                        else if (recoveryResult == DialogResult.Abort)
+                        {
+                            flashMulti.AppendLog("DFU Recovery failed.");
+                            flashMulti.EnableControls(true);
+                            return;
+                        }
                     }
-                    else if (recoveryResult == DialogResult.Abort)
+                    else
                     {
-                        flashMulti.AppendLog("DFU Recovery failed.");
-                        flashMulti.EnableControls(true);
-                        return;
+                        flashMulti.AppendLog(" done\r\n");
+                        flashMulti.AppendVerbose(string.Empty);
                     }
                 }
             }
