@@ -116,7 +116,7 @@ namespace Flash_Multi
         public void OutputHandler(object sendingProcess, DataReceivedEventArgs eventArgs)
         {
             // Ignore the meaningless DFU error we get on every upload
-            if (eventArgs.Data != "error resetting after download: usb_reset: could not reset device, win error: The system cannot find the file specified.")
+            if (eventArgs.Data != "error resetting after download: usb_reset: could not reset device, win error: A device which does not exist was specified.")
             {
                 // Append to the verbose log box
                 this.AppendVerbose(eventArgs.Data);
@@ -148,7 +148,7 @@ namespace Flash_Multi
             // Match a 'normal' end of line, or the end of line used by stm32flash
             if (this.outputLineBuffer.EndsWith("\r\n") || this.outputLineBuffer.EndsWith(") \r"))
             {
-                // Suppress writing the dfu-util finished line and the avrdude reading/writing finished lines
+                // Suppress writing the dfu-util finished line, and the avrdude reading/writing finished lines
                 if (this.outputLineBuffer != "Starting download: [##################################################] finished!\r\n")
                 {
                     if ((this.outputLineBuffer.StartsWith("Reading | #") && this.outputLineBuffer.EndsWith("\r\n")) || (this.outputLineBuffer.StartsWith("Writing | #") && this.outputLineBuffer.EndsWith("\r\n")))
