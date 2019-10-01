@@ -19,22 +19,26 @@ shopt -s extglob
 # *********************************************************************
 
 # Define the script version
-VERSION=0.1.6
+VERSION=0.2.0
 
 # Write the script header
 printf "flash-multi $VERSION\n\nThis program is Free Software and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
 
 # Prepare simple help text to display when needed
-USAGE="Usage: flash-multi -f [firmware file] -p [serial device]\n\n"
+USAGE="Usage: flash-multi [options] -f [firmware file] -p [serial device]\n\nOptions:\n  -h  Print this message and exit\n  -r  Read and display the firmware file information and exit\n  -s  Don't prompt for confirmation\n\n"
 
 # Get the command line options
-while getopts ":f:p:h" opt; do
+while getopts ":f:p:hrs" opt; do
   case $opt in
     f) FWFILE="$OPTARG"
     ;;
     p) PORT="$OPTARG"
     ;;
     h) printf "$USAGE"; exit 1
+    ;;
+    r) SHOWINFO="True"
+    ;;
+    s) SILENT="True"
     ;;
     \?) printf "Invalid argument -$OPTARG\n\n"; >&2
     ;;
@@ -60,6 +64,16 @@ if [ ! -r "$FWFILE" ]; then
     printf "ERROR: $FWFILE cannot be read!\n\n";
     exit 2;
 fi
+
+function confirm() {
+  while true; do
+    read -p "$1 [Y]es or [N]o: "
+    case $(echo $REPLY | tr '[A-Z]' '[a-z]') in
+        y|yes) echo "yes"; return ;;
+        n|no)  echo "no" ; return ;;
+    esac
+  done
+}
 
 function list_usb()
 {
@@ -100,19 +114,65 @@ function module_type()
   printf "$b"
 }
 
+function module_type_bin()
+{
+  case "$1" in
+    "00")
+      b="AVR"
+      ;;
+    "01")
+      b="STM32"
+      ;;
+    "10")
+      b="OrangeRX"
+      ;;
+  esac
+  printf "$b"
+}
+
+channel_order_string_from_bits()
+{
+  CHORDER=""
+  if [ "$1" == "00000" ]; then echo "AETR"; fi
+  if [ "$1" == "00001" ]; then echo "AERT"; fi
+  if [ "$1" == "00010" ]; then echo "ARET"; fi
+  if [ "$1" == "00011" ]; then echo "ARTE"; fi
+  if [ "$1" == "00100" ]; then echo "ATRE"; fi
+  if [ "$1" == "00101" ]; then echo "ATER"; fi
+  if [ "$1" == "00110" ]; then echo "EATR"; fi
+  if [ "$1" == "00111" ]; then echo "EART"; fi
+  if [ "$1" == "01000" ]; then echo "ERAT"; fi
+  if [ "$1" == "01001" ]; then echo "ERTA"; fi
+  if [ "$1" == "01010" ]; then echo "ETRA"; fi
+  if [ "$1" == "01011" ]; then echo "ETAR"; fi
+  if [ "$1" == "01100" ]; then echo "TEAR"; fi
+  if [ "$1" == "01101" ]; then echo "TERA"; fi
+  if [ "$1" == "01110" ]; then echo "TREA"; fi
+  if [ "$1" == "01111" ]; then echo "TRAE"; fi
+  if [ "$1" == "10000" ]; then echo "TARE"; fi
+  if [ "$1" == "10001" ]; then echo "TAER"; fi
+  if [ "$1" == "10010" ]; then echo "RETA"; fi
+  if [ "$1" == "10011" ]; then echo "REAT"; fi
+  if [ "$1" == "10100" ]; then echo "RAET"; fi
+  if [ "$1" == "10101" ]; then echo "RATE"; fi
+  if [ "$1" == "10110" ]; then echo "RTAE"; fi
+  if [ "$1" == "10111" ]; then echo "RTEA"; fi
+  printf "$CHORDER"
+}
+
 function get_signature()
 {
   FW_FILE=$1;
   FW_SIGNATURE=$(tail -c24 $FW_FILE);
-
   SIG_V1_REGEX="^multi-(stm|avr|orx)-(\\w{5})-([0-9]{8})$"
-  SIG_V2_REGEX="^multi-x(\\[0-9a-z]{8})-([0-9]{8})$"
+  SIG_V2_REGEX="^multi-x([0-9a-z]{8})-([0-9]{8})$"
   if [[ $FW_SIGNATURE =~ $SIG_V1_REGEX ]]; then
     SIG_BOARD=${BASH_REMATCH[1]}
     SIG_FLAGS=${BASH_REMATCH[2]}
     SIG_VERSION=${BASH_REMATCH[3]}
 
     SIG_BOARD_TYPE_NAME=$(module_type $SIG_BOARD);
+    SIG_CHANNEL_ORDER=""
 
     SIG_FLAG_REGEX="^(\\w)(\\w)(\\w)(\\w)(\\w)$"
     if [[ $SIG_FLAGS =~ $SIG_FLAG_REGEX ]]; then
@@ -164,13 +224,33 @@ function get_signature()
     SIG_VERSION=${BASH_REMATCH[2]}
 
     SIG_FLAGS_BINARY=`echo "obase=2; ibase=16; ${SIG_FLAGS_HEX^^}" | bc`
+    
+    # Get the module type
     SIG_MODULE_TYPE_BINARY=${SIG_FLAGS_BINARY: -2}
-    SIG_CHANNEL_ORDER_BINARY=echo ${SIG_FLAGS_BINARY: -7: -2}
+    SIG_BOARD_TYPE_NAME=$(module_type_bin $SIG_MODULE_TYPE_BINARY);
 
-    # Set the bitwse flag values
-    [[ "$(( 0x$SIG_FLAGS_HEX & 0x100 ))" -gt 0 ]] && FW_BOOTLOADER_SUPPORT="True" || FW_BOOTLOADER_SUPPORT="False"
-    [[ "$(( 0x$SIG_FLAGS_HEX & 0x200 ))" -gt 0 ]] && FW_CHECK_FOR_BOOTLOADER_ENABLED="True" || FW_CHECK_FOR_BOOTLOADER_ENABLED="False"
+    # Get the channel order
+    SIG_CHANNEL_ORDER_BINARY=${SIG_FLAGS_BINARY: -7: -2}
+    SIG_CHANNEL_ORDER=$(channel_order_string_from_bits $SIG_CHANNEL_ORDER_BINARY)
 
+    # Set the bitwise flag values
+    [[ "$(( 0x$SIG_FLAGS_HEX & 0x80 ))" -gt 0 ]] && FW_BOOTLOADER_SUPPORT="True" || FW_BOOTLOADER_SUPPORT="False"
+    [[ "$(( 0x$SIG_FLAGS_HEX & 0x100 ))" -gt 0 ]] && FW_CHECK_FOR_BOOTLOADER_ENABLED="True" || FW_CHECK_FOR_BOOTLOADER_ENABLED="False"
+    [[ "$(( 0x$SIG_FLAGS_HEX & 0x200 ))" -gt 0 ]] && FW_INVERT_TELEMETRY_ENABLED="True" || FW_INVERT_TELEMETRY_ENABLED="False"
+    [[ "$(( 0x$SIG_FLAGS_HEX & 0x400 ))" -gt 0 ]] && FW_MULTI_STATUS_ENABLED=1 || FW_MULTI_STATUS_ENABLED=0
+    [[ "$(( 0x$SIG_FLAGS_HEX & 0x800 ))" -gt 0 ]] && FW_MULTI_TELEMETRY_ENABLED=1 || FW_MULTI_TELEMETRY_ENABLED=0
+    [[ "$(( 0x$SIG_FLAGS_HEX & 0x1000 ))" -gt 0 ]] && FW_DEBUG_SERIAL_ENABLED="True" || FW_DEBUG_SERIAL_ENABLED="False"
+
+    # Set the Multi Telemetry type
+    FW_TELEMETRY_TYPE="Disabled";
+    if [ $FW_MULTI_TELEMETRY_ENABLED -eq 1 ] && [ $FW_MULTI_STATUS_ENABLED -eq 0 ]; then
+      FW_TELEMETRY_TYPE="OpenTX";
+    fi
+    if [ $FW_MULTI_TELEMETRY_ENABLED -eq 0 ] && [ $FW_MULTI_STATUS_ENABLED -eq 1 ]; then
+      FW_TELEMETRY_TYPE="erSkyTx";
+    fi
+
+    # Assemble the version number string
     SIG_VERSION_REGEX="^([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})$"
     if [[ $SIG_VERSION =~ $SIG_VERSION_REGEX ]]; then
       SIG_VERSION_MAJOR=${BASH_REMATCH[1]##+(0)}
@@ -181,11 +261,13 @@ function get_signature()
       SIG_VERSION_STRING="$SIG_VERSION_MAJOR.$SIG_VERSION_MINOR.$SIG_VERSION_REVISION.$SIG_VERSION_PATCH"
     fi
   else
-    printf "Firmware signature not found.\n\n";
+    printf "Firmware signature not found - unable to validate firmware.\n\n";
     return;
   fi
 
+  # Show the firmware information
   printf "Multi Firmware Version:    $SIG_VERSION_STRING ($SIG_BOARD_TYPE_NAME)\n";
+  printf "Expected Channel Order:    $SIG_CHANNEL_ORDER\n";
   printf "Multi Telemetry Type:      $FW_TELEMETRY_TYPE\n";
   printf "Invert Telemetry Enabled:  $FW_INVERT_TELEMETRY_ENABLED\n";
   printf "Flash From Radio Enabled:  $FW_CHECK_FOR_BOOTLOADER_ENABLED\n";
@@ -193,9 +275,13 @@ function get_signature()
   printf "Serial Debug Enabled:      $FW_DEBUG_SERIAL_ENABLED\n\n";
 }
 
-# Display information about the firmware file
-get_signature $FWFILE
-exit
+# Just show the info of -r was sepcified
+
+
+if [[ $SHOWINFO == "True" ]]; then
+  get_signature $FWFILE
+  exit 0
+fi
 
 # Check to see if a native STM32 USB device (Maple device) is attached
 uname -a | grep "Darwin" 2>&1 1>/dev/null
@@ -222,6 +308,7 @@ if [ $MAPLE_DEVICE = "Native" ] || [ $MAPLE_DEVICE = "Unknown" ]
 then
   # Die if a serial port wasn't specified
   if [ "x" == "x$PORT" ]; then
+    printf "ERROR: No port specified and no DFU device found!\n\n";
     printf "$USAGE"
     exit 1
   fi
@@ -281,6 +368,19 @@ if [ $FWFILE_SIZE -gt $MAX_FILE_SIZE ]; then
     printf "ERROR: Firmware file is too large. File is $FWFILE_SIZE, maximum is $MAX_FILE_SIZE.\n\n";
     exit 2;
 fi
+
+# Display information about the firmware file
+get_signature $FWFILE
+
+# Ask the user to confirm
+if [[ $SILENT != "True" ]]; then
+  if [[ "no" == $(confirm "Proceed with firmware update?") ]]
+  then
+      printf "\nFirmware update aborted.\n\n"
+      exit 0
+  fi
+fi
+echo
 
 # Run the Maple or serial flash
 if [[ $MAPLE_DEVICE = "Unknown" ]]
