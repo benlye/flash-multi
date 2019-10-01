@@ -21,12 +21,8 @@
 namespace Flash_Multi
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
-    using System.Text;
     using System.Text.RegularExpressions;
-    using System.Threading.Tasks;
     using System.Windows.Forms;
 
     /// <summary>
@@ -34,6 +30,14 @@ namespace Flash_Multi
     /// </summary>
     internal class FileUtils
     {
+        // Bitmasks for firmware options
+        private const int BootloaderSupportMask = 0x80;
+        private const int CheckForBootloaderMask = 0x100;
+        private const int InvertTelemetryMask = 0x200;
+        private const int MultiStatusMask = 0x400;
+        private const int MultiTelemetryMask = 0x800;
+        private const int SerialDebugMask = 0x1000;
+
         /// <summary>
         /// Parses the binary file looking for a string which indicates that the compiled firmware images contains USB support.
         /// The binary firmware file will contain the strings 'Maple' and 'LeafLabs' if it was compiled with support for the USB / Flash from TX bootloader.
@@ -54,6 +58,93 @@ namespace Flash_Multi
             }
 
             return usbSupportEnabled;
+        }
+
+        /// <summary>
+        /// Converts a channel order index to the string representation.
+        /// </summary>
+        /// <param name="index">Integer representing the channel order.</param>
+        /// <returns>A string containing the channel order, e.g. 'AETR'.</returns>
+        internal static string GetChannelOrderString(int index)
+        {
+            string result = string.Empty;
+            switch (index)
+            {
+                case 0:
+                    result = "AETR";
+                    break;
+                case 1:
+                    result = "AERT";
+                    break;
+                case 2:
+                    result = "ARET";
+                    break;
+                case 3:
+                    result = "ARTE";
+                    break;
+                case 4:
+                    result = "ATRE";
+                    break;
+                case 5:
+                    result = "ATER";
+                    break;
+                case 6:
+                    result = "EATR";
+                    break;
+                case 7:
+                    result = "EART";
+                    break;
+                case 8:
+                    result = "ERAT";
+                    break;
+                case 9:
+                    result = "ERTA";
+                    break;
+                case 10:
+                    result = "ETRA";
+                    break;
+                case 11:
+                    result = "ETAR";
+                    break;
+                case 12:
+                    result = "TEAR";
+                    break;
+                case 13:
+                    result = "TERA";
+                    break;
+                case 14:
+                    result = "TREA";
+                    break;
+                case 15:
+                    result = "TRAE";
+                    break;
+                case 16:
+                    result = "TARE";
+                    break;
+                case 17:
+                    result = "TAER";
+                    break;
+                case 18:
+                    result = "RETA";
+                    break;
+                case 19:
+                    result = "REAT";
+                    break;
+                case 20:
+                    result = "RAET";
+                    break;
+                case 21:
+                    result = "RATE";
+                    break;
+                case 22:
+                    result = "RTAE";
+                    break;
+                case 23:
+                    result = "RTEA";
+                    break;
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -95,6 +186,7 @@ namespace Flash_Multi
         {
             string signature = string.Empty;
 
+            // Read the last 24 bytes of the binary file so we can see if it contains a signature string
             using (var reader = new StreamReader(filename))
             {
                 if (reader.BaseStream.Length > 24)
@@ -109,8 +201,9 @@ namespace Flash_Multi
                 }
             }
 
-            Regex regexSerialProgress = new Regex(@"^multi-(avr|stm|orx)-([a-z]{5})-(\d{8}$)");
-            Match match = regexSerialProgress.Match(signature);
+            // Handle firmware signature v1
+            Regex regexFirmwareSignature = new Regex(@"^multi-(avr|stm|orx)-([a-z]{5})-(\d{8}$)");
+            Match match = regexFirmwareSignature.Match(signature);
             if (match.Success)
             {
                 FirmwareFile file = new FirmwareFile
@@ -122,14 +215,65 @@ namespace Flash_Multi
                     MultiTelemetryType = match.Groups[2].Value.Substring(2, 1) == "t" ? "OpenTX" : match.Groups[2].Value.Substring(2, 1) == "s" ? "erskyTx" : "Undefined",
                     InvertTelemetry = match.Groups[2].Value.Substring(3, 1) == "i" ? true : false,
                     DebugSerial = match.Groups[2].Value.Substring(4, 1) == "d" ? true : false,
+                    ChannelOrder = "Unknown",
                     Version = match.Groups[3].Value.Substring(0, 2).TrimStart('0') + "." + match.Groups[3].Value.Substring(2, 2).TrimStart('0') + "." + match.Groups[3].Value.Substring(4, 2).TrimStart('0') + "." + match.Groups[3].Value.Substring(6, 2).TrimStart('0'),
                 };
                 return file;
             }
-            else
+
+            // Handle firmware signature v2
+            regexFirmwareSignature = new Regex(@"^multi-x([a-z0-9]{8})-(\d{8}$)");
+            match = regexFirmwareSignature.Match(signature);
+            if (match.Success)
             {
-                return null;
+                try
+                {
+                    // Get the hex value of the firmware flags from the regex match
+                    string flagHexString = "0x" + match.Groups[1].Value;
+
+                    // Convert the firmware flags to decimal
+                    uint flagDecimal = Convert.ToUInt32(flagHexString, 16);
+
+                    // Convert the firmware flags to a binary string
+                    string flagBinary = Convert.ToString(flagDecimal, 2).PadLeft(32, '0');
+
+                    // Get the module type from the rightmost two bits of the flag binary string
+                    int moduleType = Convert.ToInt16(flagBinary.Substring(flagBinary.Length - 2, 2));
+
+                    // Get the channel order from bits 3-7 of the flag binary string
+                    int channelOrder = Convert.ToInt16(flagBinary.Substring(flagBinary.Length - 7, 5));
+                    string channelOrderString = GetChannelOrderString(channelOrder);
+
+                    // Get the version from the regex
+                    string versionString = match.Groups[2].Value;
+
+                    // Convert the zero-padded string to a dot-separated version string
+                    string parsedVersion = versionString.Substring(0, 2).TrimStart('0') + "." + versionString.Substring(2, 2).TrimStart('0') + "." + versionString.Substring(4, 2).TrimStart('0') + "." + versionString.Substring(6, 2).TrimStart('0');
+
+                    // Create the firmware file signatre and return it
+                    FirmwareFile file = new FirmwareFile
+                    {
+                        Signature = signature,
+                        ModuleType = moduleType == 0 ? "AVR" : moduleType == 1 ? "STM32" : moduleType == 3 ? "OrangeRX" : "Unknown",
+                        ChannelOrder = channelOrderString,
+                        BootloaderSupport = (flagDecimal & BootloaderSupportMask) > 0 ? true : false,
+                        CheckForBootloader = (flagDecimal & CheckForBootloaderMask) > 0 ? true : false,
+                        InvertTelemetry = (flagDecimal & InvertTelemetryMask) > 0 ? true : false,
+                        MultiTelemetryType = (flagDecimal & MultiTelemetryMask) > 0 ? "OpenTX" : (flagDecimal & MultiStatusMask) > 0 ? "erskyTx" : "Undefined",
+                        DebugSerial = (flagDecimal & SerialDebugMask) > 0 ? true : false,
+                        Version = parsedVersion,
+                    };
+                    return file;
+                }
+                catch (Exception ex)
+                {
+                    // Throw a warning if we fail to parse the signature
+                    MessageBox.Show("Unable to read the details from the firmware file - the signature could not be parsed.", "Firmware Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
+
+            // Didn't find a signature in either format, return null
+            return null;
         }
 
         /// <summary>
@@ -141,6 +285,11 @@ namespace Flash_Multi
             /// Gets or sets the type of module.
             /// </summary>
             public string ModuleType { get; set; }
+
+            /// <summary>
+            /// Gets or sets the channel order the firmware was compiled for.
+            /// </summary>
+            public string ChannelOrder { get; set; }
 
             /// <summary>
             /// Gets or sets a value indicating whether the bootloader is supported.

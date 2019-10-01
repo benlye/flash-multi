@@ -738,11 +738,12 @@ namespace Flash_Multi
                     {
                         this.AppendLog($"Firmware File Name:       {this.textFileName.Text.Substring(this.textFileName.Text.LastIndexOf("\\") + 1)}\r\n");
                         this.AppendLog($"Multi Firmware Version:   {fileDetails.Version} ({fileDetails.ModuleType})\r\n");
+                        this.AppendLog($"Expected Channel Order:   {fileDetails.ChannelOrder}\r\n");
                         this.AppendLog($"Multi Telemetry Type:     {fileDetails.MultiTelemetryType}\r\n");
                         this.AppendLog($"Invert Telemetry Enabled: {fileDetails.InvertTelemetry}\r\n");
                         this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader}\r\n");
                         this.AppendLog($"Bootloader Enabled:       {fileDetails.BootloaderSupport}\r\n");
-                        this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}\r\n");
+                        this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}");
                     }
                     else
                     {
