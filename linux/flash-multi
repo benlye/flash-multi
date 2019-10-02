@@ -101,19 +101,13 @@ done < <( system_profiler SPUSBDataType )
 function module_type()
 {
   case "$1" in
-    "0")
-      ;&
-    "avr")
+    "0"|"avr")
       b="AVR"
       ;;
-    "1")
-      ;&
-    "stm")
+    "1"|"stm")
       b="STM32"
       ;;
-    "2")
-      ;&
-    "orx")
+    "2"|"orx")
       b="OrangeRX"
       ;;
   esac
