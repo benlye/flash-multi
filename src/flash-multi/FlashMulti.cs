@@ -273,8 +273,11 @@ namespace Flash_Multi
                         this.UpdateProgress(avrdudeProgress);
                     }
 
-                    // Append the character to the output
-                    this.AppendVerbose(((char)data).ToString(), false);
+                    // Append the character to the output, unless it's a carriage return
+                    if (data != '\r')
+                    {
+                        this.AppendVerbose(((char)data).ToString(), false);
+                    }
                 }
             }
         }
@@ -300,7 +303,7 @@ namespace Flash_Multi
         /// Appends a string to the verbose output text box.
         /// </summary>
         /// <param name="text">String to append.</param>
-        /// <param name="newline">Boolean indeicating whtether or not append a newline.</param>
+        /// <param name="newline">Boolean indicating whether or not to append a newline.</param>
         public void AppendVerbose(string text, bool newline = true)
         {
             // Check if we're called from another thread
@@ -628,6 +631,7 @@ namespace Flash_Multi
             this.textActivity.Clear();
             this.textVerbose.Clear();
             this.progressBar1.Value = 0;
+            this.outputLineBuffer = string.Empty;
 
             // Check if the file exists
             if (!File.Exists(this.textFileName.Text))

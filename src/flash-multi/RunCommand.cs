@@ -98,8 +98,11 @@ namespace Flash_Multi
             // Loop until the process finishes
             myProcess.WaitForExit();
 
+            int returnCode = myProcess.ExitCode;
+            myProcess.Dispose();
+
             // Return the exit code from the process
-            return myProcess.ExitCode;
+            return returnCode;
         }
     }
 }
