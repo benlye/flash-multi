@@ -30,7 +30,12 @@ namespace Flash_Multi
     /// </summary>
     internal class FileUtils
     {
-        // Bitmasks for firmware options
+        // Multi-bit bitmasks for firmware options
+        private const int ModuleTypeMask = 0x3;
+        private const int ChannelOrderMask = 0x7C;
+        private const int MultiTelemetryTypeMask = 0xC00;
+
+        // Single-bit bitmasks for firmware options
         private const int BootloaderSupportMask = 0x80;
         private const int CheckForBootloaderMask = 0x100;
         private const int InvertTelemetryMask = 0x200;
@@ -65,7 +70,7 @@ namespace Flash_Multi
         /// </summary>
         /// <param name="index">Integer representing the channel order.</param>
         /// <returns>A string containing the channel order, e.g. 'AETR'.</returns>
-        internal static string GetChannelOrderString(int index)
+        internal static string GetChannelOrderString(uint index)
         {
             string result = string.Empty;
             switch (index)
@@ -231,17 +236,14 @@ namespace Flash_Multi
                     // Get the hex value of the firmware flags from the regex match
                     string flagHexString = "0x" + match.Groups[1].Value;
 
-                    // Convert the firmware flags to decimal
+                    // Convert the hex string to a number
                     uint flagDecimal = Convert.ToUInt32(flagHexString, 16);
 
-                    // Convert the firmware flags to a binary string
-                    string flagBinary = Convert.ToString(flagDecimal, 2).PadLeft(32, '0');
+                    // Get the module type from the rightmost two bits
+                    uint moduleType = flagDecimal & ModuleTypeMask;
 
-                    // Get the module type from the rightmost two bits of the flag binary string
-                    int moduleType = Convert.ToInt16(flagBinary.Substring(flagBinary.Length - 2, 2));
-
-                    // Get the channel order from bits 3-7 of the flag binary string
-                    int channelOrder = Convert.ToInt16(flagBinary.Substring(flagBinary.Length - 7, 5));
+                    // Get the channel order from bits 3-7
+                    uint channelOrder = (flagDecimal & ChannelOrderMask) >> 2;
                     string channelOrderString = GetChannelOrderString(channelOrder);
 
                     // Get the version from the regex
@@ -259,7 +261,7 @@ namespace Flash_Multi
                         BootloaderSupport = (flagDecimal & BootloaderSupportMask) > 0 ? true : false,
                         CheckForBootloader = (flagDecimal & CheckForBootloaderMask) > 0 ? true : false,
                         InvertTelemetry = (flagDecimal & InvertTelemetryMask) > 0 ? true : false,
-                        MultiTelemetryType = (flagDecimal & MultiTelemetryMask) > 0 ? "OpenTX" : (flagDecimal & MultiStatusMask) > 0 ? "erskyTx" : "Undefined",
+                        MultiTelemetryType = ((flagDecimal & MultiTelemetryTypeMask) >> 10) == 2 ? "OpenTX" : ((flagDecimal & MultiTelemetryTypeMask) >> 10) == 1 ? "erskyTx" : "Undefined",
                         DebugSerial = (flagDecimal & SerialDebugMask) > 0 ? true : false,
                         Version = parsedVersion,
                     };
