@@ -19,7 +19,7 @@ shopt -s extglob
 # *********************************************************************
 
 # Define the script version
-VERSION=0.2.0
+VERSION=0.2.2
 
 # Write the script header
 printf "flash-multi $VERSION\n\nThis program is Free Software and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
@@ -277,12 +277,14 @@ if [[ $SHOWINFO == "True" ]]; then
   exit 0
 fi
 
-# Check to see if a native STM32 USB device (Maple device) is attached
+# Check to see if a native STM32 USB device (Maple device) or USBasp is attached
 uname -a | grep "Darwin" 2>&1 1>/dev/null
 if [ $? -eq 0 ]; then
   MAPLE_USB_DEVICES=$(echo "$(list_usb)" | grep "1eaf" | awk '{ print $1}')
+  USBASP_DEVICE=$(echo "$(list_usb)" | grep "16c0:05dc" | awk '{ print $1}')
 else
   MAPLE_USB_DEVICES=$(lsusb | grep "1eaf" | awk '{ print $NF}')
+  USBASP_DEVICE=$(lsusb | grep "16c0:05dc" | awk '{ print $NF}')
 fi
 
 case $MAPLE_USB_DEVICES in 
@@ -297,12 +299,11 @@ case $MAPLE_USB_DEVICES in
    ;;
 esac
 
-# Check if port exists for Maple USB or serial - there is no port needed for DFU
-if [ $MAPLE_DEVICE = "Native" ] || [ $MAPLE_DEVICE = "Unknown" ]
-then
+# Check if port exists for Maple USB or serial - there is no port needed for DFU or USBasp
+if [ $MAPLE_DEVICE == "Native" ] || ([ $MAPLE_DEVICE == "Unknown" ] && [ "x$USBASP_DEVICE" == "x" ]) ; then
   # Die if a serial port wasn't specified
   if [ "x" == "x$PORT" ]; then
-    printf "ERROR: No port specified and no DFU device found!\n\n";
+    printf "ERROR: No port specified and no programmable device found!\n\n";
     printf "$USAGE"
     exit 1
   fi
@@ -317,9 +318,6 @@ fi
 # Get the directory where the script is running.
 # DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 DIR=$(dirname "$0")
-
-# Set the path to the bootloader file
-BOOTLOADERFILE="$DIR/bootloader/StmMulti4in1.bin"
 
 # Determine the binaries to use based on the platform architecture
 uname -a | grep "Darwin" 2>&1 1>/dev/null
@@ -339,9 +337,58 @@ else
   STAT_ARGS="--printf=%s"
 fi
 
+AVRDUDE="$TOOLS_DIR/avrdude"
+AVRDUDE_CONF="$TOOLS_DIR/avrdude.conf"
 STM32_FLASH="$TOOLS_DIR/stm32flash"
 RESET_UTIL="$TOOLS_DIR/maple-reset"
 DFU_UTIL="$TOOLS_DIR/dfu-util"
+
+# Display information about the firmware file
+get_signature $FWFILE
+
+# Ask the user to confirm
+if [[ $SILENT != "True" ]]; then
+  if [[ "no" == $(confirm "Proceed with firmware update?") ]]
+  then
+      printf "\nFirmware update aborted.\n\n"
+      exit 0
+  fi
+fi
+echo
+
+# AVR Module Flashing
+if [[ $SIG_BOARD_TYPE_NAME == "AVR" ]]; then
+  BOOTLOADERFILE="$DIR/bootloader/AtmegaMultiBoot.hex"
+
+  # Die if there's no USBasp device
+  if [ "x$USBASP_DEVICE" == "x" ] ; then
+    printf "ERROR: USBasp device not found!\n\n"; exit 6;
+  fi
+
+  # Die if AVRDUDE can't be found
+  if [ ! -x $AVRDUDE ]; then
+    printf "ERROR: Required tool $AVRDUDE does not exist or is not executable!\n\n"; exit 3;
+  fi
+
+  if [[ "$(( 0x$SIG_FLAGS_HEX & 0x80 ))" -gt 0 ]]; then
+    printf "Writing firmware (including bootloader)...\n"
+    printf "$AVRDUDE -C$AVRDUDE_CONF -patmega328p -cusbasp -Ulock:w:0x3F:m -Uefuse:w:0xFD:m -Uhfuse:w:0xD6:m -Ulfuse:w:0xFF:m \"-Uflash:w:$BOOTLOADERFILE:i\" \"-Uflash:w:$FWFILE:a\" -Ulock:w:0x0F:m\n"
+    "$AVRDUDE" -C"$AVRDUDE_CONF" -patmega328p -cusbasp -Ulock:w:0x3F:m -Uefuse:w:0xFD:m -Uhfuse:w:0xD6:m -Ulfuse:w:0xFF:m "-Uflash:w:$BOOTLOADERFILE:i" "-Uflash:w:$FWFILE:a" -Ulock:w:0x0F:m
+    [ $? -ne 0 ] && printf "\nERROR: Failed to write firmware!\n\n" && exit 5;
+  else
+    printf "Writing firmware...\n"
+    printf "$AVRDUDE -C$AVRDUDE_CONF -patmega328p -cusbasp -Ulock:w:0x3F:m  -Uefuse:w:0xFD:m -Uhfuse:w:0xD7:m -Ulfuse:w:0xFF:m \"-Uflash:w:$FWFILE:a\"\n"
+    "$AVRDUDE" -C"$AVRDUDE_CONF" -patmega328p -cusbasp -Ulock:w:0x3F:m -Uefuse:w:0xFD:m -Uhfuse:w:0xD7:m -Ulfuse:w:0xFF:m "-Uflash:w:$FWFILE:a"
+    [ $? -ne 0 ] && printf "\nERROR: Failed to write firmware!\n\n" && exit 5;
+  fi
+  printf "Firmware flashed successfully.\n\n"
+  exit 0
+fi
+
+
+# STM32 Module Flashing
+# Set the path to the bootloader file
+BOOTLOADERFILE="$DIR/bootloader/StmMulti4in1.bin"
 
 # Determine if the specified firmware file contains support for the STM32 USB port
 if grep -q $GREP_ARGS 'M\x00a\x00p\x00l\x00e\x00\x12\x03L\x00e\x00a\x00f\x00L\x00a\x00b\x00s' "$FWFILE"; then
@@ -363,21 +410,8 @@ if [ $FWFILE_SIZE -gt $MAX_FILE_SIZE ]; then
     exit 2;
 fi
 
-# Display information about the firmware file
-get_signature $FWFILE
-
-# Ask the user to confirm
-if [[ $SILENT != "True" ]]; then
-  if [[ "no" == $(confirm "Proceed with firmware update?") ]]
-  then
-      printf "\nFirmware update aborted.\n\n"
-      exit 0
-  fi
-fi
-echo
-
 # Run the Maple or serial flash
-if [[ $MAPLE_DEVICE = "Unknown" ]]
+if [[ $MAPLE_DEVICE == "Unknown" ]]
 then
   # No Maple device - run the serial flash
   printf "Attempting serial upload using stm32flash\n\n"
@@ -387,7 +421,7 @@ then
   fi
   
   STEP=1
-  [ "$HAS_USB_SUPPORT" = true ] && NUM_STEPS=3 || NUM_STEPS=2;
+  [ "$HAS_USB_SUPPORT" == true ] && NUM_STEPS=3 || NUM_STEPS=2;
   
   printf "[$STEP/$NUM_STEPS] Erasing flash...\n"
   printf "$STM32_FLASH -o -S 0x8000000:129024 -b 115200 \"$PORT\"\n"
@@ -395,7 +429,7 @@ then
   [ $? -ne 0 ] && printf "ERROR: Failed to erase flash!\n\n" && exit 3;
   STEP=$((STEP+1))
   
-  if [ "$HAS_USB_SUPPORT" = true ] ; then
+  if [ "$HAS_USB_SUPPORT" == true ] ; then
     printf "[$STEP/$NUM_STEPS] Writing bootloader...\n"
     printf "$STM32_FLASH -v -e 0 -g 0x8000000 -b 115200 -w \"$BOOTLOADERFILE\" \"$PORT\"\n"
     "${STM32_FLASH}" -v -e 0 -g 0x8000000 -b 115200 -w "$BOOTLOADERFILE" "$PORT"
@@ -421,7 +455,7 @@ else
   fi
   
   # Die if the firmware file doesn't contain USB code
-  if [ "$HAS_USB_SUPPORT" = false ]; then
+  if [ "$HAS_USB_SUPPORT" == false ]; then
     printf "ERROR: Specified firmware file was not compiled with USB support.\nFlashing this file would make the Multiprotocol module unusable.\n\n"; 
     exit 9;
   fi
@@ -429,7 +463,7 @@ else
   STEP=1;
   NUM_STEPS=1;
   
-  if [[ $MAPLE_DEVICE = "Native" ]] ; then
+  if [[ $MAPLE_DEVICE == "Native" ]] ; then
     NUM_STEPS=2;
     
     printf "[$STEP/$NUM_STEPS] Resetting to DFU mode...\n"
