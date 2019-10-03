@@ -281,10 +281,10 @@ fi
 uname -a | grep "Darwin" 2>&1 1>/dev/null
 if [ $? -eq 0 ]; then
   MAPLE_USB_DEVICES=$(echo "$(list_usb)" | grep "1eaf" | awk '{ print $1}')
-  USBASP_DEVICE=$(echo "$(list_usb)" | grep "\(0x\)\?16c0:\(0x\)\?05dc" | awk '{ print $1}')
+  USBASP_DEVICE=$(echo "$(list_usb)" | grep "0x16c0:0x05dc" | awk '{ print $1}')
 else
   MAPLE_USB_DEVICES=$(lsusb | grep "1eaf" | awk '{ print $NF}')
-  USBASP_DEVICE=$(lsusb | grep grep "\(0x\)\?16c0:\(0x\)\?05dc" | awk '{ print $NF}')
+  USBASP_DEVICE=$(lsusb | grep "16c0:05dc" | awk '{ print $NF}')
 fi
 
 case $MAPLE_USB_DEVICES in 
