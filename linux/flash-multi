@@ -175,7 +175,7 @@ function get_signature()
     SIG_VERSION=${BASH_REMATCH[3]}
 
     SIG_BOARD_TYPE_NAME=$(module_type $SIG_BOARD);
-    SIG_CHANNEL_ORDER=""
+    FW_CHANNEL_ORDER="Unknown"
 
     SIG_FLAG_REGEX="^(\\w)(\\w)(\\w)(\\w)(\\w)$"
     if [[ $SIG_FLAGS =~ $SIG_FLAG_REGEX ]]; then
