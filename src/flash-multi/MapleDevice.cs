@@ -272,7 +272,7 @@ namespace Flash_Multi
             }
 
             flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMultimodule updated sucessfully");
+            flashMulti.AppendLog("\r\nMultimodule updated successfully");
 
             // Reconnect the serial monitor
             if (serialMonitor != null && reconnectSerialMonitor)
@@ -281,7 +281,7 @@ namespace Flash_Multi
                 serialMonitor.SerialConnect(comPort);
             }
 
-            MessageBox.Show("Multimodule updated sucessfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Multimodule updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
             flashMulti.EnableControls(true);
         }
     }

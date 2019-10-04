@@ -185,10 +185,10 @@ namespace Flash_Multi
 
             // Write a success message to the log
             flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMultimodule updated sucessfully");
+            flashMulti.AppendLog("\r\nMultimodule updated successfully");
 
             // Show a success message box
-            MessageBox.Show("Multimodule updated sucessfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Multimodule updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             // Re-enable the form controls
             flashMulti.EnableControls(true);
