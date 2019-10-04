@@ -134,6 +134,10 @@ namespace Flash_Multi
             }
 
             flashMulti.AppendLog("\r\nDone.");
+            flashMulti.AppendLog("\r\nMultimodule updated successfully");
+
+            MessageBox.Show("Multimodule updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
             flashMulti.EnableControls(true);
         }
     }
