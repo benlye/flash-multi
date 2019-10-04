@@ -40,8 +40,6 @@ Supported modules include:
 * 'Banggood' STM32 and ATmega328p Multiprotocol TX Modules
 * DIY STM32 and ATmega328p Multiprotocol TX Modules
 
-**Note:** Flashing ATmega328p modules is only supported with the Windows app, not the Linux/macOS script.
-
 # Flash Multi Requirements
 Flash Multi requires .Net Framework 4.5 or newer.  You probably already have a compatible version installed, but if not, the latest version can be downloaded from (Microsoft)[https://dotnet.microsoft.com/download/dotnet-framework].  
 > _Tip: When you launch Flash Multi it will tell you if you need to install or upgrade your .Net Framework._
