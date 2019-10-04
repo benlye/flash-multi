@@ -7,13 +7,13 @@ Like the Flash Multi Window application, the Linux and Mac script will automatic
 1. Download and extract the latest Linux release, for example:
 
    ```
-   wget https://github.com/benlye/flash-multi/releases/download/0.1.5/flash-multi-0.1.5.tar.gz
-   tar -xvzf flash-multi-0.1.5.tar.gz
+   wget https://github.com/benlye/flash-multi/releases/download/0.2.2/flash-multi-0.2.2.tar.gz
+   tar -xvzf flash-multi-0.2.2.tar.gz
    ```
    
 1. Change to the flash-multi directory, for example:
 
-   `cd flash-multi-0.1.5`
+   `cd flash-multi-0.2.2`
    
 1. Configure serial device permissions by running `tools/install.sh` as root to update the udev rules and add the current user to the dialout group, e.g.:
    
@@ -48,16 +48,26 @@ macOS requires the libusb library to be installed. The easiest way to install th
 
    For example:
    
-   `./flash-multi -f /tmp/Multi-STM_TXFLASH_INV_OPENTX-v1.2.1.71.bin -p /dev/ttyUSB0 `
+   `./flash-multi -f /tmp/multi-stm-opentx-aetr-inv-v1.2.1.85.bin -p /dev/ttyUSB0 `
    
-The ouput will look similar to this:
+For firmware compiled from recent source code the ouput will look similar to what is shown below, firmware from older source will not display information about the firmware configuration:
 
 ```
-ben@ben-ubuntu:~/flash-multi-0.1.5$ ./flash-multi -f /tmp/Multi-STM_TXFLASH_INV_OPENTX-v1.2.1.71.bin -p /dev/ttyUSB0
-flash-multi 0.1.5
+ben@ben-ubuntu:~/flash-multi-0.2.2$ ./flash-multi -f /tmp/multi-stm-opentx-aetr-inv-v1.2.1.85.bin -p /dev/ttyUSB0
+flash-multi 0.2.2
 
 This program is Free Sofware and has NO WARRANTY.
 https://github.com/benlye/flash-multi/
+
+Multi Firmware Version:    1.2.1.85 (STM32)
+Expected Channel Order:    AETR
+Multi Telemetry Type:      OpenTX
+Invert Telemetry Enabled:  True
+Flash From Radio Enabled:  True
+Bootloader Enabled:        True
+Serial Debug Enabled:      False
+
+Proceed with firmware update? [Y]es or [N]o:y
 
 Attempting serial upload using stm32flash
 
@@ -100,7 +110,7 @@ Wrote and verified address 0x08001ff0 (100.00%) Done.
 Starting execution at address 0x08000000... done.
 
 [3/3] Writing firmware...
-./tools/64bit/stm32flash -v -s 8 -e 0 -g 0x8002000 -b 115200 -w "/tmp/Multi-STM_TXFLASH_INV_OPENTX-v1.2.1.71.bin" "/dev/ttyUSB0"
+./tools/64bit/stm32flash -v -s 8 -e 0 -g 0x8002000 -b 115200 -w "/tmp/multi-stm-opentx-aetr-inv-v1.2.1.85.bin" "/dev/ttyUSB0"
 stm32flash Arduino_STM32_0.9
 
 http://github.com/rogerclarkmelbourne/arduino_stm32
