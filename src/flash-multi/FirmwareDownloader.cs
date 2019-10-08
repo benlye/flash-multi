@@ -37,9 +37,9 @@ namespace Flash_Multi
         public FirmwareDownloader(FlashMulti flashMulti)
         {
             this.InitializeComponent();
-
             this.PopulateReleaseSelector();
-
+            this.UpdateReleaseInfo();
+            this.UpdateReleaseFiles();
         }
 
         /// <summary>
@@ -85,7 +85,98 @@ namespace Flash_Multi
 
         private void UpdateReleaseInfo()
         {
+            string selectedRelease = this.releaseSelector.SelectedValue.ToString();
+            Debug.WriteLine($"{selectedRelease} is selected");
+            string releaseDate = "Unknown";
+            foreach (GitHub.Release release in GitHub.GetReleases())
+            {
+                if (release.TagName == selectedRelease)
+                {
+                    releaseDate = release.PublishedAt.ToShortDateString();
+                }
+            }
 
+            this.releaseDate.Text = releaseDate;
+        }
+
+        private void UpdateReleaseFiles()
+        {
+            Collection<GitHub.Asset> releaseAssets = GitHub.GetReleaseAssets(this.releaseSelector.SelectedValue.ToString());
+
+            this.comboBox1.Items.Clear();
+            if (releaseAssets != null)
+            {
+                foreach (GitHub.Asset asset in releaseAssets)
+                {
+                    if (asset.Name.EndsWith(".bin"))
+                    {
+                        this.comboBox1.Items.Add(asset.Name);
+                    }
+                }
+            }
+        }
+
+        private string ComputeNominalFileName()
+        {
+            string unknown = "[unknown]";
+            string boardType = unknown;
+            string radioType = unknown;
+            string channelOrder = unknown;
+
+            string releaseTag = this.releaseSelector.SelectedValue.ToString();
+
+            if (this.moduleTypeSelector.SelectedItem != null)
+            {
+                boardType = this.moduleTypeSelector.SelectedItem.ToString() == "STM32" ? "stm" : this.moduleTypeSelector.SelectedItem.ToString() == "ATmega328p" ? "avr" : this.moduleTypeSelector.SelectedItem.ToString() == "OrangeRX" ? "orx" : unknown;
+            }
+
+            if (this.radioTypeSelector.SelectedItem != null)
+            {
+                radioType = this.radioTypeSelector.SelectedItem.ToString() == "PPM" ? "ppm" : this.radioTypeSelector.SelectedItem.ToString() == "OpenTX" ? "opentx" : this.radioTypeSelector.SelectedItem.ToString() == "erSkyTX" ? "erskytx" : unknown;
+            }
+
+            if (this.channelOrderSelector.SelectedItem != null)
+            {
+                channelOrder = this.channelOrderSelector.SelectedItem.ToString() == "AETR" ? "aetr" : this.channelOrderSelector.SelectedItem.ToString() == "TAER" ? "taer" : this.channelOrderSelector.SelectedItem.ToString() == "RETA" ? "reta" : unknown;
+            }
+
+            string telemetryInversion = this.checkBoxTelemetryInversion.Checked == true ? "inv" : "noinv";
+
+            string nominalFileName = $"multi-{boardType}-{radioType}-{channelOrder}-{telemetryInversion}-{releaseTag}.bin";
+
+            Debug.WriteLine(nominalFileName);
+
+            return nominalFileName;
+        }
+
+        private void releaseSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.UpdateReleaseInfo();
+            this.UpdateReleaseFiles();
+        }
+
+        /// <summary>
+        /// Opens a URL in the default browser.
+        /// </summary>
+        /// <param name="url">The URL to open.</param>
+        public void OpenLink(string url)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(url);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Handles the Github release notes link being clicked.
+        /// </summary>
+        private void ReleaseNotesLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            this.OpenLink("https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/releases/tag/" + this.releaseSelector.SelectedValue.ToString());
         }
 
         /// <summary>
@@ -105,9 +196,24 @@ namespace Flash_Multi
             public string DisplayName { get; set; }
         }
 
-        private void releaseSelector_SelectedIndexChanged(object sender, EventArgs e)
+        private void moduleTypeSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
+            ComputeNominalFileName();
+        }
 
+        private void multiTelemetrySelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComputeNominalFileName();
+        }
+
+        private void channelOrderSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComputeNominalFileName();
+        }
+
+        private void checkBoxTelemetryInversion_CheckedChanged(object sender, EventArgs e)
+        {
+            ComputeNominalFileName();
         }
     }
 }

@@ -150,6 +150,27 @@ namespace Flash_Multi
             return releases;
         }
 
+        public static Collection<Asset> GetReleaseAssets(string tag)
+        {
+            Collection<Asset> assets = null;
+            Release release = ReleaseFromTag(tag);
+
+            if (release != null)
+            {
+                string assetsUrl = ReleaseFromTag(tag).AssetsUrl;
+                // Call the API and get the response
+                ApiResponse response = GetApiRespose(assetsUrl);
+
+                // Deserialize the JSON response if the API call succeeded
+                if (response.Success)
+                {
+                    assets = JsonConvert.DeserializeObject<Collection<Asset>>(response.Response);
+                }
+            }
+
+            return assets;
+        }
+
         /// <summary>
         /// Converts a UNIX-style epoch timestamp to a DateTime.
         /// Used to convert the times in GitHub API responses.
@@ -160,6 +181,20 @@ namespace Flash_Multi
         {
             var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             return epoch.AddSeconds(unixTime);
+        }
+
+        public static Release ReleaseFromTag(string tag)
+        {
+            Release result = null;
+            foreach (GitHub.Release release in GitHub.GetReleases())
+            {
+                if (release.TagName == tag)
+                {
+                    result = release;
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -219,6 +254,12 @@ namespace Flash_Multi
             public string HtmlUrl { get; set; }
 
             /// <summary>
+            /// Gets or sets the assets URL for the release.
+            /// </summary>
+            [JsonProperty("assets_url")]
+            public string AssetsUrl { get; set; }
+
+            /// <summary>
             /// Gets or sets the release ID.
             /// </summary>
             [JsonProperty("id")]
@@ -259,6 +300,25 @@ namespace Flash_Multi
             /// </summary>
             [JsonProperty("published_at")]
             public DateTime PublishedAt { get; set; }
+        }
+
+        /// <summary>
+        /// Class to store the details of a GitHub release, as retrieved from the Git API.
+        /// See https://developer.github.com/v3/repos/releases/ for details.
+        /// See https://api.github.com/repos/pascallanger/DIY-Multiprotocol-TX-Module/releases/18408222 for an example.
+        /// </summary>
+        [JsonObject(MemberSerialization.OptIn)]
+        public class Asset
+        {
+            [JsonProperty("id")]
+            public string ID { get; set; }
+
+            [JsonProperty("name")]
+            public string Name { get; set; }
+
+            [JsonProperty("browser_download_url")]
+            public string DownloadUrl { get; set; }
+
         }
     }
 }
