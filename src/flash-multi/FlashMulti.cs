@@ -22,6 +22,7 @@ namespace Flash_Multi
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -883,6 +884,12 @@ namespace Flash_Multi
                 SerialMonitor serialMonitor = new SerialMonitor(this.comPortSelector.SelectedValue.ToString());
                 serialMonitor.Show();
             }
+        }
+
+        private void buttonDownload_Click(object sender, EventArgs e)
+        {
+            FirmwareDownloader firmwareDownloader = new FirmwareDownloader(this);
+            firmwareDownloader.ShowDialog();
         }
     }
 }

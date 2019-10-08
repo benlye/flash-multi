@@ -56,6 +56,7 @@ namespace Flash_Multi
             this.label3 = new System.Windows.Forms.Label();
             this.buttonBrowse = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.buttonDownload = new System.Windows.Forms.Button();
             this.buttonSerialMonitor = new System.Windows.Forms.Button();
             this.buttonRefresh = new System.Windows.Forms.Button();
             this.showVerboseOutput = new System.Windows.Forms.CheckBox();
@@ -72,11 +73,11 @@ namespace Flash_Multi
             // buttonUpload
             // 
             this.buttonUpload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonUpload.Location = new System.Drawing.Point(373, 47);
+            this.buttonUpload.Location = new System.Drawing.Point(345, 124);
             this.buttonUpload.Name = "buttonUpload";
-            this.buttonUpload.Size = new System.Drawing.Size(75, 23);
+            this.buttonUpload.Size = new System.Drawing.Size(125, 23);
             this.buttonUpload.TabIndex = 6;
-            this.buttonUpload.Text = "Upload";
+            this.buttonUpload.Text = "Start Upload";
             this.buttonUpload.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
             this.buttonUpload.UseVisualStyleBackColor = true;
             this.buttonUpload.Click += new System.EventHandler(this.ButtonUpload_Click);
@@ -88,7 +89,7 @@ namespace Flash_Multi
             this.comPortSelector.FormattingEnabled = true;
             this.comPortSelector.Location = new System.Drawing.Point(77, 48);
             this.comPortSelector.Name = "comPortSelector";
-            this.comPortSelector.Size = new System.Drawing.Size(90, 21);
+            this.comPortSelector.Size = new System.Drawing.Size(113, 21);
             this.comPortSelector.TabIndex = 2;
             this.comPortSelector.SelectedIndexChanged += new System.EventHandler(this.ComPortSelector_SelectionChanged);
             // 
@@ -98,7 +99,7 @@ namespace Flash_Multi
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textFileName.Location = new System.Drawing.Point(77, 20);
             this.textFileName.Name = "textFileName";
-            this.textFileName.Size = new System.Drawing.Size(290, 20);
+            this.textFileName.Size = new System.Drawing.Size(199, 20);
             this.textFileName.TabIndex = 0;
             this.textFileName.DoubleClick += new System.EventHandler(this.ButtonBrowse_Click);
             // 
@@ -116,16 +117,16 @@ namespace Flash_Multi
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(14, 52);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(58, 13);
+            this.label3.Size = new System.Drawing.Size(44, 13);
             this.label3.TabIndex = 8;
-            this.label3.Text = "Serial Port:";
+            this.label3.Text = "Device:";
             // 
             // buttonBrowse
             // 
             this.buttonBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonBrowse.Location = new System.Drawing.Point(373, 19);
+            this.buttonBrowse.Location = new System.Drawing.Point(282, 19);
             this.buttonBrowse.Name = "buttonBrowse";
-            this.buttonBrowse.Size = new System.Drawing.Size(75, 22);
+            this.buttonBrowse.Size = new System.Drawing.Size(80, 22);
             this.buttonBrowse.TabIndex = 1;
             this.buttonBrowse.Text = "Browse";
             this.buttonBrowse.UseVisualStyleBackColor = true;
@@ -135,9 +136,9 @@ namespace Flash_Multi
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.buttonDownload);
             this.groupBox1.Controls.Add(this.buttonSerialMonitor);
             this.groupBox1.Controls.Add(this.buttonRefresh);
-            this.groupBox1.Controls.Add(this.buttonUpload);
             this.groupBox1.Controls.Add(this.buttonBrowse);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.comPortSelector);
@@ -145,14 +146,25 @@ namespace Flash_Multi
             this.groupBox1.Controls.Add(this.textFileName);
             this.groupBox1.Location = new System.Drawing.Point(15, 37);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(454, 84);
+            this.groupBox1.Size = new System.Drawing.Size(454, 82);
             this.groupBox1.TabIndex = 11;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Settings";
             // 
+            // buttonDownload
+            // 
+            this.buttonDownload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonDownload.Location = new System.Drawing.Point(368, 19);
+            this.buttonDownload.Name = "buttonDownload";
+            this.buttonDownload.Size = new System.Drawing.Size(80, 22);
+            this.buttonDownload.TabIndex = 16;
+            this.buttonDownload.Text = "Download";
+            this.buttonDownload.UseVisualStyleBackColor = true;
+            this.buttonDownload.Click += new System.EventHandler(this.buttonDownload_Click);
+            // 
             // buttonSerialMonitor
             // 
-            this.buttonSerialMonitor.Location = new System.Drawing.Point(259, 47);
+            this.buttonSerialMonitor.Location = new System.Drawing.Point(282, 48);
             this.buttonSerialMonitor.Name = "buttonSerialMonitor";
             this.buttonSerialMonitor.Size = new System.Drawing.Size(80, 23);
             this.buttonSerialMonitor.TabIndex = 15;
@@ -162,7 +174,7 @@ namespace Flash_Multi
             // 
             // buttonRefresh
             // 
-            this.buttonRefresh.Location = new System.Drawing.Point(173, 47);
+            this.buttonRefresh.Location = new System.Drawing.Point(196, 48);
             this.buttonRefresh.Name = "buttonRefresh";
             this.buttonRefresh.Size = new System.Drawing.Size(80, 23);
             this.buttonRefresh.TabIndex = 3;
@@ -265,7 +277,7 @@ namespace Flash_Multi
             this.tableLayoutPanel1.Controls.Add(this.linkLabel1, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.showVerboseOutput, 1, 2);
             this.tableLayoutPanel1.Controls.Add(this.progressBar1, 0, 1);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(14, 127);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(14, 153);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 4;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -279,13 +291,14 @@ namespace Flash_Multi
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(484, 320);
+            this.ClientSize = new System.Drawing.Size(484, 346);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.linkLabel2);
             this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.buttonUpload);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(500, 359);
+            this.MinimumSize = new System.Drawing.Size(500, 385);
             this.Name = "FlashMulti";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Flash Multi";
@@ -316,6 +329,7 @@ namespace Flash_Multi
         private System.Windows.Forms.Button buttonRefresh;
         private System.Windows.Forms.Button buttonSerialMonitor;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Button buttonDownload;
     }
 }
 
