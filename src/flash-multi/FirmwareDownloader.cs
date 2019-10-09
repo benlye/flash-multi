@@ -29,17 +29,26 @@ namespace Flash_Multi
     using System.Drawing;
     using System.Linq;
     using System.Text;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using System.Windows.Forms;
 
     public partial class FirmwareDownloader : Form
     {
+        private static Collection<GitHub.Asset> ReleaseAssets { get; set; }
+
         public FirmwareDownloader(FlashMulti flashMulti)
         {
             this.InitializeComponent();
             this.PopulateReleaseSelector();
             this.UpdateReleaseInfo();
+            this.GetReleaseAssets();
             this.UpdateReleaseFiles();
+
+            this.moduleTypeSelector.SelectedIndex = 0;
+            this.radioTypeSelector.SelectedIndex = 0;
+            this.channelOrderSelector.SelectedIndex = 0;
+            this.telemetryInversionSelector.SelectedIndex = 0;
         }
 
         /// <summary>
@@ -99,18 +108,21 @@ namespace Flash_Multi
             this.releaseDate.Text = releaseDate;
         }
 
+        private void GetReleaseAssets()
+        {
+            ReleaseAssets = GitHub.GetReleaseAssets(this.releaseSelector.SelectedValue.ToString());
+        }
+
         private void UpdateReleaseFiles()
         {
-            Collection<GitHub.Asset> releaseAssets = GitHub.GetReleaseAssets(this.releaseSelector.SelectedValue.ToString());
-
-            this.comboBox1.Items.Clear();
-            if (releaseAssets != null)
+            this.firmwareFileSelector.Items.Clear();
+            if (ReleaseAssets != null)
             {
-                foreach (GitHub.Asset asset in releaseAssets)
+                foreach (GitHub.Asset asset in ReleaseAssets)
                 {
                     if (asset.Name.EndsWith(".bin"))
                     {
-                        this.comboBox1.Items.Add(asset.Name);
+                        this.firmwareFileSelector.Items.Add(asset.Name);
                     }
                 }
             }
@@ -140,11 +152,18 @@ namespace Flash_Multi
                 channelOrder = this.channelOrderSelector.SelectedItem.ToString() == "AETR" ? "aetr" : this.channelOrderSelector.SelectedItem.ToString() == "TAER" ? "taer" : this.channelOrderSelector.SelectedItem.ToString() == "RETA" ? "reta" : unknown;
             }
 
-            string telemetryInversion = this.checkBoxTelemetryInversion.Checked == true ? "inv" : "noinv";
+            string telemetryInversion = this.telemetryInversionSelector.SelectedItem.ToString() == "Enabled" ? "inv" : this.telemetryInversionSelector.SelectedItem.ToString() == "Enabled" ? "noinv" : unknown;
 
             string nominalFileName = $"multi-{boardType}-{radioType}-{channelOrder}-{telemetryInversion}-{releaseTag}.bin";
 
             Debug.WriteLine(nominalFileName);
+
+            this.firmwareFileSelector.SelectedItem = nominalFileName;
+
+            if (this.firmwareFileSelector.SelectedItem != null && this.firmwareFileSelector.SelectedItem.ToString() != nominalFileName)
+            {
+                this.firmwareFileSelector.SelectedItem = null;
+            }
 
             return nominalFileName;
         }
@@ -152,7 +171,58 @@ namespace Flash_Multi
         private void releaseSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.UpdateReleaseInfo();
+            this.GetReleaseAssets();
             this.UpdateReleaseFiles();
+        }
+
+        private void moduleTypeSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComputeNominalFileName();
+        }
+
+        private void multiTelemetrySelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (radioTypeSelector.SelectedItem != null && radioTypeSelector.SelectedItem.ToString() == "PPM")
+            {
+                telemetryInversionSelector.SelectedItem = "Disabled";
+                telemetryInversionSelector.Enabled = false;
+                inversionLabel.Enabled = false;
+            }
+            else
+            {
+                telemetryInversionSelector.Enabled = true;
+                telemetryInversionSelector.SelectedItem = "*";
+                inversionLabel.Enabled = true;
+            }
+            ComputeNominalFileName();
+        }
+
+        private void channelOrderSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComputeNominalFileName();
+        }
+
+        private void telemetryInversionSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComputeNominalFileName();
+        }
+
+        private void firmwareFileSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            /*
+            Regex fileNameParts = new Regex(@"^multi-([A-z]{3})-([A-z]+)-([A-z]+)-([A-z]+).*$");
+            if (firmwareFileSelector.SelectedItem != null)
+            {
+                Match match = fileNameParts.Match(firmwareFileSelector.SelectedItem.ToString());
+                if (match.Success)
+                {
+                    moduleTypeSelector.SelectedItem = match.Groups[1].Value == "stm" ? "STM32" : "*";
+                    radioTypeSelector.SelectedItem = match.Groups[2].Value == "opentx" ? "OpenTX" : match.Groups[2].Value == "erskytx" ? "erSkyTX" : match.Groups[2].Value == "ppm" ? "PPM" : "[Any]";
+                    channelOrderSelector.SelectedItem = match.Groups[3].Value == "aetr" ? "AETR" : match.Groups[3].Value == "taer" ? "TAER" : match.Groups[3].Value == "reta" ? "RETA" : "[Any]";
+                    telemetryInversionSelector.SelectedItem = match.Groups[4].Value == "inv" ? "Enabled" : match.Groups[4].Value == "noinv" ? "Disabled" : "[Any]";
+                }
+            }
+            */
         }
 
         /// <summary>
@@ -196,24 +266,5 @@ namespace Flash_Multi
             public string DisplayName { get; set; }
         }
 
-        private void moduleTypeSelector_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ComputeNominalFileName();
-        }
-
-        private void multiTelemetrySelector_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ComputeNominalFileName();
-        }
-
-        private void channelOrderSelector_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ComputeNominalFileName();
-        }
-
-        private void checkBoxTelemetryInversion_CheckedChanged(object sender, EventArgs e)
-        {
-            ComputeNominalFileName();
-        }
     }
 }

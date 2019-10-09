@@ -30,7 +30,7 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
+            this.inversionLabel = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.groupboxRelease = new System.Windows.Forms.GroupBox();
             this.releaseDate = new System.Windows.Forms.Label();
@@ -38,13 +38,14 @@
             this.label5 = new System.Windows.Forms.Label();
             this.releaseSelector = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.checkBoxTelemetryInversion = new System.Windows.Forms.CheckBox();
+            this.telemetryInversionSelector = new System.Windows.Forms.ComboBox();
             this.radioTypeSelector = new System.Windows.Forms.ComboBox();
             this.channelOrderSelector = new System.Windows.Forms.ComboBox();
             this.moduleTypeSelector = new System.Windows.Forms.ComboBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.firmwareFileSelector = new System.Windows.Forms.ComboBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.groupboxRelease.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -70,15 +71,15 @@
             this.label2.Text = "Radio Type:";
             this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
-            // label3
+            // inversionLabel
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(17, 107);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(102, 13);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Telemetry Inversion:";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.inversionLabel.AutoSize = true;
+            this.inversionLabel.Location = new System.Drawing.Point(17, 107);
+            this.inversionLabel.Name = "inversionLabel";
+            this.inversionLabel.Size = new System.Drawing.Size(102, 13);
+            this.inversionLabel.TabIndex = 2;
+            this.inversionLabel.Text = "Telemetry Inversion:";
+            this.inversionLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // label4
             // 
@@ -150,36 +151,41 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.checkBoxTelemetryInversion);
+            this.groupBox1.Controls.Add(this.telemetryInversionSelector);
             this.groupBox1.Controls.Add(this.radioTypeSelector);
             this.groupBox1.Controls.Add(this.channelOrderSelector);
             this.groupBox1.Controls.Add(this.moduleTypeSelector);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label4);
-            this.groupBox1.Controls.Add(this.label3);
+            this.groupBox1.Controls.Add(this.inversionLabel);
             this.groupBox1.Location = new System.Drawing.Point(12, 88);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(282, 139);
+            this.groupBox1.Size = new System.Drawing.Size(282, 135);
             this.groupBox1.TabIndex = 5;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Firmware Attributes";
+            this.groupBox1.Text = "Firmware File Filters";
             // 
-            // checkBoxTelemetryInversion
+            // telemetryInversionSelector
             // 
-            this.checkBoxTelemetryInversion.AutoSize = true;
-            this.checkBoxTelemetryInversion.Location = new System.Drawing.Point(126, 106);
-            this.checkBoxTelemetryInversion.Name = "checkBoxTelemetryInversion";
-            this.checkBoxTelemetryInversion.Size = new System.Drawing.Size(15, 14);
-            this.checkBoxTelemetryInversion.TabIndex = 7;
-            this.checkBoxTelemetryInversion.UseVisualStyleBackColor = true;
-            this.checkBoxTelemetryInversion.CheckedChanged += new System.EventHandler(this.checkBoxTelemetryInversion_CheckedChanged);
+            this.telemetryInversionSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.telemetryInversionSelector.FormattingEnabled = true;
+            this.telemetryInversionSelector.Items.AddRange(new object[] {
+            "[Any]",
+            "Enabled",
+            "Disabled"});
+            this.telemetryInversionSelector.Location = new System.Drawing.Point(126, 103);
+            this.telemetryInversionSelector.Name = "telemetryInversionSelector";
+            this.telemetryInversionSelector.Size = new System.Drawing.Size(121, 21);
+            this.telemetryInversionSelector.TabIndex = 7;
+            this.telemetryInversionSelector.DropDownClosed += new System.EventHandler(this.telemetryInversionSelector_SelectedIndexChanged);
             // 
             // radioTypeSelector
             // 
             this.radioTypeSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.radioTypeSelector.FormattingEnabled = true;
             this.radioTypeSelector.Items.AddRange(new object[] {
+            "[Any]",
             "erSkyTX",
             "OpenTX",
             "PPM"});
@@ -187,13 +193,14 @@
             this.radioTypeSelector.Name = "radioTypeSelector";
             this.radioTypeSelector.Size = new System.Drawing.Size(121, 21);
             this.radioTypeSelector.TabIndex = 6;
-            this.radioTypeSelector.SelectedIndexChanged += new System.EventHandler(this.multiTelemetrySelector_SelectedIndexChanged);
+            this.radioTypeSelector.DropDownClosed += new System.EventHandler(this.multiTelemetrySelector_SelectedIndexChanged);
             // 
             // channelOrderSelector
             // 
             this.channelOrderSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.channelOrderSelector.FormattingEnabled = true;
             this.channelOrderSelector.Items.AddRange(new object[] {
+            "[Any]",
             "AETR",
             "TAER",
             "RETA"});
@@ -201,58 +208,73 @@
             this.channelOrderSelector.Name = "channelOrderSelector";
             this.channelOrderSelector.Size = new System.Drawing.Size(121, 21);
             this.channelOrderSelector.TabIndex = 5;
-            this.channelOrderSelector.SelectedIndexChanged += new System.EventHandler(this.channelOrderSelector_SelectedIndexChanged);
+            this.channelOrderSelector.DropDownClosed += new System.EventHandler(this.channelOrderSelector_SelectedIndexChanged);
             // 
             // moduleTypeSelector
             // 
             this.moduleTypeSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.moduleTypeSelector.FormattingEnabled = true;
             this.moduleTypeSelector.Items.AddRange(new object[] {
+            "[Any]",
+            "ATmega328p",
+            "OrangeRX",
             "STM32"});
             this.moduleTypeSelector.Location = new System.Drawing.Point(126, 22);
             this.moduleTypeSelector.Name = "moduleTypeSelector";
             this.moduleTypeSelector.Size = new System.Drawing.Size(121, 21);
             this.moduleTypeSelector.TabIndex = 4;
-            this.moduleTypeSelector.SelectedIndexChanged += new System.EventHandler(this.moduleTypeSelector_SelectedIndexChanged);
+            this.moduleTypeSelector.DropDownClosed += new System.EventHandler(this.moduleTypeSelector_SelectedIndexChanged);
             // 
             // groupBox2
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox2.Controls.Add(this.comboBox1);
-            this.groupBox2.Location = new System.Drawing.Point(12, 233);
+            this.groupBox2.Controls.Add(this.firmwareFileSelector);
+            this.groupBox2.Location = new System.Drawing.Point(12, 229);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(282, 56);
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Firmware File";
             // 
-            // comboBox1
+            // firmwareFileSelector
             // 
-            this.comboBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.firmwareFileSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(14, 19);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(258, 21);
-            this.comboBox1.TabIndex = 5;
+            this.firmwareFileSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.firmwareFileSelector.FormattingEnabled = true;
+            this.firmwareFileSelector.Location = new System.Drawing.Point(14, 19);
+            this.firmwareFileSelector.Name = "firmwareFileSelector";
+            this.firmwareFileSelector.Size = new System.Drawing.Size(258, 21);
+            this.firmwareFileSelector.TabIndex = 5;
+            this.firmwareFileSelector.DropDownClosed += new System.EventHandler(this.firmwareFileSelector_SelectedIndexChanged);
             // 
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(219, 299);
+            this.button1.Location = new System.Drawing.Point(219, 292);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 7;
             this.button1.Text = "Download";
             this.button1.UseVisualStyleBackColor = true;
             // 
+            // button2
+            // 
+            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button2.Location = new System.Drawing.Point(138, 292);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 8;
+            this.button2.Text = "Clear Filters";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
             // FirmwareDownloader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(309, 334);
+            this.ClientSize = new System.Drawing.Size(309, 327);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -273,7 +295,7 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label inversionLabel;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.GroupBox groupboxRelease;
         private System.Windows.Forms.ComboBox releaseSelector;
@@ -282,11 +304,12 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox firmwareFileSelector;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.CheckBox checkBoxTelemetryInversion;
         private System.Windows.Forms.ComboBox radioTypeSelector;
         private System.Windows.Forms.ComboBox channelOrderSelector;
         private System.Windows.Forms.ComboBox moduleTypeSelector;
+        private System.Windows.Forms.ComboBox telemetryInversionSelector;
+        private System.Windows.Forms.Button button2;
     }
 }
