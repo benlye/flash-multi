@@ -34,7 +34,7 @@ Just three steps are required to update your Jumper, iRangeX, or DIY Multiprotoc
 All Multiprotocol modules based on the STM32 or ATmega328p microcontrollers are supported.  OrangeRX modules are _not_ supported (yet).
 
 Supported modules include:
-* Jumper JP4IN1
+* Jumper JP4IN1 and T16 Pro internal modules
 * iRangeX IRX4, IRX4 Plus, and IRX4 Lite
 * Vantac MPM Lite
 * 'Banggood' STM32 and ATmega328p Multiprotocol TX Modules
