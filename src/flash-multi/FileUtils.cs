@@ -250,7 +250,13 @@ namespace Flash_Multi
                     string versionString = match.Groups[2].Value;
 
                     // Convert the zero-padded string to a dot-separated version string
-                    string parsedVersion = versionString.Substring(0, 2).TrimStart('0') + "." + versionString.Substring(2, 2).TrimStart('0') + "." + versionString.Substring(4, 2).TrimStart('0') + "." + versionString.Substring(6, 2).TrimStart('0');
+                    // int versionMajor;
+
+                    int.TryParse(versionString.Substring(0, 2), out int versionMajor);
+                    int.TryParse(versionString.Substring(2, 2), out int versionMinor);
+                    int.TryParse(versionString.Substring(4, 2), out int versionRevision);
+                    int.TryParse(versionString.Substring(6, 2), out int versionPatch);
+                    string parsedVersion = versionMajor + "." + versionMinor + "." + versionRevision + "." + versionPatch;
 
                     // Create the firmware file signatre and return it
                     FirmwareFile file = new FirmwareFile
