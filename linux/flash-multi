@@ -19,7 +19,7 @@ shopt -s extglob
 # *********************************************************************
 
 # Define the script version
-VERSION=0.2.2
+VERSION=0.2.3
 
 # Write the script header
 printf "flash-multi $VERSION\n\nThis program is Free Software and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
