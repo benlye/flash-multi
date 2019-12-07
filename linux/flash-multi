@@ -215,10 +215,10 @@ function get_signature()
 
     SIG_VERSION_REGEX="^([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})$"
     if [[ $SIG_VERSION =~ $SIG_VERSION_REGEX ]]; then
-      SIG_VERSION_MAJOR=${BASH_REMATCH[1]##+(0)}
-      SIG_VERSION_MINOR=${BASH_REMATCH[2]##+(0)}
-      SIG_VERSION_REVISION=${BASH_REMATCH[3]##+(0)}
-      SIG_VERSION_PATCH=${BASH_REMATCH[4]##+(0)}
+      SIG_VERSION_MAJOR=`printf "%d" ${BASH_REMATCH[1]}`
+      SIG_VERSION_MINOR=`printf "%d" ${BASH_REMATCH[2]}`
+      SIG_VERSION_REVISION=`printf "%d" ${BASH_REMATCH[3]}`
+      SIG_VERSION_PATCH=`printf "%d" ${BASH_REMATCH[4]}`
       
       SIG_VERSION_STRING="$SIG_VERSION_MAJOR.$SIG_VERSION_MINOR.$SIG_VERSION_REVISION.$SIG_VERSION_PATCH"
     fi
@@ -249,10 +249,10 @@ function get_signature()
     # Assemble the version number string
     SIG_VERSION_REGEX="^([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})$"
     if [[ $SIG_VERSION =~ $SIG_VERSION_REGEX ]]; then
-      SIG_VERSION_MAJOR=${BASH_REMATCH[1]##+(0)}
-      SIG_VERSION_MINOR=${BASH_REMATCH[2]##+(0)}
-      SIG_VERSION_REVISION=${BASH_REMATCH[3]##+(0)}
-      SIG_VERSION_PATCH=${BASH_REMATCH[4]##+(0)}
+      SIG_VERSION_MAJOR=`printf "%d" ${BASH_REMATCH[1]}`
+      SIG_VERSION_MINOR=`printf "%d" ${BASH_REMATCH[2]}`
+      SIG_VERSION_REVISION=`printf "%d" ${BASH_REMATCH[3]}`
+      SIG_VERSION_PATCH=`printf "%d" ${BASH_REMATCH[4]}`
       
       SIG_VERSION_STRING="$SIG_VERSION_MAJOR.$SIG_VERSION_MINOR.$SIG_VERSION_REVISION.$SIG_VERSION_PATCH"
     fi
