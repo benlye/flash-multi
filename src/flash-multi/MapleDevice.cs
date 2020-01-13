@@ -22,6 +22,7 @@ namespace Flash_Multi
 {
     using System;
     using System.Diagnostics;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Forms;
@@ -139,7 +140,8 @@ namespace Flash_Multi
         /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
         /// <param name="fileName">The path of the file to flash.</param>
         /// <param name="comPort">The COM port where the Maple USB device can be found.</param>
-        public static async void WriteFlash(FlashMulti flashMulti, string fileName, string comPort)
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public static async Task WriteFlash(FlashMulti flashMulti, string fileName, string comPort)
         {
             string command;
             string commandArgs;
@@ -147,55 +149,78 @@ namespace Flash_Multi
 
             flashMulti.AppendLog("Starting Multimodule update via native USB\r\n");
 
+            // Stop the serial monitor if it's active
+            SerialMonitor serialMonitor = null;
+            bool reconnectSerialMonitor = false;
+            if (Application.OpenForms.OfType<SerialMonitor>().Any())
+            {
+                Debug.WriteLine("Serial monitor window is open");
+                serialMonitor = Application.OpenForms.OfType<SerialMonitor>().First();
+                if (serialMonitor != null && serialMonitor.SerialPort != null && serialMonitor.SerialPort.IsOpen)
+                {
+                    reconnectSerialMonitor = true;
+                    Debug.WriteLine($"Serial monitor is connected to {serialMonitor.SerialPort.PortName}");
+
+                    Debug.WriteLine($"Closing serial monitor connection to {serialMonitor.SerialPort.PortName}");
+                    serialMonitor.SerialDisconnect();
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Serial monitor is not open");
+            }
+
+            // Check if the port can be opened
+            if (!ComPort.CheckPort(comPort))
+            {
+                flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
+                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.EnableControls(true);
+                return;
+            }
+
             string mapleMode = MapleDevice.FindMaple().Mode;
 
             if (mapleMode == "USB")
             {
                 flashMulti.AppendLog("Switching Multimodule into DFU mode ...");
                 command = ".\\tools\\maple-reset.exe";
-                commandArgs = comPort;
+                commandArgs = $"{comPort} 2000";
                 await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
-                if (returnCode != 0)
+                if (returnCode == 0)
                 {
-                    flashMulti.EnableControls(true);
-                    flashMulti.AppendLog(" failed!");
-                    MessageBox.Show("Failed to get module to DFU mode.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                flashMulti.AppendLog(" done\r\n");
-
-                // Check for a Maple DFU device
-                flashMulti.AppendLog("Waiting for DFU device ...");
-                bool dfuCheck = false;
-
-                await Task.Run(() => { dfuCheck = WaitForDFU(2000); });
-
-                if (dfuCheck)
-                {
-                    flashMulti.AppendLog(" got it\r\n");
+                    flashMulti.AppendLog(" done\r\n");
+                    flashMulti.AppendVerbose(string.Empty);
                 }
                 else
                 {
-                    flashMulti.AppendLog(" failed!\r\n");
-                    flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
-
-                    // Show the recovery mode dialog
-                    DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
-                    var recoveryResult = recoveryDialog.ShowDialog();
-
-                    // Stop if we didn't made it into recovery mode
-                    if (recoveryResult == DialogResult.Cancel)
+                    if (MapleDevice.FindMaple().DfuMode == false)
                     {
-                        flashMulti.AppendLog("DFU Recovery cancelled.");
-                        flashMulti.EnableControls(true);
-                        return;
+                        flashMulti.AppendLog(" failed!\r\n");
+                        flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
+
+                        // Show the recovery mode dialog
+                        DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
+                        var recoveryResult = recoveryDialog.ShowDialog();
+
+                        // Stop if we didn't make it into recovery mode
+                        if (recoveryResult == DialogResult.Cancel)
+                        {
+                            flashMulti.AppendLog("DFU Recovery cancelled.");
+                            flashMulti.EnableControls(true);
+                            return;
+                        }
+                        else if (recoveryResult == DialogResult.Abort)
+                        {
+                            flashMulti.AppendLog("DFU Recovery failed.");
+                            flashMulti.EnableControls(true);
+                            return;
+                        }
                     }
-                    else if (recoveryResult == DialogResult.Abort)
+                    else
                     {
-                        flashMulti.AppendLog("DFU Recovery failed.");
-                        flashMulti.EnableControls(true);
-                        return;
+                        flashMulti.AppendLog(" done\r\n");
+                        flashMulti.AppendVerbose(string.Empty);
                     }
                 }
             }
@@ -247,9 +272,16 @@ namespace Flash_Multi
             }
 
             flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMultimodule updated sucessfully");
+            flashMulti.AppendLog("\r\nMultimodule updated successfully");
 
-            MessageBox.Show("Multimodule updated sucessfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // Reconnect the serial monitor
+            if (serialMonitor != null && reconnectSerialMonitor)
+            {
+                Thread.Sleep(1000);
+                serialMonitor.SerialConnect(comPort);
+            }
+
+            MessageBox.Show("Multimodule updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
             flashMulti.EnableControls(true);
         }
     }

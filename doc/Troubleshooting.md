@@ -1,6 +1,9 @@
 # Troubleshooting
 Fortunately it is nearly impossible to 'brick' an STM32, so whatever state your Multiprotocol module is in, it should be possible to recover it.
 
+## Flashing fails when flashing a JP4IN1 in the radio
+If the module is in the radio, make sure that the radio is **switched off**.  The JP4IN1 will only go into 'flashing mode' (i.e. BOOT0 mode) when it is powered up from the USB port.
+
 ## Module stuck in DFU mode after flashing and cannot be re-flashed
 If your module isn't working, it shows up in Device Manager as **Maple DFU**, and attempting to re-flash it via the native USB port fails with verbose output like this:
 ```

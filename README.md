@@ -1,9 +1,9 @@
-# Flash-Multi
+# Flash Multi
 <img src=https://img.shields.io/github/downloads/benlye/flash-multi/total.svg> <a href="https://scan.coverity.com/projects/benlye-flash-multi"><img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/18725.svg"/></a>
 
-Tool for flashing pre-compiled firmware to a Jumper, iRangeX, Vantac, 'Banggood', or DIY STM32-based Multiprotocol TX module.
+Flash Multi is an application for flashing pre-compiled firmware to a Jumper, iRangeX, Vantac, 'Banggood', or DIY Multiprotocol TX module.  A GUI application is available for Windows and a shell script for Linux and macOS.
 
-Firmware upload can be performed using the built-in USB connection or via an external USB-to-serial adapter.
+For STM32 modules, firmware upload can be performed using the built-in USB connection or via an external USB-to-serial adapter.  For ATmega328p modules a USBasp programmer is required.
 
 Just three steps are required to update your Jumper, iRangeX, or DIY Multiprotocol TX module (full instructions are below):
 1. [Download and install](#installing-flash-multi) Flash Multi and any required [device drivers](#additional-drivers)
@@ -18,6 +18,7 @@ Just three steps are required to update your Jumper, iRangeX, or DIY Multiprotoc
 1. [Supported Modules](#supported-modules)
 1. [Flash Multi Requirements](#flash-multi-requirements)
 1. [Installing Flash Multi](#installing-flash-multi)
+   1. [Linux and Mac](#linux-and-mac)
    1. [Using the Installer](#using-the-installer)
    1. [Manual Installation](#manual-installation)
    1. [Additional Drivers](#additional-drivers)
@@ -30,24 +31,26 @@ Just three steps are required to update your Jumper, iRangeX, or DIY Multiprotoc
 1. [Warranty](#warranty)
 
 # Supported Modules
-All Multiprotocol modules based on the STM32 microcontroller are supported.  Modules based on the ATmega328 microcontoller are _not_ supported.
+All Multiprotocol modules based on the STM32 or ATmega328p microcontrollers are supported.  OrangeRX modules are _not_ supported (yet).
 
 Supported modules include:
-* Jumper JP4IN1
+* Jumper JP4IN1 and T16 Pro internal modules
 * iRangeX IRX4, IRX4 Plus, and IRX4 Lite
 * Vantac MPM Lite
-* 'Banggood' STM32 Multiprotocol TX Modules
-* DIY STM32 Multiprotocol TX Modules
+* 'Banggood' STM32 and ATmega328p Multiprotocol TX Modules
+* DIY STM32 and ATmega328p Multiprotocol TX Modules
 
 # Flash Multi Requirements
 Flash Multi requires .Net Framework 4.5 or newer.  You probably already have a compatible version installed, but if not, the latest version can be downloaded from (Microsoft)[https://dotnet.microsoft.com/download/dotnet-framework].  
 > _Tip: When you launch Flash Multi it will tell you if you need to install or upgrade your .Net Framework._
 
 # Installing Flash Multi
-
-**Note:** Make sure your Multiprotocol module is not plugged in when you run the Flash Multi installer, or when you run the manual Maple USB driver installer.  This is to avoid potential problems with the driver installation.
+## Linux and Mac
+Please refer to the [Linux and macOS instructions](doc/Linux.md).
 
 ## Using the Installer
+**Note:** Make sure your Multiprotocol module is not plugged in when you run the Flash Multi installer, or when you run the manual Maple USB driver installer.  This is to avoid potential problems with the driver installation.
+
 1. Download the latest installer (`flash-multi-[version].exe`) from the [Releases](https://github.com/benlye/flash-multi/releases) page
 1. Run the installer to install the application and the Maple USB device drivers - **the Maple USB device drivers must be selected for installation at least once**. They do not need to be installed on subsequent reinstalls or upgrades (but reinstalling them won't do any harm).
 1. Launch 'Flash Multi' from the Start menu
@@ -75,10 +78,10 @@ Other drivers may be needed if you are using an external USB-to-serial adapter. 
 
 1. If the module is installed in the radio and you are connecting to the module's USB port, ensure the radio is powered **off**
 1. Launch **Flash Multi**
-1. Connect your module to the computer using the module's USB port or via an external USB-to-serial adapter, as appropriate
-   > _Tip: Flash Multi will automatically select the new COM port, if it's running when the module is plugged in._
+1. Connect your module to the computer using the module's USB port, an external USB-to-serial adapter, or a USBasp device (ATmega328p modules only), as appropriate
+   > _Tip: Flash Multi will automatically select the new COM port / device, if it's running when the module is plugged in._
 1. Click the **Browse** button and select a compiled firmware file
-1. If it wasn't automatically selected, select the appropriate COM port
+1. If it wasn't automatically selected, select the appropriate COM port or device
 1. Click the **Upload** button
 
 ## Writing the Bootloader

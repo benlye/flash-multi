@@ -66,6 +66,12 @@ namespace Flash_Multi
                 comPorts.Add("DFU Device");
             }
 
+            // Check if we there's a USBasp device plugged in and add it to the list
+            if (UsbAspDevice.FindUsbAsp().DeviceFound)
+            {
+                comPorts.Add("USBasp");
+            }
+
             // Return an array of COM port names
             return comPorts.ToArray();
         }
@@ -84,7 +90,7 @@ namespace Flash_Multi
             List<ComPort> comPorts = new List<ComPort>();
 
             // Get all the COM port names
-            string[] comPortNames = SerialPort.GetPortNames();
+            string[] comPortNames = SerialPort.GetPortNames().Distinct().ToArray();
 
             // Add all the COM ports to the list
             foreach (string portName in comPortNames)
@@ -112,6 +118,18 @@ namespace Flash_Multi
                     DisplayName = "DFU Device",
                 };
                 comPorts.Add(dfuPort);
+            }
+
+            // Check if we there's a USBasp device plugged in and add it to the list
+            if (UsbAspDevice.FindUsbAsp().DeviceFound)
+            {
+                ComPort usbAsp = new ComPort
+                {
+                    Name = "USBasp",
+                    Description = "USBasp",
+                    DisplayName = "USBasp",
+                };
+                comPorts.Add(usbAsp);
             }
 
             // Get the time now and write how long that took

@@ -20,6 +20,8 @@
 
 namespace Flash_Multi
 {
+    using System.Diagnostics;
+    using System.Linq;
     using System.Threading.Tasks;
     using System.Windows.Forms;
 
@@ -35,7 +37,8 @@ namespace Flash_Multi
         /// <param name="fileName">The path of the file to flash.</param>
         /// <param name="comPort">The COM port where the serial device can be found.</param>
         /// <param name="writeBootloader">Indicates whether or not the bootloader should be written.</param>
-        public static async void WriteFlash(FlashMulti flashMulti, string fileName, string comPort, bool writeBootloader)
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public static async Task WriteFlash(FlashMulti flashMulti, string fileName, string comPort, bool writeBootloader)
         {
             // Path to the flashing tool, stm32flash.exe
             string command = ".\\tools\\stm32flash.exe";
@@ -78,6 +81,36 @@ namespace Flash_Multi
 
             // Write to the log
             flashMulti.AppendLog("Starting Multimodule update via serial\r\n");
+
+            // Stop the serial monitor if it's active
+            SerialMonitor serialMonitor = null;
+            bool reconnectSerialMonitor = false;
+            if (Application.OpenForms.OfType<SerialMonitor>().Any())
+            {
+                Debug.WriteLine("Serial monitor window is open");
+                serialMonitor = Application.OpenForms.OfType<SerialMonitor>().First();
+                if (serialMonitor != null && serialMonitor.SerialPort != null && serialMonitor.SerialPort.IsOpen)
+                {
+                    reconnectSerialMonitor = true;
+                    Debug.WriteLine($"Serial monitor is connected to {serialMonitor.SerialPort.PortName}");
+
+                    Debug.WriteLine($"Closing serial monitor connection to {serialMonitor.SerialPort.PortName}");
+                    serialMonitor.SerialDisconnect();
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Serial monitor is not open");
+            }
+
+            // Check if the port can be opened
+            if (!ComPort.CheckPort(comPort))
+            {
+                flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
+                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.EnableControls(true);
+                return;
+            }
 
             // Erase the flash
             flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Erasing flash memory...");
@@ -144,12 +177,18 @@ namespace Flash_Multi
                 return;
             }
 
+            // Reconnect the serial monitor if it was connected before
+            if (serialMonitor != null && serialMonitor.IsDisposed != true && reconnectSerialMonitor)
+            {
+                serialMonitor.SerialConnect(comPort);
+            }
+
             // Write a success message to the log
             flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMultimodule updated sucessfully");
+            flashMulti.AppendLog("\r\nMultimodule updated successfully");
 
             // Show a success message box
-            MessageBox.Show("Multimodule updated sucessfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Multimodule updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             // Re-enable the form controls
             flashMulti.EnableControls(true);

@@ -98,12 +98,12 @@ int setDTR(unsigned short level)
 /* Main function of the program */
 int main(int argc, char *argv[])
 {
-  printf("upload-reset 0.1\n\n");
+  printf("maple-reset 0.1\n\n");
   printf("This program is Free Sofware and has NO WARRANTY\n\n");
 
 	if (argc != 2)
 	{
-		printf("Usage: upload-reset [serial device]\n\n");
+		printf("Usage: maple-reset [serial device]\n\n");
 		return 1;
 	}
 

@@ -56,22 +56,25 @@ namespace Flash_Multi
             this.label3 = new System.Windows.Forms.Label();
             this.buttonBrowse = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.buttonSerialMonitor = new System.Windows.Forms.Button();
             this.buttonRefresh = new System.Windows.Forms.Button();
-            this.label4 = new System.Windows.Forms.Label();
             this.showVerboseOutput = new System.Windows.Forms.CheckBox();
             this.textVerbose = new System.Windows.Forms.TextBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.textActivity = new System.Windows.Forms.TextBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.linkLabel2 = new System.Windows.Forms.LinkLabel();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox1.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonUpload
             // 
-            this.buttonUpload.Location = new System.Drawing.Point(373, 48);
+            this.buttonUpload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonUpload.Location = new System.Drawing.Point(373, 47);
             this.buttonUpload.Name = "buttonUpload";
-            this.buttonUpload.Size = new System.Drawing.Size(75, 22);
+            this.buttonUpload.Size = new System.Drawing.Size(75, 23);
             this.buttonUpload.TabIndex = 6;
             this.buttonUpload.Text = "Upload";
             this.buttonUpload.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
@@ -91,6 +94,8 @@ namespace Flash_Multi
             // 
             // textFileName
             // 
+            this.textFileName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textFileName.Location = new System.Drawing.Point(77, 20);
             this.textFileName.Name = "textFileName";
             this.textFileName.Size = new System.Drawing.Size(290, 20);
@@ -117,6 +122,7 @@ namespace Flash_Multi
             // 
             // buttonBrowse
             // 
+            this.buttonBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonBrowse.Location = new System.Drawing.Point(373, 19);
             this.buttonBrowse.Name = "buttonBrowse";
             this.buttonBrowse.Size = new System.Drawing.Size(75, 22);
@@ -127,6 +133,9 @@ namespace Flash_Multi
             // 
             // groupBox1
             // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.buttonSerialMonitor);
             this.groupBox1.Controls.Add(this.buttonRefresh);
             this.groupBox1.Controls.Add(this.buttonUpload);
             this.groupBox1.Controls.Add(this.buttonBrowse);
@@ -141,74 +150,87 @@ namespace Flash_Multi
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Settings";
             // 
+            // buttonSerialMonitor
+            // 
+            this.buttonSerialMonitor.Location = new System.Drawing.Point(259, 47);
+            this.buttonSerialMonitor.Name = "buttonSerialMonitor";
+            this.buttonSerialMonitor.Size = new System.Drawing.Size(80, 23);
+            this.buttonSerialMonitor.TabIndex = 15;
+            this.buttonSerialMonitor.Text = "Serial Monitor";
+            this.buttonSerialMonitor.UseVisualStyleBackColor = true;
+            this.buttonSerialMonitor.Click += new System.EventHandler(this.ButtonSerialMonitor_Click);
+            // 
             // buttonRefresh
             // 
             this.buttonRefresh.Location = new System.Drawing.Point(173, 47);
             this.buttonRefresh.Name = "buttonRefresh";
-            this.buttonRefresh.Size = new System.Drawing.Size(75, 23);
+            this.buttonRefresh.Size = new System.Drawing.Size(80, 23);
             this.buttonRefresh.TabIndex = 3;
-            this.buttonRefresh.Text = "Refresh";
+            this.buttonRefresh.Text = "Refresh Ports";
             this.buttonRefresh.UseVisualStyleBackColor = true;
             this.buttonRefresh.Click += new System.EventHandler(this.ButtonRefresh_Click);
             // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(339, 268);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(114, 13);
-            this.label4.TabIndex = 12;
-            this.label4.Text = "Show Verbose Output:";
-            // 
             // showVerboseOutput
             // 
+            this.showVerboseOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.showVerboseOutput.AutoSize = true;
-            this.showVerboseOutput.Location = new System.Drawing.Point(454, 269);
+            this.showVerboseOutput.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.showVerboseOutput.Location = new System.Drawing.Point(324, 159);
             this.showVerboseOutput.Name = "showVerboseOutput";
-            this.showVerboseOutput.Size = new System.Drawing.Size(15, 14);
+            this.showVerboseOutput.Size = new System.Drawing.Size(130, 17);
             this.showVerboseOutput.TabIndex = 8;
+            this.showVerboseOutput.Text = "Show Verbose Output";
             this.showVerboseOutput.UseVisualStyleBackColor = true;
             this.showVerboseOutput.CheckedChanged += new System.EventHandler(this.ShowVerboseOutput_OnChange);
             // 
             // textVerbose
             // 
             this.textVerbose.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.tableLayoutPanel1.SetColumnSpan(this.textVerbose, 2);
             this.textVerbose.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.textVerbose.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textVerbose.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textVerbose.Location = new System.Drawing.Point(15, 292);
+            this.textVerbose.Location = new System.Drawing.Point(3, 184);
             this.textVerbose.Multiline = true;
             this.textVerbose.Name = "textVerbose";
             this.textVerbose.ReadOnly = true;
             this.textVerbose.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textVerbose.Size = new System.Drawing.Size(457, 172);
+            this.textVerbose.Size = new System.Drawing.Size(451, 1);
             this.textVerbose.TabIndex = 10;
             this.textVerbose.TabStop = false;
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(15, 237);
+            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel1.SetColumnSpan(this.progressBar1, 2);
+            this.progressBar1.Location = new System.Drawing.Point(3, 130);
+            this.progressBar1.Maximum = 1000;
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(454, 23);
+            this.progressBar1.Size = new System.Drawing.Size(451, 23);
             this.progressBar1.TabIndex = 12;
-            this.progressBar1.Visible = false;
             // 
             // textActivity
             // 
             this.textActivity.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.tableLayoutPanel1.SetColumnSpan(this.textActivity, 2);
+            this.textActivity.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textActivity.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textActivity.Location = new System.Drawing.Point(15, 127);
+            this.textActivity.Location = new System.Drawing.Point(3, 3);
+            this.textActivity.MinimumSize = new System.Drawing.Size(451, 120);
             this.textActivity.Multiline = true;
             this.textActivity.Name = "textActivity";
             this.textActivity.ReadOnly = true;
             this.textActivity.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textActivity.Size = new System.Drawing.Size(454, 133);
+            this.textActivity.Size = new System.Drawing.Size(451, 120);
             this.textActivity.TabIndex = 7;
             this.textActivity.TabStop = false;
             // 
             // linkLabel1
             // 
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(15, 269);
+            this.linkLabel1.Location = new System.Drawing.Point(3, 159);
+            this.linkLabel1.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(182, 13);
             this.linkLabel1.TabIndex = 7;
@@ -230,27 +252,47 @@ namespace Flash_Multi
             this.linkLabel2.UseCompatibleTextRendering = true;
             this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ReleasesLink_LinkClicked);
             // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Controls.Add(this.textVerbose, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.textActivity, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.linkLabel1, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.showVerboseOutput, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(this.progressBar1, 0, 1);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(14, 127);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 4;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 0F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(457, 181);
+            this.tableLayoutPanel1.TabIndex = 15;
+            // 
             // FlashMulti
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(484, 291);
+            this.ClientSize = new System.Drawing.Size(484, 320);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.linkLabel2);
-            this.Controls.Add(this.linkLabel1);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.textActivity);
-            this.Controls.Add(this.showVerboseOutput);
-            this.Controls.Add(this.progressBar1);
-            this.Controls.Add(this.textVerbose);
             this.Controls.Add(this.groupBox1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(500, 359);
             this.Name = "FlashMulti";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Flash Multi";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -266,13 +308,14 @@ namespace Flash_Multi
         private System.Windows.Forms.Button buttonBrowse;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox textVerbose;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.CheckBox showVerboseOutput;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.TextBox textActivity;
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.LinkLabel linkLabel2;
         private System.Windows.Forms.Button buttonRefresh;
+        private System.Windows.Forms.Button buttonSerialMonitor;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
     }
 }
 
