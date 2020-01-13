@@ -1,5 +1,4 @@
 
-
 # Use the modern UI
 !include MUI2.nsh
 !include "FileFunc.nsh"
@@ -8,7 +7,7 @@
 Name "Flash Multi"
 
 ; The file to write
-OutFile "flash-multi-${VERSION}.exe"
+OutFile "flash-multi\bin\flash-multi-${VERSION}.exe"
 
 ; The default installation directory
 InstallDir $PROGRAMFILES\FlashMulti
