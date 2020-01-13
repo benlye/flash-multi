@@ -35,7 +35,8 @@ REM Rename the root folder in the zip
 "C:\Program Files\7-Zip\7z.exe" rn  .\flash-multi\bin\flash-multi-%fileVersion%.zip Release\ flash-multi-%fileVersion%\
 
 REM Create the installer package
-"C:\Program Files (x86)\Inno Setup 6\iscc.exe"  /Qp /DMyAppVersion=%fileVersion% flash-multi.iss
+REM "C:\Program Files (x86)\Inno Setup 6\iscc.exe"  /Qp /DMyAppVersion=%fileVersion% flash-multi.iss
+C:\Program Files (x86)\NSIS\Bin\makensis.exe"/DVERSION=%fileVersion% flash-multi.nsi
 
 REM Get the SH256 hashes from the files
 ECHO.
