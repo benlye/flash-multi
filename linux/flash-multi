@@ -19,7 +19,7 @@ shopt -s extglob
 # *********************************************************************
 
 # Define the script version
-VERSION=0.2.3
+VERSION=0.2.4
 
 # Write the script header
 printf "flash-multi $VERSION\n\nThis program is Free Software and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
@@ -456,7 +456,7 @@ else
   
   # Die if the firmware file doesn't contain USB code
   if [ "$HAS_USB_SUPPORT" == false ]; then
-    printf "ERROR: Specified firmware file was not compiled with USB support.\nFlashing this file would make the Multiprotocol module unusable.\n\n"; 
+    printf "ERROR: Specified firmware file was not compiled with USB support.\nFlashing this file would make the MULTI-Module unusable.\n\n"; 
     exit 9;
   fi
   
@@ -484,4 +484,4 @@ else
   printf "\n";
 fi
 
-printf "Firmware flashed successfully.\n\n"
+printf "MULTI-Module firmware flashed successfully.\n\n"
