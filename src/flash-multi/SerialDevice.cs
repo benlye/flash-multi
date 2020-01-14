@@ -75,12 +75,12 @@ namespace Flash_Multi
                 // The bootloader occupies the first 8 pages (0-7), so start writing after it
                 flashStart = 8;
 
-                // Start execution at the Multiprotocol code rather than the bootloader
+                // Start execution at the MULTI-Module code rather than the bootloader
                 executionAddress = "0x8002000";
             }
 
             // Write to the log
-            flashMulti.AppendLog("Starting Multimodule update via serial\r\n");
+            flashMulti.AppendLog("Starting MULTI-Module update via serial\r\n");
 
             // Stop the serial monitor if it's active
             SerialMonitor serialMonitor = null;
@@ -160,7 +160,7 @@ namespace Flash_Multi
 
             // Increment the step counter and write to the log
             flashStep++;
-            flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Writing Multimodule firmware...");
+            flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Writing MULTI-Module firmware...");
 
             // Prepare the command line arguments for writing the firmware
             commandArgs = $"-v -s {flashStart} -e 0 -g {executionAddress} -b {serialBaud} -w \"{fileName}\" {comPort}";
@@ -185,10 +185,10 @@ namespace Flash_Multi
 
             // Write a success message to the log
             flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMultimodule updated successfully");
+            flashMulti.AppendLog("\r\nMULTI-Module updated successfully");
 
             // Show a success message box
-            MessageBox.Show("Multimodule updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("MULTI-Module updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             // Re-enable the form controls
             flashMulti.EnableControls(true);

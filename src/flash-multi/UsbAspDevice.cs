@@ -119,7 +119,7 @@ namespace Flash_Multi
             }
 
             // Write to the log
-            flashMulti.AppendLog("Starting Multimodule update via USBasp\r\n");
+            flashMulti.AppendLog("Starting MULTI-Module update via USBasp\r\n");
 
             // Run the command asynchronously and wait for it to finish
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
@@ -134,9 +134,9 @@ namespace Flash_Multi
             }
 
             flashMulti.AppendLog("\r\nDone.");
-            flashMulti.AppendLog("\r\nMultimodule updated successfully");
+            flashMulti.AppendLog("\r\nMULTI-Module updated successfully");
 
-            MessageBox.Show("Multimodule updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("MULTI-Module updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             flashMulti.EnableControls(true);
         }

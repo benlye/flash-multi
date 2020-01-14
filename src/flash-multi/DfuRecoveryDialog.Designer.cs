@@ -64,7 +64,7 @@ namespace Flash_Multi
             this.dialogText.Name = "dialogText";
             this.dialogText.Size = new System.Drawing.Size(306, 84);
             this.dialogText.TabIndex = 0;
-            this.dialogText.Text = "Could not find a Multiprotocol module in DFU mode.  \r\n\r\nPlease unplug and then re" +
+            this.dialogText.Text = "Could not find a MULTI-Module in DFU mode.  \r\n\r\nPlease unplug and then re" +
     "-plug your module.\r\n\r\nFlashing will continue automatically when the module is pl" +
     "ugged back in.";
             // 

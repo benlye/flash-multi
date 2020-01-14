@@ -664,7 +664,7 @@ namespace Flash_Multi
             // Error if flashing non-USB firmware via native USB port
             if (mapleResult.DeviceFound && !firmwareSupportsUsb)
             {
-                string msgBoxMessage = "The selected firmware file was compiled without USB support.\r\n\r\nFlashing this firmware would prevent the Multiprotocol module from functioning correctly.\r\n\r\nPlease select a different firmware file.";
+                string msgBoxMessage = "The selected firmware file was compiled without USB support.\r\n\r\nFlashing this firmware would prevent the MULTI-Module from functioning correctly.\r\n\r\nPlease select a different firmware file.";
                 MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.EnableControls(true);
                 return;
