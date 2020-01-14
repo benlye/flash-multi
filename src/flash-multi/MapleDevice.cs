@@ -147,7 +147,7 @@ namespace Flash_Multi
             string commandArgs;
             int returnCode = -1;
 
-            flashMulti.AppendLog("Starting Multimodule update via native USB\r\n");
+            flashMulti.AppendLog("Starting MULTI-Module update via native USB\r\n");
 
             // Stop the serial monitor if it's active
             SerialMonitor serialMonitor = null;
@@ -183,7 +183,7 @@ namespace Flash_Multi
 
             if (mapleMode == "USB")
             {
-                flashMulti.AppendLog("Switching Multimodule into DFU mode ...");
+                flashMulti.AppendLog("Switching MULTI-Module into DFU mode ...");
                 command = ".\\tools\\maple-reset.exe";
                 commandArgs = $"{comPort} 2000";
                 await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
@@ -226,7 +226,7 @@ namespace Flash_Multi
             }
 
             // First attempt to flash the firmware
-            flashMulti.AppendLog("Writing firmware to Multimodule ...");
+            flashMulti.AppendLog("Writing firmware to MULTI-Module ...");
             command = ".\\tools\\dfu-util.exe";
             commandArgs = string.Format("-R -a 2 -d 1EAF:0003 -D \"{0}\"", fileName, comPort);
 
@@ -247,7 +247,7 @@ namespace Flash_Multi
                 if (recoveryResult == DialogResult.OK)
                 {
                     // Run the recovery flash command
-                    flashMulti.AppendLog("Writing firmware to Multimodule ...");
+                    flashMulti.AppendLog("Writing firmware to MULTI-Module ...");
                     await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
                     if (returnCode != 0)
                     {
@@ -272,7 +272,7 @@ namespace Flash_Multi
             }
 
             flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMultimodule updated successfully");
+            flashMulti.AppendLog("\r\nMULTI-Module updated successfully");
 
             // Reconnect the serial monitor
             if (serialMonitor != null && reconnectSerialMonitor)
@@ -281,7 +281,7 @@ namespace Flash_Multi
                 serialMonitor.SerialConnect(comPort);
             }
 
-            MessageBox.Show("Multimodule updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("MULTI-Module updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
             flashMulti.EnableControls(true);
         }
     }
