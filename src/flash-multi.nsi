@@ -2,6 +2,7 @@
 # Use the modern UI
 !include MUI2.nsh
 !include "FileFunc.nsh"
+!include "nsProcess.nsh"
 
 ; The name of the installer
 Name "Flash Multi"
@@ -19,33 +20,52 @@ InstallDirRegKey HKLM "Software\FlashMulti" "Install_Dir"
 ; Request application privileges
 RequestExecutionLevel admin
 
+; Installer initialization function - checks for previous installation
 Function .onInit
-    IfFileExists "$INSTDIR\unins000.exe" PreviousVersionWarn
-    IfFileExists "$INSTDIR\uninstall.exe" PreviousVersionWarn
-    Goto End
+  IfFileExists "$INSTDIR\unins000.exe" PreviousVersionWarn
+  IfFileExists "$INSTDIR\uninstall.exe" PreviousVersionWarn
+  Goto End
 
-PreviousVersionWarn:
+  PreviousVersionWarn:
     MessageBox MB_YESNO|MB_ICONQUESTION "Remove the existing installation of Flash Multi?$\n$\nAnswering $\"No$\" will abort the installation." /SD IDYES IDYES Uninstall
     Goto AbortInstall
-    
-Uninstall:
+      
+  Uninstall:
     IfFileExists "$INSTDIR\unins000.exe" InnoUninstall
     IfFileExists "$INSTDIR\uninstall.exe" NsisUninstall
     Goto End
 
-InnoUninstall:
-  ExecWait '"$INSTDIR\unins000.exe" /SILENT'
-  Goto End
+  InnoUninstall:
+    ExecWait '"$INSTDIR\unins000.exe" /SILENT'
+    Goto End
 
-NsisUninstall:
-  ExecWait '"$INSTDIR\uninstall.exe" /S _=$INSTDIR'
-  Goto End
+  NsisUninstall:
+    ExecWait '"$INSTDIR\uninstall.exe" /S _=$INSTDIR'
+    Goto End
 
-AbortInstall:
+  AbortInstall:
     abort
 
-End:
+  End:
 
+FunctionEnd
+
+; Uninstaller initialization function - checks for running program
+Function un.onInit
+  ${nsProcess::FindProcess} "flash-multi.exe" $R0
+  ${If} $R0 == 0
+    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "Flash Multi is running. Click OK to close it or Cancel to abort." /SD IDOK IDOK Close
+    Abort
+  ${Else}
+    Goto End
+  ${EndIf}
+
+  Close:
+    ${nsProcess::CloseProcess} "flash-multi.exe" $R0
+    Goto End
+
+  End:
+    ${nsProcess::Unload}
 FunctionEnd
 
 ;--------------------------------
@@ -56,6 +76,7 @@ FunctionEnd
 ;--------------------------------
 ;Pages
 
+  !define MUI_COMPONENTSPAGE_NODESC
   !insertmacro MUI_PAGE_LICENSE ".\flash-multi\bin\Release\license.txt"
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
@@ -137,7 +158,8 @@ Section "Start Menu Shortcuts"
 
   CreateDirectory "$SMPROGRAMS\Flash Multi"
   CreateShortcut "$SMPROGRAMS\Flash Multi\Flash Multi.lnk" "$INSTDIR\flash-multi.exe" "" "$INSTDIR\flash-multi.exe" 0
-  CreateShortcut "$SMPROGRAMS\Flash Multi\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+  CreateShortcut "$SMPROGRAMS\Flash Multi\Run Maple Driver Installer.lnk" "$INSTDIR\drivers\install_drivers.bat"
+  CreateShortcut "$SMPROGRAMS\Flash Multi\Uninstall Flash Multi.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   
 SectionEnd
 
