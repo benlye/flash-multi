@@ -25,7 +25,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("flash-multi")]
-[assembly: AssemblyDescription("Multiprotocol TX module firmware updater")]
+[assembly: AssemblyDescription("MULTI-Module firmware updater")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Ben Lye")]
 [assembly: AssemblyProduct("flash-multi")]
@@ -51,5 +51,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.2.3")]
-[assembly: AssemblyFileVersion("0.2.3")]
+[assembly: AssemblyVersion("0.2.4")]
+[assembly: AssemblyFileVersion("0.2.4")]
