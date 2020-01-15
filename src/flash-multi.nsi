@@ -1,18 +1,18 @@
 
-# Use the modern UI
+; Plugins to Include
 !include MUI2.nsh
 !include "FileFunc.nsh"
 !include "nsProcess.nsh"
 !include "StrFunc.nsh"
-
-; 'Declare' functions used in StrFunc.nsh
-${StrRep}
 
 ; The name of the installer
 Name "Flash Multi"
 
 ; The file to write
 OutFile "flash-multi\bin\flash-multi-${VERSION}.exe"
+
+; Use Unicode
+Unicode True
 
 ; The default installation directory
 InstallDir $PROGRAMFILES\FlashMulti
@@ -27,34 +27,59 @@ InstallDirRegKey HKLM "Software\FlashMulti" "InstallDir"
 RequestExecutionLevel admin
 
 ;--------------------------------
-;Interface Settings
+; Variables
+  Var StartMenuFolder
 
+;--------------------------------
+; 'Declare' functions used in StrFunc.nsh
+  ${StrRep}
+
+;--------------------------------
+;Interface Settings
   !define MUI_ABORTWARNING
 
 ;--------------------------------
-;Pages
+; Installer pages
 
-  !define MUI_COMPONENTSPAGE_NODESC
+  ; License page
+  !define MUI_LICENSEPAGE_RADIOBUTTONS
   !insertmacro MUI_PAGE_LICENSE ".\flash-multi\bin\Release\license.txt"
+
+  ; Components page
+  !define MUI_COMPONENTSPAGE_NODESC
   !insertmacro MUI_PAGE_COMPONENTS
+
+  ; Directory page
   !insertmacro MUI_PAGE_DIRECTORY
+
+  ; Start menu page
+  !define MUI_STARTMENUPAGE_DEFAULTFOLDER "Flash Multi"
+  !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKLM" 
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\FlashMulti" 
+  !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "StartMenuFolder"
+  !insertmacro MUI_PAGE_STARTMENU Application $StartMenuFolder
+
+  ; Files page
   !insertmacro MUI_PAGE_INSTFILES
+
+  ; Finish page
+  !define MUI_FINISHPAGE_NOAUTOCLOSE
+  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README.txt"
+  !define MUI_FINISHPAGE_RUN "$INSTDIR\flash-multi.exe"
+  !define MUI_FINISHPAGE_LINK 'https://github.com/benlye/flash-multi/'
+  !define MUI_FINISHPAGE_LINK_LOCATION https://github.com/benlye/flash-multi/
+  !insertmacro MUI_PAGE_FINISH 
+
+;--------------------------------
+; Uninstaller pages
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
 
-  !define MUI_FINISHPAGE_LINK 'https://github.com/benlye/flash-multi/'
-  !define MUI_FINISHPAGE_LINK_LOCATION https://github.com/benlye/flash-multi/
-  !define MUI_FINISHPAGE_TITLE "IMPORTANT"
-  !define /file MUI_FINISHPAGE_TEXT ".\installer_infoafter.txt"
-  !insertmacro MUI_PAGE_FINISH 
-  
 ;--------------------------------
 ;Languages
- 
-  !insertmacro MUI_LANGUAGE "English"
+   !insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
-
 ; The stuff to install
 Section "Flash Multi" "flash_multi"
 
@@ -71,6 +96,7 @@ Section "Flash Multi" "flash_multi"
   File ".\flash-multi\bin\Release\flash-multi.exe.config"
   File ".\flash-multi\bin\Release\GPL.txt"
   File ".\flash-multi\bin\Release\license.txt"
+  File ".\flash-multi\bin\Release\README.txt"
   
   ; Write the uninstaller
   WriteUninstaller "$INSTDIR\uninstall.exe"
@@ -80,8 +106,7 @@ Section "Flash Multi" "flash_multi"
 
   ; Write a flag indicating the component selections
   WriteRegDWORD HKLM SOFTWARE\FlashMulti "InstallDrivers" "0"
-  WriteRegDWORD HKLM SOFTWARE\FlashMulti "CreateShortcuts" "0"
-
+  
   ; Write the uninstall keys for Windows
   ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
   IntFmt $0 "0x%08X" $0
@@ -96,6 +121,13 @@ Section "Flash Multi" "flash_multi"
   WriteRegDWORD HKLM "${AddRemoveProgsReg}""NoModify" 1
   WriteRegDWORD HKLM "${AddRemoveProgsReg}""NoRepair" 1
 
+  ; Create Start Menu shortcuts
+  !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+    CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
+    CreateShortcut "$SMPROGRAMS\$StartMenuFolder\Flash Multi.lnk" "$INSTDIR\flash-multi.exe" "" "$INSTDIR\flash-multi.exe" 0
+    CreateShortcut "$SMPROGRAMS\$StartMenuFolder\Run Maple Driver Installer.lnk" "$INSTDIR\drivers\install_drivers.bat"
+    CreateShortcut "$SMPROGRAMS\$StartMenuFolder\Uninstall Flash Multi.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+  !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
 
 ; Optional section (can be disabled by the user)
@@ -116,24 +148,12 @@ Section "Run the Maple USB driver installer" "install_drivers"
   WriteRegDWORD HKLM SOFTWARE\FlashMulti "InstallDrivers" "1"
 SectionEnd
 
-; Optional section (can be disabled by the user)
-Section "Start Menu Shortcuts" "create_shortcuts"
-
-  CreateDirectory "$SMPROGRAMS\Flash Multi"
-  CreateShortcut "$SMPROGRAMS\Flash Multi\Flash Multi.lnk" "$INSTDIR\flash-multi.exe" "" "$INSTDIR\flash-multi.exe" 0
-  CreateShortcut "$SMPROGRAMS\Flash Multi\Run Maple Driver Installer.lnk" "$INSTDIR\drivers\install_drivers.bat"
-  CreateShortcut "$SMPROGRAMS\Flash Multi\Uninstall Flash Multi.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
-  
-  ; Remember that shortcuts  were selected
-  WriteRegDWORD HKLM SOFTWARE\FlashMulti "CreateShortcuts" "1"
-
-SectionEnd
-
 ;--------------------------------
-
 ; Uninstaller
 Section "Uninstall"
-  
+  ; Get the start menu folder
+  !insertmacro MUI_STARTMENU_GETFOLDER Application $StartMenuFolder
+
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FlashMulti"
   DeleteRegKey HKLM SOFTWARE\FlashMulti
@@ -142,30 +162,21 @@ Section "Uninstall"
   Delete $INSTDIR\*.*
 
   ; Remove shortcuts, if any
-  Delete "$SMPROGRAMS\Flash Multi\*.*"
+  Delete "$SMPROGRAMS\$StartMenuFolder\*.*"
 
   ; Remove directories used
-  RMDir "$SMPROGRAMS\Flash Multi"
+  RMDir "$SMPROGRAMS\$StartMenuFolder"
   RMDir /r "$INSTDIR"
-
 SectionEnd
 
 ; Installer initialization function - checks for previous installation
 Function .onInit
-
   ; Select/unselect the components based on previous selections
   ReadRegDWORD $0 HKLM "Software\FlashMulti" "InstallDrivers"
   ${If} $0 == 0
     SectionSetFlags ${install_drivers} 0
   ${Else}
     SectionSetFlags ${install_drivers} 1
-  ${EndIf}
-
-  ReadRegDWORD $0 HKLM "Software\FlashMulti" "CreateShortcuts"
-  ${If} $0 == 0
-    SectionSetFlags ${create_shortcuts} 0
-  ${Else}
-    SectionSetFlags ${create_shortcuts} 1
   ${EndIf}
 
   ; Check for an NSIS uninstaller in the registry
@@ -225,7 +236,6 @@ Function .onInit
     abort
 
   End:
-
 FunctionEnd
 
 ; Uninstaller initialization function - checks for running program
