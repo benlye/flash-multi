@@ -3,6 +3,10 @@
 !include MUI2.nsh
 !include "FileFunc.nsh"
 !include "nsProcess.nsh"
+!include "StrFunc.nsh"
+
+; 'Declare' functions used in StrFunc.nsh
+${StrRep}
 
 ; The name of the installer
 Name "Flash Multi"
@@ -13,6 +17,9 @@ OutFile "flash-multi\bin\flash-multi-${VERSION}.exe"
 ; The default installation directory
 InstallDir $PROGRAMFILES\FlashMulti
 
+; Get the previous installation path from the registry
+InstallDirRegKey HKLM "Software\FlashMulti" "InstallDir"
+
 ; Add/Remove programs registry key
 !define AddRemoveProgsReg "Software\Microsoft\Windows\CurrentVersion\Uninstall\FlashMulti"
 
@@ -21,33 +28,56 @@ RequestExecutionLevel admin
 
 ; Installer initialization function - checks for previous installation
 Function .onInit
-  ; Registry key to check for directory (so if you install again, it will overwrite the old one automatically)
-  ReadRegStr $1 HKLM "Software\FlashMulti" "InstallDir"
-  ${If} ${Errors}
-    
-  ${Else}
-    InstallDirRegKey HKLM "Software\FlashMulti" "InstallDir"
+  ; Check for an NSIS uninstaller in the registry
+  ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FlashMulti" "UninstallString"
+  ${If} $R0 != ""
+    StrCpy $0 $R0
   ${EndIf}
 
+  ; Check for an InnoSetup uninstaller in the registry
+  ReadRegStr $R1 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Flash Multi_is1" "UninstallString"
+  ${If} $R1 != ""
+    StrCpy $0 $R1
+  ${EndIf}
 
+  ; If we have an uninstaller, parse the path to find the installation directory
+  ${If} $0 != ""
+    ; Strip any double quotes from the uninstaller path
+    ${StrRep} '$1' '$0' '$\"' ''
+
+    ; Get the parent folder of the uninstaller executable
+    ${GetParent} $1 $2
+
+    ; If the uninstaller folder is not the same as the default install dir, update the install dir
+    ${If} $2 != $INSTDIR
+      StrCpy $INSTDIR $2
+    ${EndIf}
+  ${EndIf}
+
+  ; Check if an uninstaller executable exists
   IfFileExists "$INSTDIR\unins000.exe" PreviousVersionWarn
   IfFileExists "$INSTDIR\uninstall.exe" PreviousVersionWarn
   Goto End
 
   PreviousVersionWarn:
+    ; An uninstaller exists so ask the user if we should uninstall
     MessageBox MB_YESNO|MB_ICONQUESTION "Remove the existing installation of Flash Multi?$\n$\nAnswering $\"No$\" will abort the installation." /SD IDYES IDYES Uninstall
     Goto AbortInstall
       
   Uninstall:
+    ; Check for InnoSetup uninstaller
     IfFileExists "$INSTDIR\unins000.exe" InnoUninstall
+    ; Check for NSIS uninstaller
     IfFileExists "$INSTDIR\uninstall.exe" NsisUninstall
     Goto End
 
   InnoUninstall:
+    ; Run the InnoSetup uninstaller silently
     ExecWait '"$INSTDIR\unins000.exe" /SILENT'
     Goto End
 
   NsisUninstall:
+    ; Run the NSIS uninstaller silently
     ExecWait '"$INSTDIR\uninstall.exe" /S _=$INSTDIR'
     Goto End
 
