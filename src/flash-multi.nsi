@@ -13,15 +13,23 @@ OutFile "flash-multi\bin\flash-multi-${VERSION}.exe"
 ; The default installation directory
 InstallDir $PROGRAMFILES\FlashMulti
 
-; Registry key to check for directory (so if you install again, it will 
-; overwrite the old one automatically)
-InstallDirRegKey HKLM "Software\FlashMulti" "Install_Dir"
+; Add/Remove programs registry key
+!define AddRemoveProgsReg "Software\Microsoft\Windows\CurrentVersion\Uninstall\FlashMulti"
 
 ; Request application privileges
 RequestExecutionLevel admin
 
 ; Installer initialization function - checks for previous installation
 Function .onInit
+  ; Registry key to check for directory (so if you install again, it will overwrite the old one automatically)
+  ReadRegStr $1 HKLM "Software\FlashMulti" "InstallDir"
+  ${If} ${Errors}
+    
+  ${Else}
+    InstallDirRegKey HKLM "Software\FlashMulti" "InstallDir"
+  ${EndIf}
+
+
   IfFileExists "$INSTDIR\unins000.exe" PreviousVersionWarn
   IfFileExists "$INSTDIR\uninstall.exe" PreviousVersionWarn
   Goto End
@@ -117,11 +125,9 @@ Section "Flash Multi"
   WriteUninstaller "$INSTDIR\uninstall.exe"
   
   ; Write the installation path into the registry
-  WriteRegStr HKLM SOFTWARE\FlashMulti "Install_Dir" "$INSTDIR"
+  WriteRegStr HKLM SOFTWARE\FlashMulti "InstallDir" "$INSTDIR"
 
   ; Write the uninstall keys for Windows
-  !define AddRemoveProgsReg "Software\Microsoft\Windows\CurrentVersion\Uninstall\FlashMulti"
-
   ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
   IntFmt $0 "0x%08X" $0
   WriteRegDWORD HKLM "${AddRemoveProgsReg}" "EstimatedSize" "$0"
@@ -166,7 +172,6 @@ SectionEnd
 ;--------------------------------
 
 ; Uninstaller
-
 Section "Uninstall"
   
   ; Remove registry keys
