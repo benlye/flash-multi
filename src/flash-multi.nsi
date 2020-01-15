@@ -26,8 +26,148 @@ InstallDirRegKey HKLM "Software\FlashMulti" "InstallDir"
 ; Request application privileges
 RequestExecutionLevel admin
 
+;--------------------------------
+;Interface Settings
+
+  !define MUI_ABORTWARNING
+
+;--------------------------------
+;Pages
+
+  !define MUI_COMPONENTSPAGE_NODESC
+  !insertmacro MUI_PAGE_LICENSE ".\flash-multi\bin\Release\license.txt"
+  !insertmacro MUI_PAGE_COMPONENTS
+  !insertmacro MUI_PAGE_DIRECTORY
+  !insertmacro MUI_PAGE_INSTFILES
+  !insertmacro MUI_UNPAGE_CONFIRM
+  !insertmacro MUI_UNPAGE_INSTFILES
+
+  !define MUI_FINISHPAGE_LINK 'https://github.com/benlye/flash-multi/'
+  !define MUI_FINISHPAGE_LINK_LOCATION https://github.com/benlye/flash-multi/
+  !define MUI_FINISHPAGE_TITLE "IMPORTANT"
+  !define /file MUI_FINISHPAGE_TEXT ".\installer_infoafter.txt"
+  !insertmacro MUI_PAGE_FINISH 
+  
+;--------------------------------
+;Languages
+ 
+  !insertmacro MUI_LANGUAGE "English"
+
+;--------------------------------
+
+; The stuff to install
+Section "Flash Multi" "flash_multi"
+
+  SectionIn RO
+  
+  ; Set output path to the installation directory.
+  SetOutPath $INSTDIR
+  
+  ; Get the files
+  File /r ".\flash-multi\bin\Release\bootloaders"
+  File /r ".\flash-multi\bin\Release\drivers"
+  File /r ".\flash-multi\bin\Release\tools"
+  File ".\flash-multi\bin\Release\flash-multi.exe"
+  File ".\flash-multi\bin\Release\flash-multi.exe.config"
+  File ".\flash-multi\bin\Release\GPL.txt"
+  File ".\flash-multi\bin\Release\license.txt"
+  
+  ; Write the uninstaller
+  WriteUninstaller "$INSTDIR\uninstall.exe"
+  
+  ; Write the installation path into the registry
+  WriteRegStr HKLM SOFTWARE\FlashMulti "InstallDir" "$INSTDIR"
+
+  ; Write a flag indicating the component selections
+  WriteRegDWORD HKLM SOFTWARE\FlashMulti "InstallDrivers" "0"
+  WriteRegDWORD HKLM SOFTWARE\FlashMulti "CreateShortcuts" "0"
+
+  ; Write the uninstall keys for Windows
+  ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+  IntFmt $0 "0x%08X" $0
+  WriteRegDWORD HKLM "${AddRemoveProgsReg}" "EstimatedSize" "$0"
+
+  WriteRegStr HKLM "${AddRemoveProgsReg}""Publisher" "Ben Lye"
+  WriteRegStr HKLM "${AddRemoveProgsReg}""DisplayIcon" '"$INSTDIR\flash-multi.exe"'
+  WriteRegStr HKLM "${AddRemoveProgsReg}""DisplayName" "Flash Multi ${VERSION}"
+  WriteRegStr HKLM "${AddRemoveProgsReg}""DisplayVersion" "${VERSION}"
+  WriteRegStr HKLM "${AddRemoveProgsReg}""URLInfoAbout" "https://github.com/benlye/flash-multi/"
+  WriteRegStr HKLM "${AddRemoveProgsReg}""UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegDWORD HKLM "${AddRemoveProgsReg}""NoModify" 1
+  WriteRegDWORD HKLM "${AddRemoveProgsReg}""NoRepair" 1
+
+SectionEnd
+
+; Optional section (can be disabled by the user)
+Section "Run the Maple USB driver installer" "install_drivers"
+  ; Install the drivers - https://github.com/pbatard/libwdi/blob/master/examples/wdi-simple.iss
+
+  SetDetailsPrint textonly ; or both
+  DetailPrint 'Installing Maple USB driver ...'
+  SetDetailsPrint none   ; or listonly
+  nsExec::Exec '"$INSTDIR\drivers\wdi-simple.exe" --vid 0x1EAF --pid 0x0003 --type 1 --name "Maple DFU" --dest "$TEMP\maple-dfu" --progressbar=$HWNDPARENT --timeout 120000"'
+
+  SetDetailsPrint textonly ; or both
+  DetailPrint 'Installing Maple Serial driver ...'
+  SetDetailsPrint none   ; or listonly
+  nsExec::Exec '"$INSTDIR\drivers\wdi-simple.exe" --vid 0x1EAF --pid 0x0004 --type 3 --name "Maple Serial" --dest "$TEMP\maple-serial" --progressbar=$HWNDPARENT --timeout 120000"'
+  
+  ; Remember that drivers were selected
+  WriteRegDWORD HKLM SOFTWARE\FlashMulti "InstallDrivers" "1"
+SectionEnd
+
+; Optional section (can be disabled by the user)
+Section "Start Menu Shortcuts" "create_shortcuts"
+
+  CreateDirectory "$SMPROGRAMS\Flash Multi"
+  CreateShortcut "$SMPROGRAMS\Flash Multi\Flash Multi.lnk" "$INSTDIR\flash-multi.exe" "" "$INSTDIR\flash-multi.exe" 0
+  CreateShortcut "$SMPROGRAMS\Flash Multi\Run Maple Driver Installer.lnk" "$INSTDIR\drivers\install_drivers.bat"
+  CreateShortcut "$SMPROGRAMS\Flash Multi\Uninstall Flash Multi.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+  
+  ; Remember that shortcuts  were selected
+  WriteRegDWORD HKLM SOFTWARE\FlashMulti "CreateShortcuts" "1"
+
+SectionEnd
+
+;--------------------------------
+
+; Uninstaller
+Section "Uninstall"
+  
+  ; Remove registry keys
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FlashMulti"
+  DeleteRegKey HKLM SOFTWARE\FlashMulti
+
+  ; Remove files
+  Delete $INSTDIR\*.*
+
+  ; Remove shortcuts, if any
+  Delete "$SMPROGRAMS\Flash Multi\*.*"
+
+  ; Remove directories used
+  RMDir "$SMPROGRAMS\Flash Multi"
+  RMDir /r "$INSTDIR"
+
+SectionEnd
+
 ; Installer initialization function - checks for previous installation
 Function .onInit
+
+  ; Select/unselect the components based on previous selections
+  ReadRegDWORD $0 HKLM "Software\FlashMulti" "InstallDrivers"
+  ${If} $0 == 0
+    SectionSetFlags ${install_drivers} 0
+  ${Else}
+    SectionSetFlags ${install_drivers} 1
+  ${EndIf}
+
+  ReadRegDWORD $0 HKLM "Software\FlashMulti" "CreateShortcuts"
+  ${If} $0 == 0
+    SectionSetFlags ${create_shortcuts} 0
+  ${Else}
+    SectionSetFlags ${create_shortcuts} 1
+  ${EndIf}
+
   ; Check for an NSIS uninstaller in the registry
   ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FlashMulti" "UninstallString"
   ${If} $R0 != ""
@@ -105,117 +245,3 @@ Function un.onInit
   End:
     ${nsProcess::Unload}
 FunctionEnd
-
-;--------------------------------
-;Interface Settings
-
-  !define MUI_ABORTWARNING
-
-;--------------------------------
-;Pages
-
-  !define MUI_COMPONENTSPAGE_NODESC
-  !insertmacro MUI_PAGE_LICENSE ".\flash-multi\bin\Release\license.txt"
-  !insertmacro MUI_PAGE_COMPONENTS
-  !insertmacro MUI_PAGE_DIRECTORY
-  !insertmacro MUI_PAGE_INSTFILES
-  !insertmacro MUI_UNPAGE_CONFIRM
-  !insertmacro MUI_UNPAGE_INSTFILES
-
-  !define MUI_FINISHPAGE_LINK 'https://github.com/benlye/flash-multi/'
-  !define MUI_FINISHPAGE_LINK_LOCATION https://github.com/benlye/flash-multi/
-  !define /file MUI_FINISHPAGE_TEXT ".\installer_infoafter.txt"
-  !insertmacro MUI_PAGE_FINISH 
-  
-;--------------------------------
-;Languages
- 
-  !insertmacro MUI_LANGUAGE "English"
-
-;--------------------------------
-
-; The stuff to install
-Section "Flash Multi"
-
-  SectionIn RO
-  
-  ; Set output path to the installation directory.
-  SetOutPath $INSTDIR
-  
-  ; Get the files
-  File /r ".\flash-multi\bin\Release\bootloaders"
-  File /r ".\flash-multi\bin\Release\drivers"
-  File /r ".\flash-multi\bin\Release\tools"
-  File ".\flash-multi\bin\Release\flash-multi.exe"
-  File ".\flash-multi\bin\Release\flash-multi.exe.config"
-  File ".\flash-multi\bin\Release\GPL.txt"
-  File ".\flash-multi\bin\Release\license.txt"
-  
-  ; Write the uninstaller
-  WriteUninstaller "$INSTDIR\uninstall.exe"
-  
-  ; Write the installation path into the registry
-  WriteRegStr HKLM SOFTWARE\FlashMulti "InstallDir" "$INSTDIR"
-
-  ; Write the uninstall keys for Windows
-  ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
-  IntFmt $0 "0x%08X" $0
-  WriteRegDWORD HKLM "${AddRemoveProgsReg}" "EstimatedSize" "$0"
-
-  WriteRegStr HKLM "${AddRemoveProgsReg}""Publisher" "Ben Lye"
-  WriteRegStr HKLM "${AddRemoveProgsReg}""DisplayIcon" '"$INSTDIR\flash-multi.exe"'
-  WriteRegStr HKLM "${AddRemoveProgsReg}""DisplayName" "Flash Multi ${VERSION}"
-  WriteRegStr HKLM "${AddRemoveProgsReg}""DisplayVersion" "${VERSION}"
-  WriteRegStr HKLM "${AddRemoveProgsReg}""URLInfoAbout" "https://github.com/benlye/flash-multi/"
-  WriteRegStr HKLM "${AddRemoveProgsReg}""UninstallString" '"$INSTDIR\uninstall.exe"'
-  WriteRegDWORD HKLM "${AddRemoveProgsReg}""NoModify" 1
-  WriteRegDWORD HKLM "${AddRemoveProgsReg}""NoRepair" 1
-
-SectionEnd
-
-; Optional section (can be disabled by the user)
-Section "Run the Maple USB driver installer"
-  ; Install the drivers - https://github.com/pbatard/libwdi/blob/master/examples/wdi-simple.iss
-
-  SetDetailsPrint textonly ; or both
-  DetailPrint 'Installing Maple USB driver ...'
-  SetDetailsPrint none   ; or listonly
-  nsExec::Exec '"$INSTDIR\drivers\wdi-simple.exe" --vid 0x1EAF --pid 0x0003 --type 1 --name "Maple DFU" --dest "$TEMP\maple-dfu" --progressbar=$HWNDPARENT --timeout 120000"'
-
-  SetDetailsPrint textonly ; or both
-  DetailPrint 'Installing Maple Serial driver ...'
-  SetDetailsPrint none   ; or listonly
-  nsExec::Exec '"$INSTDIR\drivers\wdi-simple.exe" --vid 0x1EAF --pid 0x0004 --type 3 --name "Maple Serial" --dest "$TEMP\maple-serial" --progressbar=$HWNDPARENT --timeout 120000"'
-  
-SectionEnd
-
-; Optional section (can be disabled by the user)
-Section "Start Menu Shortcuts"
-
-  CreateDirectory "$SMPROGRAMS\Flash Multi"
-  CreateShortcut "$SMPROGRAMS\Flash Multi\Flash Multi.lnk" "$INSTDIR\flash-multi.exe" "" "$INSTDIR\flash-multi.exe" 0
-  CreateShortcut "$SMPROGRAMS\Flash Multi\Run Maple Driver Installer.lnk" "$INSTDIR\drivers\install_drivers.bat"
-  CreateShortcut "$SMPROGRAMS\Flash Multi\Uninstall Flash Multi.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
-  
-SectionEnd
-
-;--------------------------------
-
-; Uninstaller
-Section "Uninstall"
-  
-  ; Remove registry keys
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FlashMulti"
-  DeleteRegKey HKLM SOFTWARE\FlashMulti
-
-  ; Remove files
-  Delete $INSTDIR\*.*
-
-  ; Remove shortcuts, if any
-  Delete "$SMPROGRAMS\Flash Multi\*.*"
-
-  ; Remove directories used
-  RMDir "$SMPROGRAMS\Flash Multi"
-  RMDir /r "$INSTDIR"
-
-SectionEnd
