@@ -1,7 +1,7 @@
 # Flash Multi
 <img src=https://img.shields.io/github/downloads/benlye/flash-multi/total.svg> <a href="https://scan.coverity.com/projects/benlye-flash-multi"><img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/18725.svg"/></a>
 
-Flash Multi is an application for flashing pre-compiled firmware to a Jumper, iRangeX, Vantac, 'Banggood', or DIY MULTI-Modulee.  A GUI application is available for Windows and a shell script for Linux and macOS.
+Flash Multi is an application for flashing pre-compiled firmware to a Jumper, iRangeX, Vantac, 'Banggood', or DIY MULTI-Module.  A GUI application is available for Windows and a shell script for Linux and macOS.
 
 For STM32 modules, firmware upload can be performed using the built-in USB connection or via an external USB-to-serial adapter.  For ATmega328p modules a USBasp programmer is required.
 
