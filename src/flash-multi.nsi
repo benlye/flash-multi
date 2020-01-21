@@ -37,9 +37,18 @@ RequestExecutionLevel admin
 ;--------------------------------
 ;Interface Settings
   !define MUI_ABORTWARNING
+  !define MUI_HEADERIMAGE
+  !define MUI_HEADERIMAGE_BITMAP ".\Multi Logo.bmp"
+  !define MUI_HEADERIMAGE_RIGHT
+  !define MUI_HEADERIMAGE_UNBITMAP ".\Multi Logo.bmp"
+  !define MUI_WELCOMEFINISHPAGE_BITMAP ".\Multi Logo Tall.bmp"
+  !define MUI_UNWELCOMEFINISHPAGE_BITMAP  ".\Multi Logo Tall.bmp"
 
 ;--------------------------------
 ; Installer pages
+
+  ; Welcome page
+  !insertmacro MUI_PAGE_WELCOME
 
   ; License page
   !define MUI_LICENSEPAGE_RADIOBUTTONS
