@@ -7,7 +7,7 @@ For STM32 modules, firmware upload can be performed using the built-in USB conne
 
 Just three steps are required to update your Jumper, iRangeX, or DIY MULTI-Module (full instructions are below):
 1. [Download and install](#installing-flash-multi) Flash Multi and any required [device drivers](#additional-drivers)
-1. Download the appropriate [MULTI-Module firmware file](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/releases)
+1. Download the appropriate [MULTI-Module firmware file](https://downloads.multi-module.org/)
 1. [Flash](#using-flash-multi) the new firmware to your module
 
 <p align="center">
@@ -128,7 +128,7 @@ MULTI-Module updated sucessfully
 For both methods, if the 'Show Verbose Output' box is checked the actual output from each of the flash proceses will be shown. If the flash fails for any reason the verbose messages are a good place to look for more details.
 
 # MULTI-Module Firmware
-Pre-compiled MULTI-Module firmware can be downloaded from the MULTI-Module [Releases](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/releases).
+Pre-compiled MULTI-Module firmware can be downloaded from [https://downloads.multi-module.org/](https://downloads.multi-module.org/).
 
 The MULTI-Module firmware can also be [compiled from source](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/blob/master/docs/Compiling_STM32.md) relatively easily.
 
