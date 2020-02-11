@@ -864,7 +864,7 @@ namespace Flash_Multi
         /// </summary>
         private void ReleasesLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            this.OpenLink("https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/releases");
+            this.OpenLink("https://downloads.multi-module.org/");
         }
 
         /// <summary>
