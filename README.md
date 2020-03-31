@@ -1,6 +1,12 @@
 # Flash Multi
 <img src=https://img.shields.io/github/downloads/benlye/flash-multi/total.svg> <a href="https://scan.coverity.com/projects/benlye-flash-multi"><img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/18725.svg"/></a>
 
+# Google Safe Browsing
+If you use Google Chrome and you try to go to the Release page you will get a warning telling you this site contains harmful programs.  It does not, but for some reason Google has decided that it does.  I am trying to get this fixed but Google do not make this easy for sites like Github.  All I can suggest at the moment is using another browser.
+
+See [this issue](https://github.com/benlye/flash-multi/issues/16) for more details.
+
+# About Flash Multi
 Flash Multi is an application for updating (flashing) the firmware on a Jumper, iRangeX, Vantac, 'Banggood', or DIY MULTI-Module.  A GUI application is available for Windows and a shell script for Linux and macOS.
 
 For STM32 modules, firmware upload can be performed using the built-in USB connection or via an external USB-to-serial adapter.  For ATmega328p modules a USBasp programmer is required.
