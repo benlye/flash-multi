@@ -50,6 +50,8 @@ macOS requires the libusb library to be installed. The easiest way to install th
    
    `./flash-multi -f /tmp/multi-stm-opentx-aetr-inv-v1.2.1.85.bin -p /dev/ttyUSB0 `
    
+   *Note: On OSX the device might be `/dev/tty.SLAB_USBtoUART`
+   
 For firmware compiled from recent source code the ouput will look similar to what is shown below, firmware from older source will not display information about the firmware configuration:
 
 ```
