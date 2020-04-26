@@ -55,7 +55,7 @@ Flash Multi requires .Net Framework 4.5 or newer.  You probably already have a c
 # Installing Flash Multi
 ## Windows
 
-1. Download `flash-multi-[version].zip` from the [latest releases](https://github.com/benlye/flash-multi/releases/latest)
+1. Download `flash-multi-[version].zip` from the [latest release](https://github.com/benlye/flash-multi/releases/latest)
 1. Unzip the zip file to a convenient location
 1. Launch the application by running `flash-multi.exe`
 
