@@ -1,11 +1,6 @@
 # Flash Multi
 <img src=https://img.shields.io/github/downloads/benlye/flash-multi/total.svg> <a href="https://scan.coverity.com/projects/benlye-flash-multi"><img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/18725.svg"/></a>
 
-# Google Safe Browsing
-If you use Google Chrome and you try to go to the Release page you will get a warning telling you this site contains harmful programs.  It does not, but for some reason Google has decided that it does.  I am trying to get this fixed but Google do not make this easy for sites like Github.  All I can suggest at the moment is using another browser.
-
-See [this issue](https://github.com/benlye/flash-multi/issues/16) for more details.
-
 # About Flash Multi
 Flash Multi is an application for updating (flashing) the firmware on a Jumper, iRangeX, Vantac, 'Banggood', or DIY MULTI-Module.  A GUI application is available for Windows and a shell script for Linux and macOS.
 
@@ -24,10 +19,9 @@ Just three steps are required to update your Jumper, iRangeX, or DIY MULTI-Modul
 1. [Supported Modules](#supported-multi-modules)
 1. [Flash Multi Requirements](#flash-multi-requirements)
 1. [Installing Flash Multi](#installing-flash-multi)
+   1. [Windows](#windows)
+      1. [Additional Drivers](#additional-drivers)
    1. [Linux and Mac](#linux-and-mac)
-   1. [Using the Installer](#using-the-installer)
-   1. [Manual Installation](#manual-installation)
-   1. [Additional Drivers](#additional-drivers)
 1. [Using Flash Multi](#using-flash-multi)
    1. [Writing the Bootloader](#writing-the-bootloader)
    1. [Upload Output](#upload-output)
@@ -59,31 +53,33 @@ Flash Multi requires .Net Framework 4.5 or newer.  You probably already have a c
 > _Tip: When you launch Flash Multi it will tell you if you need to install or upgrade your .Net Framework._
 
 # Installing Flash Multi
-## Linux and Mac
-Please refer to the [Linux and macOS instructions](doc/Linux.md).
+## Windows
 
-## Using the Installer
-**Note:** Make sure your MULTI-Module is not plugged in when you run the Flash Multi installer, or when you run the manual Maple USB driver installer.  This is to avoid potential problems with the driver installation.
-
-1. Download the latest installer (`flash-multi-[version].exe`) from the [Releases](https://github.com/benlye/flash-multi/releases) page
-1. Run the installer to install the application and the Maple USB device drivers - **the Maple USB device drivers must be selected for installation at least once**. They do not need to be installed on subsequent reinstalls or upgrades (but reinstalling them won't do any harm).
-1. Launch 'Flash Multi' from the Start menu
-
-## Manual Installation
-1. Download the latest .zip archive (`flash-multi-[version].zip`) from the [Releases](https://github.com/benlye/flash-multi/releases) page
-1. Unzip the archive to a convenient location
-1. Run `\drivers\install_drivers.bat` to manually install the Maple USB device drivers (only needed once)
+1. Download `flash-multi-[version].zip` from the [latest releases](https://github.com/benlye/flash-multi/releases/latest)
+1. Unzip the zip file to a convenient location
 1. Launch the application by running `flash-multi.exe`
 
-## Additional Drivers
+### Additional Drivers
 **Depending on your MULTI-Module and version of Windows you may need to install additional drivers manually.**
 
+#### Maple USB
+The Maple USB driver, which is used by many MULTI-Modules, including original Jumper JP4IN1 modules, iRangeX IRX4 and IRX4+ modules, and all Banggood STM32 modules, can be installed using the driver installer which is included with Flash Multi.
+
+**Note:** Make sure your MULTI-Module is not plugged in when you run the Maple USB driver installer.  This is to avoid potential problems with the driver installation.
+
+1. Locate the folder where you unzipped Flash Multi
+1. Run `\drivers\install_drivers.bat` to install the Maple USB device drivers
+
+#### Jumper JP4IN1-SE
 The driver for the Jumper JP4IN1 module, the Silicon Labs CP210x driver, is **not** included with Flash Multi and can be downloaded from here:
 https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers
 
 Other drivers may be needed if you are using an external USB-to-serial adapter. Consult the documentation for your adapter.
 
 *Windows 10 includes drivers for many common serial devices, including many USB-to-serial adapters, so check Device Manager to see if your device is recognised.*
+
+## Linux and Mac
+Please refer to the [Linux and macOS instructions](doc/Linux.md).
 
 # Using Flash Multi
 **Note:** The first time you flash your module you may need to connect it with an external USB-to-serial adapter in order to flash the bootloader. The bootloader is required in order for the native USB port work, and it can only be written with a USB-to-serial adapter.  This does not apply to newer Jumper 4IN1 modules, which have an _internal_ USB-to-serial adapter.
