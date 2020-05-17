@@ -21,6 +21,7 @@
 namespace Flash_Multi
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Text.RegularExpressions;
     using System.Windows.Forms;
@@ -206,6 +207,21 @@ namespace Flash_Multi
                 }
             }
 
+            // Parse the entire file if we didn't find the signature in the last 24 bytes
+            if (signature != string.Empty && signature.Substring(0, 6) != "multi-")
+            {
+                byte[] byteBuffer = File.ReadAllBytes(filename);
+                string byteBufferAsString = System.Text.Encoding.ASCII.GetString(byteBuffer);
+                int offset = byteBufferAsString.IndexOf("multi-");
+
+                if (offset > 0)
+                {
+                    signature = byteBufferAsString.Substring(offset, 24);
+                }
+            }
+
+            Debug.WriteLine(signature);
+
             // Handle firmware signature v1
             Regex regexFirmwareSignature = new Regex(@"^multi-(avr|stm|orx)-([a-z]{5})-(\d{8}$)");
             Match match = regexFirmwareSignature.Match(signature);
@@ -250,8 +266,6 @@ namespace Flash_Multi
                     string versionString = match.Groups[2].Value;
 
                     // Convert the zero-padded string to a dot-separated version string
-                    // int versionMajor;
-
                     int.TryParse(versionString.Substring(0, 2), out int versionMajor);
                     int.TryParse(versionString.Substring(2, 2), out int versionMinor);
                     int.TryParse(versionString.Substring(4, 2), out int versionRevision);

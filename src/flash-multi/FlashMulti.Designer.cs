@@ -56,6 +56,7 @@ namespace Flash_Multi
             this.label3 = new System.Windows.Forms.Label();
             this.buttonBrowse = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.buttonRead = new System.Windows.Forms.Button();
             this.buttonSerialMonitor = new System.Windows.Forms.Button();
             this.buttonRefresh = new System.Windows.Forms.Button();
             this.showVerboseOutput = new System.Windows.Forms.CheckBox();
@@ -65,14 +66,19 @@ namespace Flash_Multi
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.linkLabel2 = new System.Windows.Forms.LinkLabel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonUpload
             // 
             this.buttonUpload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonUpload.Location = new System.Drawing.Point(373, 47);
+            this.buttonUpload.Location = new System.Drawing.Point(451, 47);
             this.buttonUpload.Name = "buttonUpload";
             this.buttonUpload.Size = new System.Drawing.Size(75, 23);
             this.buttonUpload.TabIndex = 6;
@@ -98,7 +104,7 @@ namespace Flash_Multi
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textFileName.Location = new System.Drawing.Point(77, 20);
             this.textFileName.Name = "textFileName";
-            this.textFileName.Size = new System.Drawing.Size(290, 20);
+            this.textFileName.Size = new System.Drawing.Size(368, 20);
             this.textFileName.TabIndex = 0;
             this.textFileName.DoubleClick += new System.EventHandler(this.ButtonBrowse_Click);
             // 
@@ -123,7 +129,7 @@ namespace Flash_Multi
             // buttonBrowse
             // 
             this.buttonBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonBrowse.Location = new System.Drawing.Point(373, 19);
+            this.buttonBrowse.Location = new System.Drawing.Point(451, 19);
             this.buttonBrowse.Name = "buttonBrowse";
             this.buttonBrowse.Size = new System.Drawing.Size(75, 22);
             this.buttonBrowse.TabIndex = 1;
@@ -135,6 +141,7 @@ namespace Flash_Multi
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.buttonRead);
             this.groupBox1.Controls.Add(this.buttonSerialMonitor);
             this.groupBox1.Controls.Add(this.buttonRefresh);
             this.groupBox1.Controls.Add(this.buttonUpload);
@@ -143,12 +150,23 @@ namespace Flash_Multi
             this.groupBox1.Controls.Add(this.comPortSelector);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.textFileName);
-            this.groupBox1.Location = new System.Drawing.Point(15, 37);
+            this.groupBox1.Location = new System.Drawing.Point(11, 37);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(454, 84);
+            this.groupBox1.Size = new System.Drawing.Size(532, 84);
             this.groupBox1.TabIndex = 11;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Settings";
+            // 
+            // buttonRead
+            // 
+            this.buttonRead.Location = new System.Drawing.Point(345, 47);
+            this.buttonRead.Name = "buttonRead";
+            this.buttonRead.Size = new System.Drawing.Size(75, 23);
+            this.buttonRead.TabIndex = 16;
+            this.buttonRead.Text = "Read";
+            this.buttonRead.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
+            this.buttonRead.UseVisualStyleBackColor = true;
+            this.buttonRead.Click += new System.EventHandler(this.ButtonRead_Click);
             // 
             // buttonSerialMonitor
             // 
@@ -175,7 +193,7 @@ namespace Flash_Multi
             this.showVerboseOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.showVerboseOutput.AutoSize = true;
             this.showVerboseOutput.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.showVerboseOutput.Location = new System.Drawing.Point(324, 159);
+            this.showVerboseOutput.Location = new System.Drawing.Point(405, 148);
             this.showVerboseOutput.Name = "showVerboseOutput";
             this.showVerboseOutput.Size = new System.Drawing.Size(130, 17);
             this.showVerboseOutput.TabIndex = 8;
@@ -186,16 +204,15 @@ namespace Flash_Multi
             // textVerbose
             // 
             this.textVerbose.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.tableLayoutPanel1.SetColumnSpan(this.textVerbose, 2);
             this.textVerbose.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.textVerbose.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textVerbose.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textVerbose.Location = new System.Drawing.Point(3, 184);
+            this.textVerbose.Location = new System.Drawing.Point(3, 8);
             this.textVerbose.Multiline = true;
             this.textVerbose.Name = "textVerbose";
             this.textVerbose.ReadOnly = true;
             this.textVerbose.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textVerbose.Size = new System.Drawing.Size(451, 1);
+            this.textVerbose.Size = new System.Drawing.Size(532, 0);
             this.textVerbose.TabIndex = 10;
             this.textVerbose.TabStop = false;
             // 
@@ -204,10 +221,10 @@ namespace Flash_Multi
             this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.progressBar1, 2);
-            this.progressBar1.Location = new System.Drawing.Point(3, 130);
+            this.progressBar1.Location = new System.Drawing.Point(3, 119);
             this.progressBar1.Maximum = 1000;
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(451, 23);
+            this.progressBar1.Size = new System.Drawing.Size(532, 23);
             this.progressBar1.TabIndex = 12;
             // 
             // textActivity
@@ -217,19 +234,18 @@ namespace Flash_Multi
             this.textActivity.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textActivity.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textActivity.Location = new System.Drawing.Point(3, 3);
-            this.textActivity.MinimumSize = new System.Drawing.Size(451, 120);
             this.textActivity.Multiline = true;
             this.textActivity.Name = "textActivity";
             this.textActivity.ReadOnly = true;
             this.textActivity.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textActivity.Size = new System.Drawing.Size(451, 120);
+            this.textActivity.Size = new System.Drawing.Size(532, 109);
             this.textActivity.TabIndex = 7;
             this.textActivity.TabStop = false;
             // 
             // linkLabel1
             // 
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(3, 159);
+            this.linkLabel1.Location = new System.Drawing.Point(3, 148);
             this.linkLabel1.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(182, 13);
@@ -253,38 +269,64 @@ namespace Flash_Multi
             // 
             // tableLayoutPanel1
             // 
-            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Controls.Add(this.textVerbose, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.textActivity, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.linkLabel1, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.showVerboseOutput, 1, 2);
             this.tableLayoutPanel1.Controls.Add(this.progressBar1, 0, 1);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(14, 127);
+            this.tableLayoutPanel1.Controls.Add(this.linkLabel1, 0, 2);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(0, 0, 0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 4;
+            this.tableLayoutPanel1.RowCount = 3;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 0F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(457, 181);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(538, 170);
             this.tableLayoutPanel1.TabIndex = 15;
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer1.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.splitContainer1.Location = new System.Drawing.Point(8, 127);
+            this.splitContainer1.Margin = new System.Windows.Forms.Padding(0, 0, 0, 0);
+            this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.BackColor = System.Drawing.SystemColors.Control;
+            this.splitContainer1.Panel1.Controls.Add(this.tableLayoutPanel1);
+            this.splitContainer1.Panel1MinSize = 160;
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.BackColor = System.Drawing.SystemColors.Control;
+            this.splitContainer1.Panel2.Controls.Add(this.textVerbose);
+            this.splitContainer1.Panel2.Padding = new System.Windows.Forms.Padding(3, 8, 3, 0);
+            this.splitContainer1.Panel2MinSize = 0;
+            this.splitContainer1.Size = new System.Drawing.Size(538, 173);
+            this.splitContainer1.SplitterDistance = 170;
+            this.splitContainer1.SplitterWidth = 3;
+            this.splitContainer1.TabIndex = 16;
             // 
             // FlashMulti
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(484, 320);
-            this.Controls.Add(this.tableLayoutPanel1);
+            this.ClientSize = new System.Drawing.Size(554, 311);
+            this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.linkLabel2);
             this.Controls.Add(this.groupBox1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(500, 359);
+            this.MinimumSize = new System.Drawing.Size(570, 350);
             this.Name = "FlashMulti";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Flash Multi";
@@ -292,6 +334,11 @@ namespace Flash_Multi
             this.groupBox1.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -315,6 +362,8 @@ namespace Flash_Multi
         private System.Windows.Forms.Button buttonRefresh;
         private System.Windows.Forms.Button buttonSerialMonitor;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Button buttonRead;
+        private System.Windows.Forms.SplitContainer splitContainer1;
     }
 }
 

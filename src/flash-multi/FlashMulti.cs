@@ -74,6 +74,14 @@ namespace Flash_Multi
             // Disable the Upload button until we're ready
             this.buttonUpload.Enabled = false;
 
+            // Hide the verbose output panel and set the height of the other panel
+            int initialHeight = 160;
+            this.splitContainer1.Panel2Collapsed = true;
+            this.splitContainer1.Panel1MinSize = 170;
+            this.splitContainer1.Size = new System.Drawing.Size(this.splitContainer1.Width, initialHeight);
+            this.splitContainer1.SplitterDistance = initialHeight;
+            this.Size = new System.Drawing.Size(this.Width, 350);
+
             // Register a handler to check for a new version when the form is shown the first time
             this.Shown += this.FlashMulti_Shown;
 
@@ -369,6 +377,7 @@ namespace Flash_Multi
             this.buttonBrowse.Enabled = arg;
             this.buttonRefresh.Enabled = arg;
             this.buttonSerialMonitor.Enabled = arg;
+            this.buttonRead.Enabled = arg;
             this.textFileName.Enabled = arg;
             this.comPortSelector.Enabled = arg;
 
@@ -496,10 +505,21 @@ namespace Flash_Multi
             if (this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() != "USBasp" && this.comPortSelector.SelectedValue.ToString() != "DFU Device")
             {
                 this.buttonSerialMonitor.Enabled = true;
+                this.buttonRead.Enabled = true;
             }
             else
             {
                 this.buttonSerialMonitor.Enabled = false;
+                this.buttonRead.Enabled = false;
+            }
+
+            if (this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() != "USBasp")
+            {
+                this.buttonRead.Enabled = true;
+            }
+            else
+            {
+                this.buttonRead.Enabled = false;
             }
         }
 
@@ -616,6 +636,75 @@ namespace Flash_Multi
             }
         }
 
+        private async void ButtonRead_Click(object sender, EventArgs e)
+        {
+            // Disable the buttons until this flash attempt is complete
+            Debug.WriteLine("Disabling the controls...");
+            this.EnableControls(false);
+
+            // Clear the output box
+            Debug.WriteLine("Clearing the output textboxes...");
+            this.textActivity.Clear();
+            this.textVerbose.Clear();
+            this.progressBar1.Value = 0;
+            this.outputLineBuffer = string.Empty;
+
+            // Determine if we should use Maple device
+            MapleDevice mapleResult = MapleDevice.FindMaple();
+
+            // Get the selected COM port
+            string comPort = this.comPortSelector.SelectedValue.ToString();
+
+            // Generate a temp file to read into
+            string tempFileName = Path.GetTempFileName();
+            Debug.WriteLine($"TEMP file: {tempFileName}");
+
+            // Do the selected flash using the appropriate method
+            if (mapleResult.DeviceFound == true)
+            {
+
+                Debug.WriteLine($"Maple device found in {mapleResult.Mode} mode");
+                await MapleDevice.ReadFlash(this, tempFileName, comPort);
+            }
+            else
+            {
+                await SerialDevice.ReadFlash(this, tempFileName, comPort);
+            }
+
+            // Get the file size
+            long length = new System.IO.FileInfo(tempFileName).Length;
+
+            // Parse the firmware file
+            if (length > 0)
+            {
+                // Get the signature from the firmware file
+                FileUtils.FirmwareFile fileDetails = FileUtils.GetFirmwareSignature(tempFileName);
+
+                // If we got details from the signature write them to the log window
+                if (fileDetails != null)
+                {
+                    this.AppendLog($"Multi Firmware Version:   {fileDetails.Version} ({fileDetails.ModuleType})\r\n");
+                    this.AppendLog($"Expected Channel Order:   {fileDetails.ChannelOrder}\r\n");
+                    this.AppendLog($"Multi Telemetry Type:     {fileDetails.MultiTelemetryType}\r\n");
+                    this.AppendLog($"Invert Telemetry Enabled: {fileDetails.InvertTelemetry}\r\n");
+                    this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader}\r\n");
+                    this.AppendLog($"Bootloader Enabled:       {fileDetails.BootloaderSupport}\r\n");
+                    this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}");
+                }
+                else
+                {
+                    this.AppendLog($"Firmware signature not found in file, extended information is not available. This is normal for firmware prior to v1.2.1.79.\r\n");
+                }
+
+                // Remove the temp file
+                //File.Delete(tempFileName);
+                //Debug.WriteLine($"TEMP {tempFileName} file deleted");
+
+                // Populate the COM ports in case they changed
+                await this.PopulateComPortsAsync();
+            }
+        }
+
         /// <summary>
         /// Main method where all the action happens.
         /// Called by the Upload button.
@@ -703,6 +792,9 @@ namespace Flash_Multi
             {
                 await SerialDevice.WriteFlash(this, this.textFileName.Text, comPort, firmwareSupportsUsb);
             }
+
+            // Populate the COM ports in case they changed
+            await this.PopulateComPortsAsync();
         }
 
         /// <summary>
@@ -819,24 +911,25 @@ namespace Flash_Multi
         {
             if (this.showVerboseOutput.Checked == true)
             {
-                this.tableLayoutPanel1.SuspendLayout();
-                this.tableLayoutPanel1.RowStyles[0].SizeType = SizeType.Absolute;
-                this.tableLayoutPanel1.RowStyles[0].Height = 126;
-                this.tableLayoutPanel1.RowStyles[3].SizeType = SizeType.Percent;
-                this.tableLayoutPanel1.RowStyles[3].Height = 50;
-                this.MinimumSize = new System.Drawing.Size(500, 505);
-                this.tableLayoutPanel1.ResumeLayout();
+                // Grow the window by the height of the verbose panel and splitter bar
+                int oldHeight = this.splitContainer1.Panel1.Height;
+                int newHeight = this.Height + 150;
+                this.splitContainer1.Panel2Collapsed = false;
+                this.splitContainer1.Panel2MinSize = 150;
+                this.Size = new System.Drawing.Size(this.Width, newHeight + this.splitContainer1.SplitterWidth);
+                this.splitContainer1.SplitterDistance = oldHeight;
+                this.MinimumSize = new System.Drawing.Size(570, 503);
             }
             else
             {
-                this.tableLayoutPanel1.SuspendLayout();
-                this.MinimumSize = new System.Drawing.Size(500, 359);
-                this.Size = new System.Drawing.Size(this.Width, 359);
-                this.tableLayoutPanel1.RowStyles[0].SizeType = SizeType.Percent;
-                this.tableLayoutPanel1.RowStyles[0].Height = 100;
-                this.tableLayoutPanel1.RowStyles[3].SizeType = SizeType.Absolute;
-                this.tableLayoutPanel1.RowStyles[3].Height = 0;
-                this.tableLayoutPanel1.ResumeLayout();
+                // Shrink the window by the height of the verbose panel and the splitter bar
+                this.MinimumSize = new System.Drawing.Size(570, 350);
+                int newHeight = this.Height - this.splitContainer1.Panel2.Height;
+                this.Size = new System.Drawing.Size(this.Width, newHeight - this.splitContainer1.SplitterWidth);
+
+                // Hide the panel
+                this.splitContainer1.Panel2Collapsed = true;
+                this.splitContainer1.Panel2MinSize = 0;
             }
         }
 

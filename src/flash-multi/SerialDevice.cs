@@ -38,6 +38,106 @@ namespace Flash_Multi
         /// <param name="comPort">The COM port where the serial device can be found.</param>
         /// <param name="writeBootloader">Indicates whether or not the bootloader should be written.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public static async Task ReadFlash(FlashMulti flashMulti, string fileName, string comPort)
+        {
+            // Path to the flashing tool, stm32flash.exe
+            string command = ".\\tools\\stm32flash.exe";
+
+            // Path to the bootloader file
+            string bootLoaderPath = ".\\bootloaders\\StmMulti4in1.bin";
+
+            // Baud rate for serial flash commands
+            int serialBaud = Properties.Settings.Default.SerialBaudRate;
+
+            // Arguments for the command line - will vary at each step of the process
+            string commandArgs;
+
+            // Variable to keep the return code from executed commands
+            int returnCode = -1;
+
+            // Page in the STM32 flash memory where we will begin writing
+            int flashStart = 0;
+
+            // Address where we will start execution after flashing
+            string executionAddress = "0x8000000";
+
+            // Write to the log
+            flashMulti.AppendLog("Reading MULTI-Module via serial\r\n");
+
+            // Stop the serial monitor if it's active
+            SerialMonitor serialMonitor = null;
+            bool reconnectSerialMonitor = false;
+            if (Application.OpenForms.OfType<SerialMonitor>().Any())
+            {
+                Debug.WriteLine("Serial monitor window is open");
+                serialMonitor = Application.OpenForms.OfType<SerialMonitor>().First();
+                if (serialMonitor != null && serialMonitor.SerialPort != null && serialMonitor.SerialPort.IsOpen)
+                {
+                    reconnectSerialMonitor = true;
+                    Debug.WriteLine($"Serial monitor is connected to {serialMonitor.SerialPort.PortName}");
+
+                    Debug.WriteLine($"Closing serial monitor connection to {serialMonitor.SerialPort.PortName}");
+                    serialMonitor.SerialDisconnect();
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Serial monitor is not open");
+            }
+
+            // Check if the port can be opened
+            if (!ComPort.CheckPort(comPort))
+            {
+                flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
+                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.EnableControls(true);
+                return;
+            }
+
+            // Write to the log
+            flashMulti.AppendLog($"Reading MULTI-Module ...");
+
+            // Prepare the command line arguments for writing the firmware
+            // commandArgs = $"-v -s {flashStart} -e 0 -g {executionAddress} -b {serialBaud} -w \"{fileName}\" {comPort}";
+            commandArgs = $"-b {serialBaud} -r \"{fileName}\" {comPort}";
+
+            // Run the write command asynchronously and wait for it to finish
+            await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+
+            // Show an error message if the command failed for any reason
+            if (returnCode != 0)
+            {
+                flashMulti.EnableControls(true);
+                flashMulti.AppendLog(" failed!");
+                MessageBox.Show("Failed to read the MULTI-module.", "Module Read", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Reconnect the serial monitor if it was connected before
+            if (serialMonitor != null && serialMonitor.IsDisposed != true && reconnectSerialMonitor)
+            {
+                serialMonitor.SerialConnect(comPort);
+            }
+
+            // Write a success message to the log
+            flashMulti.AppendLog(" done\r\n");
+            flashMulti.AppendLog("\r\nMULTI-Module read successfully.\r\n\r\n");
+
+            // Show a success message box
+            // MessageBox.Show("MULTI-Module updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            // Re-enable the form controls
+            flashMulti.EnableControls(true);
+        }
+
+        /// <summary>
+        /// Writes the firmware to a serial device.
+        /// </summary>
+        /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
+        /// <param name="fileName">The path of the file to flash.</param>
+        /// <param name="comPort">The COM port where the serial device can be found.</param>
+        /// <param name="writeBootloader">Indicates whether or not the bootloader should be written.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public static async Task WriteFlash(FlashMulti flashMulti, string fileName, string comPort, bool writeBootloader)
         {
             // Path to the flashing tool, stm32flash.exe
