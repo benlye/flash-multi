@@ -22,6 +22,7 @@ namespace Flash_Multi
 {
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Forms;
 
@@ -95,7 +96,7 @@ namespace Flash_Multi
             }
 
             // Write to the log
-            flashMulti.AppendLog($"Reading MULTI-Module ...");
+            flashMulti.AppendLog($"[1/1] Reading flash memory ...");
 
             // Prepare the command line arguments for writing the firmware
             // commandArgs = $"-v -s {flashStart} -e 0 -g {executionAddress} -b {serialBaud} -w \"{fileName}\" {comPort}";
@@ -120,8 +121,8 @@ namespace Flash_Multi
             }
 
             // Write a success message to the log
-            flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMULTI-Module read successfully.\r\n\r\n");
+            flashMulti.AppendLog(" done\r\n\r\n");
+            //flashMulti.AppendLog("\r\nMULTI-Module read successfully.\r\n\r\n");
 
             // Show a success message box
             // MessageBox.Show("MULTI-Module updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -213,7 +214,7 @@ namespace Flash_Multi
             }
 
             // Erase the flash
-            flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Erasing flash memory...");
+            flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Erasing flash memory ...");
 
             // Set the stm32flash.exe command line arguments for erasing
             // We preserve the last 2KB of flash, which is where the EEPROM data lives.
@@ -238,7 +239,7 @@ namespace Flash_Multi
             {
                 // Increment the step counter and write to the log
                 flashStep++;
-                flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Writing bootloader...");
+                flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Writing bootloader ...");
 
                 // Prepare the command line arguments for writing the bootloader
                 commandArgs = $"-v -e 0 -g 0x8000000 -b {serialBaud} -w \"{bootLoaderPath}\" {comPort}";
@@ -260,7 +261,7 @@ namespace Flash_Multi
 
             // Increment the step counter and write to the log
             flashStep++;
-            flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Writing MULTI-Module firmware...");
+            flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Writing MULTI-Module firmware ...");
 
             // Prepare the command line arguments for writing the firmware
             commandArgs = $"-v -s {flashStart} -e 0 -g {executionAddress} -b {serialBaud} -w \"{fileName}\" {comPort}";

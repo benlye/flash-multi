@@ -193,7 +193,7 @@ namespace Flash_Multi
             this.showVerboseOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.showVerboseOutput.AutoSize = true;
             this.showVerboseOutput.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.showVerboseOutput.Location = new System.Drawing.Point(405, 148);
+            this.showVerboseOutput.Location = new System.Drawing.Point(405, 202);
             this.showVerboseOutput.Name = "showVerboseOutput";
             this.showVerboseOutput.Size = new System.Drawing.Size(130, 17);
             this.showVerboseOutput.TabIndex = 8;
@@ -221,7 +221,7 @@ namespace Flash_Multi
             this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.progressBar1, 2);
-            this.progressBar1.Location = new System.Drawing.Point(3, 119);
+            this.progressBar1.Location = new System.Drawing.Point(3, 173);
             this.progressBar1.Maximum = 1000;
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(532, 23);
@@ -238,14 +238,14 @@ namespace Flash_Multi
             this.textActivity.Name = "textActivity";
             this.textActivity.ReadOnly = true;
             this.textActivity.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textActivity.Size = new System.Drawing.Size(532, 109);
+            this.textActivity.Size = new System.Drawing.Size(532, 163);
             this.textActivity.TabIndex = 7;
             this.textActivity.TabStop = false;
             // 
             // linkLabel1
             // 
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(3, 148);
+            this.linkLabel1.Location = new System.Drawing.Point(3, 202);
             this.linkLabel1.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(182, 13);
@@ -285,7 +285,7 @@ namespace Flash_Multi
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(538, 170);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(538, 224);
             this.tableLayoutPanel1.TabIndex = 15;
             // 
             // splitContainer1
@@ -311,8 +311,8 @@ namespace Flash_Multi
             this.splitContainer1.Panel2.Controls.Add(this.textVerbose);
             this.splitContainer1.Panel2.Padding = new System.Windows.Forms.Padding(3, 8, 3, 0);
             this.splitContainer1.Panel2MinSize = 0;
-            this.splitContainer1.Size = new System.Drawing.Size(538, 173);
-            this.splitContainer1.SplitterDistance = 170;
+            this.splitContainer1.Size = new System.Drawing.Size(538, 228);
+            this.splitContainer1.SplitterDistance = 224;
             this.splitContainer1.SplitterWidth = 3;
             this.splitContainer1.TabIndex = 16;
             // 
@@ -320,13 +320,13 @@ namespace Flash_Multi
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(554, 311);
+            this.ClientSize = new System.Drawing.Size(554, 366);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.linkLabel2);
             this.Controls.Add(this.groupBox1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(570, 350);
+            this.MinimumSize = new System.Drawing.Size(570, 405);
             this.Name = "FlashMulti";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Flash Multi";

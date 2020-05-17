@@ -75,12 +75,12 @@ namespace Flash_Multi
             this.buttonUpload.Enabled = false;
 
             // Hide the verbose output panel and set the height of the other panel
-            int initialHeight = 160;
+            int initialHeight = 215;
             this.splitContainer1.Panel2Collapsed = true;
-            this.splitContainer1.Panel1MinSize = 170;
+            this.splitContainer1.Panel1MinSize = 225;
             this.splitContainer1.Size = new System.Drawing.Size(this.splitContainer1.Width, initialHeight);
             this.splitContainer1.SplitterDistance = initialHeight;
-            this.Size = new System.Drawing.Size(this.Width, 350);
+            this.Size = new System.Drawing.Size(this.Width, 405);
 
             // Register a handler to check for a new version when the form is shown the first time
             this.Shown += this.FlashMulti_Shown;
@@ -662,7 +662,6 @@ namespace Flash_Multi
             // Do the selected flash using the appropriate method
             if (mapleResult.DeviceFound == true)
             {
-
                 Debug.WriteLine($"Maple device found in {mapleResult.Mode} mode");
                 await MapleDevice.ReadFlash(this, tempFileName, comPort);
             }
@@ -689,11 +688,28 @@ namespace Flash_Multi
                     this.AppendLog($"Invert Telemetry Enabled: {fileDetails.InvertTelemetry}\r\n");
                     this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader}\r\n");
                     this.AppendLog($"Bootloader Enabled:       {fileDetails.BootloaderSupport}\r\n");
-                    this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}");
+                    this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}\r\n");
                 }
                 else
                 {
-                    this.AppendLog($"Firmware signature not found in file, extended information is not available. This is normal for firmware prior to v1.2.1.79.\r\n");
+                    this.AppendLog($"Firmware signature not found in file, extended information is not available. This is expected for modules with firmware prior to v1.2.1.79.\r\n");
+                }
+
+                byte[] eepromData = EepromUtils.GetEepromDataFromBackup(tempFileName);
+
+                if (eepromData.Length > 0)
+                {
+                    int globalId = EepromUtils.ReadGlobalId(eepromData);
+                    if (globalId > 0)
+                    {
+                        this.AppendLog($"EEPROM Global ID:         0x{globalId:X8}");
+                    } else
+                    {
+                        this.AppendLog($"EEPROM Global ID:         Not found");
+                    }
+                } else
+                {
+                    this.AppendLog($"Unable to parse EEPROM data.");
                 }
 
                 // Remove the temp file
@@ -918,12 +934,12 @@ namespace Flash_Multi
                 this.splitContainer1.Panel2MinSize = 150;
                 this.Size = new System.Drawing.Size(this.Width, newHeight + this.splitContainer1.SplitterWidth);
                 this.splitContainer1.SplitterDistance = oldHeight;
-                this.MinimumSize = new System.Drawing.Size(570, 503);
+                this.MinimumSize = new System.Drawing.Size(570, 558);
             }
             else
             {
                 // Shrink the window by the height of the verbose panel and the splitter bar
-                this.MinimumSize = new System.Drawing.Size(570, 350);
+                this.MinimumSize = new System.Drawing.Size(570, 405);
                 int newHeight = this.Height - this.splitContainer1.Panel2.Height;
                 this.Size = new System.Drawing.Size(this.Width, newHeight - this.splitContainer1.SplitterWidth);
 

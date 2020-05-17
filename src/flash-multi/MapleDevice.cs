@@ -219,7 +219,7 @@ namespace Flash_Multi
             }
 
             // First attempt to flash the firmware
-            flashMulti.AppendLog("Reading from MULTI-Module ...");
+            flashMulti.AppendLog("Reading flash memory ...");
             command = ".\\tools\\dfu-util.exe";
             commandArgs = string.Format("-a 2 -d 1EAF:0003 -U \"{0}\" -v", fileName, comPort);
 
@@ -264,8 +264,8 @@ namespace Flash_Multi
                 }
             }
 
-            flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMULTI-Module read successfully.\r\n\r\n");
+            flashMulti.AppendLog(" done\r\n\r\n");
+            // flashMulti.AppendLog("\r\nMULTI-Module read successfully.\r\n\r\n");
 
             // Reconnect the serial monitor
             if (serialMonitor != null && reconnectSerialMonitor)
