@@ -32,6 +32,92 @@ namespace Flash_Multi
     internal class SerialDevice
     {
         /// <summary>
+        /// Erases the flash memory of a serial device.
+        /// </summary>
+        /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
+        /// <param name="comPort">The COM port where the serial device can be found.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public static async Task<bool> EraseFlash(FlashMulti flashMulti, string comPort, bool eraseEeprom)
+        {
+            // Path to the flashing tool, stm32flash.exe
+            string command = ".\\tools\\stm32flash.exe";
+
+            // Baud rate for serial flash commands
+            int serialBaud = Properties.Settings.Default.SerialBaudRate;
+
+            // Arguments for the command line - will vary at each step of the process
+            string commandArgs;
+
+            // Variable to keep the return code from executed commands
+            int returnCode = -1;
+
+            // By default we preserve the last 2KB of flash, which is where the EEPROM data lives.
+            int eraseBytes = 129024;
+
+            // But if we're writing the EEPROM we need to erase it first
+            if (eraseEeprom)
+            {
+                eraseBytes = 131072;
+            }
+
+            // Write to the log
+            flashMulti.AppendLog("Erasing MULTI-Module via serial\r\n");
+
+            // Stop the serial monitor if it's active
+            SerialMonitor serialMonitor = null;
+            if (Application.OpenForms.OfType<SerialMonitor>().Any())
+            {
+                Debug.WriteLine("Serial monitor window is open");
+                serialMonitor = Application.OpenForms.OfType<SerialMonitor>().First();
+                if (serialMonitor != null && serialMonitor.SerialPort != null && serialMonitor.SerialPort.IsOpen)
+                {
+                    Debug.WriteLine($"Serial monitor is connected to {serialMonitor.SerialPort.PortName}");
+                    Debug.WriteLine($"Closing serial monitor connection to {serialMonitor.SerialPort.PortName}");
+                    serialMonitor.SerialDisconnect();
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Serial monitor is not open");
+            }
+
+            // Check if the port can be opened
+            if (!ComPort.CheckPort(comPort))
+            {
+                flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
+                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Module Erase", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.EnableControls(true);
+                return false;
+            }
+
+            // Write to the log
+            flashMulti.AppendLog($"[1/1] Erasing flash memory ...");
+
+            // Prepare the command line arguments for erasing the firmware
+            commandArgs = $"-o -S 0x8000000:{eraseBytes} -b {serialBaud} {comPort}";
+
+            // Run the write command asynchronously and wait for it to finish
+            await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+
+            // Show an error message if the command failed for any reason
+            if (returnCode != 0)
+            {
+                flashMulti.EnableControls(true);
+                flashMulti.AppendLog(" failed!");
+                MessageBox.Show("Failed to erase the MULTI-module.", "Module Erase", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            // Write a success message to the log
+            flashMulti.AppendLog(" done\r\n\r\n");
+
+            // Re-enable the form controls
+            flashMulti.EnableControls(true);
+
+            return true;
+        }
+
+        /// <summary>
         /// Reads the flash memory of a serial device.
         /// </summary>
         /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>

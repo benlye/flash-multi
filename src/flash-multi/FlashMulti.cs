@@ -90,7 +90,7 @@ namespace Flash_Multi
             this.splitContainer1.Panel1MinSize = 225;
             this.splitContainer1.Size = new System.Drawing.Size(this.splitContainer1.Width, initialHeight);
             this.splitContainer1.SplitterDistance = initialHeight;
-            this.Size = new System.Drawing.Size(this.Width, 405);
+            this.Size = new System.Drawing.Size(this.Width, 440);
 
             // Register a handler to check for a new version when the form is shown the first time
             this.Shown += this.FlashMulti_Shown;
@@ -392,6 +392,7 @@ namespace Flash_Multi
             this.buttonSerialMonitor.Enabled = arg;
             this.buttonRead.Enabled = arg;
             this.buttonSaveBackup.Enabled = arg;
+            this.buttonErase.Enabled = arg;
             this.textFileName.Enabled = arg;
             this.comPortSelector.Enabled = arg;
 
@@ -536,10 +537,12 @@ namespace Flash_Multi
             if (this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() != "USBasp")
             {
                 this.buttonRead.Enabled = true;
+                this.buttonErase.Enabled = true;
             }
             else
             {
                 this.buttonRead.Enabled = false;
+                this.buttonErase.Enabled = false;
             }
 
             if (this.backupFileName != string.Empty)
@@ -724,7 +727,7 @@ namespace Flash_Multi
                     }
                     else
                     {
-                        this.AppendLog($"Firmware signature not found in file, extended information is not available. This is expected for modules with firmware prior to v1.2.1.79.\r\n\r\n");
+                        this.AppendLog($"Firmware signature not found; extended information is not available. This is expected for modules with firmware prior to v1.2.1.79.\r\n\r\n");
                     }
 
                     byte[] eepromData = EepromUtils.GetEepromDataFromBackup(tempFileName);
@@ -995,12 +998,12 @@ namespace Flash_Multi
                 this.splitContainer1.Panel2MinSize = 150;
                 this.Size = new System.Drawing.Size(this.Width, newHeight + this.splitContainer1.SplitterWidth);
                 this.splitContainer1.SplitterDistance = oldHeight;
-                this.MinimumSize = new System.Drawing.Size(570, 558);
+                this.MinimumSize = new System.Drawing.Size(570, 593);
             }
             else
             {
                 // Shrink the window by the height of the verbose panel and the splitter bar
-                this.MinimumSize = new System.Drawing.Size(570, 405);
+                this.MinimumSize = new System.Drawing.Size(570, 440);
                 int newHeight = this.Height - this.splitContainer1.Panel2.Height;
                 this.Size = new System.Drawing.Size(this.Width, newHeight - this.splitContainer1.SplitterWidth);
 
@@ -1075,6 +1078,68 @@ namespace Flash_Multi
             {
                 MessageBox.Show("No backup file. Read the MULTI-Module first.", "Save Backup", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private async void ButtonErase_Click(object sender, EventArgs e)
+        {
+            // Disable the buttons until this flash attempt is complete
+            Debug.WriteLine("Disabling the controls...");
+            this.EnableControls(false);
+
+            // Prompt for confirmation
+            DialogResult eraseConfirm = MessageBox.Show("Are you sure you want to erase the MULTI-Module?", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (eraseConfirm != DialogResult.Yes)
+            {
+                this.EnableControls(true);
+                return;
+            }
+
+            // Ask if we should erase the EEPROM as well
+            bool eraseEeprom = false;
+            DialogResult eraseEepromConfirm = MessageBox.Show("Also erase the EEPROM data?", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (eraseEepromConfirm == DialogResult.Yes)
+            {
+                eraseEeprom = true;
+            }
+
+            // Prompt for second confirmation
+            DialogResult eraseReallyConfirm = MessageBox.Show("Are you really sure you want to erase the MULTI-Module?\r\nThis action cannot be undone.", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+            if (eraseReallyConfirm != DialogResult.Yes)
+            {
+                this.EnableControls(true);
+                return;
+            }
+
+            // Clear the output box
+            Debug.WriteLine("Clearing the output textboxes...");
+            this.textActivity.Clear();
+            this.textVerbose.Clear();
+            this.progressBar1.Value = 0;
+            this.outputLineBuffer = string.Empty;
+
+            // Determine if we should use Maple device
+            MapleDevice mapleResult = MapleDevice.FindMaple();
+
+            // Get the selected COM port
+            string comPort = this.comPortSelector.SelectedValue.ToString();
+
+            // Do the selected flash using the appropriate method
+            bool eraseSucceeded;
+            if (mapleResult.DeviceFound == true)
+            {
+                Debug.WriteLine($"Maple device found in {mapleResult.Mode} mode");
+                eraseSucceeded = await MapleDevice.EraseFlash(this, comPort, eraseEeprom);
+            }
+            else
+            {
+                eraseSucceeded = await SerialDevice.EraseFlash(this, comPort, eraseEeprom);
+            }
+
+            // Re-enable the controls
+            this.CheckControls();
+
+            // Populate the COM ports in case they changed
+            await this.PopulateComPortsAsync();
         }
     }
 }

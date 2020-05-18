@@ -135,6 +135,161 @@ namespace Flash_Multi
         }
 
         /// <summary>
+        /// Erases the flash memory of a Maple USB device.
+        /// </summary>
+        /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
+        /// <param name="comPort">The COM port where the Maple USB device can be found.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public static async Task<bool> EraseFlash(FlashMulti flashMulti, string comPort, bool eraseEeprom)
+        {
+            string command;
+            string commandArgs;
+            int returnCode = -1;
+
+            flashMulti.AppendLog("Erasing MULTI-Module via native USB\r\n");
+
+            // Stop the serial monitor if it's active
+            SerialMonitor serialMonitor = null;
+            if (Application.OpenForms.OfType<SerialMonitor>().Any())
+            {
+                Debug.WriteLine("Serial monitor window is open");
+                serialMonitor = Application.OpenForms.OfType<SerialMonitor>().First();
+                if (serialMonitor != null && serialMonitor.SerialPort != null && serialMonitor.SerialPort.IsOpen)
+                {
+                    Debug.WriteLine($"Serial monitor is connected to {serialMonitor.SerialPort.PortName}");
+                    Debug.WriteLine($"Closing serial monitor connection to {serialMonitor.SerialPort.PortName}");
+                    serialMonitor.SerialDisconnect();
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Serial monitor is not open");
+            }
+
+            // Check if the port can be opened
+            if (!ComPort.CheckPort(comPort))
+            {
+                flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
+                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.EnableControls(true);
+                return false;
+            }
+
+            string mapleMode = MapleDevice.FindMaple().Mode;
+
+            if (mapleMode == "USB")
+            {
+                flashMulti.AppendLog("Switching MULTI-Module into DFU mode ...");
+                command = ".\\tools\\maple-reset.exe";
+                commandArgs = $"{comPort} 2000";
+                await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+                if (returnCode == 0)
+                {
+                    flashMulti.AppendLog(" done\r\n");
+                    flashMulti.AppendVerbose(string.Empty);
+                }
+                else
+                {
+                    if (MapleDevice.FindMaple().DfuMode == false)
+                    {
+                        flashMulti.AppendLog(" failed!\r\n");
+                        flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
+
+                        // Show the recovery mode dialog
+                        DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
+                        var recoveryResult = recoveryDialog.ShowDialog();
+
+                        // Stop if we didn't make it into recovery mode
+                        if (recoveryResult == DialogResult.Cancel)
+                        {
+                            flashMulti.AppendLog("DFU Recovery cancelled.");
+                            flashMulti.EnableControls(true);
+                            return false;
+                        }
+                        else if (recoveryResult == DialogResult.Abort)
+                        {
+                            flashMulti.AppendLog("DFU Recovery failed.");
+                            flashMulti.EnableControls(true);
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        flashMulti.AppendLog(" done\r\n");
+                        flashMulti.AppendVerbose(string.Empty);
+                    }
+                }
+            }
+
+            // It's not actually possible to erase a device with dfu-util so we write a file full of FF bytes.
+            string fileName = string.Empty;
+            if (eraseEeprom)
+            {
+                // 120KB file overwrites the EEPROM
+                fileName = ".\\tools\\erase120.bin";
+            }
+            else
+            {
+                // 118KB file preserves the EEPROM
+                fileName = ".\\tools\\erase118.bin";
+            }
+
+            // First attempt to flash the firmware
+            flashMulti.AppendLog("Erasing flash memory ...");
+            command = ".\\tools\\dfu-util.exe";
+            commandArgs = string.Format("-a 2 -d 1EAF:0003 -D \"{0}\" -v", fileName, comPort);
+
+            await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+
+            if (returnCode != 0)
+            {
+                // First attempt failed so we need to try bootloader recovery
+                flashMulti.AppendLog(" failed!\r\n");
+
+                flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
+
+                // Show the recovery mode dialog
+                DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
+                var recoveryResult = recoveryDialog.ShowDialog();
+
+                // If we made it into recovery mode, flash the module
+                if (recoveryResult == DialogResult.OK)
+                {
+                    // Run the recovery flash command
+                    flashMulti.AppendLog("Erasing flash memory ...");
+                    await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+                    if (returnCode != 0)
+                    {
+                        flashMulti.AppendLog(" failed!\r\n");
+                        MessageBox.Show("Failed to erase the module.", "Erase Flash", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        flashMulti.EnableControls(true);
+                        return false;
+                    }
+                }
+                else if (recoveryResult == DialogResult.Cancel)
+                {
+                    flashMulti.AppendLog("DFU Recovery cancelled.");
+                    flashMulti.EnableControls(true);
+                    return false;
+                }
+                else
+                {
+                    flashMulti.AppendLog("DFU Recovery failed.");
+                    flashMulti.EnableControls(true);
+                    return false;
+                }
+            }
+
+            // Write a success message to the log
+            flashMulti.AppendLog(" done\r\n\r\n");
+
+            // Re-enable the form controls
+            flashMulti.EnableControls(true);
+
+            return true;
+        }
+
+        /// <summary>
         /// Reads the flash memory of a Maple USB device.
         /// </summary>
         /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
@@ -247,7 +402,7 @@ namespace Flash_Multi
                 if (recoveryResult == DialogResult.OK)
                 {
                     // Run the recovery flash command
-                    flashMulti.AppendLog("Reading from MULTI-Module ...");
+                    flashMulti.AppendLog("Reading flash memory ...");
                     await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
                     if (returnCode != 0)
                     {
