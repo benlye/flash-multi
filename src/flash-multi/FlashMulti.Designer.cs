@@ -67,6 +67,7 @@ namespace Flash_Multi
             this.linkLabel2 = new System.Windows.Forms.LinkLabel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.buttonSaveBackup = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -78,7 +79,7 @@ namespace Flash_Multi
             // buttonUpload
             // 
             this.buttonUpload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonUpload.Location = new System.Drawing.Point(451, 47);
+            this.buttonUpload.Location = new System.Drawing.Point(451, 18);
             this.buttonUpload.Name = "buttonUpload";
             this.buttonUpload.Size = new System.Drawing.Size(75, 23);
             this.buttonUpload.TabIndex = 6;
@@ -104,7 +105,7 @@ namespace Flash_Multi
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textFileName.Location = new System.Drawing.Point(77, 20);
             this.textFileName.Name = "textFileName";
-            this.textFileName.Size = new System.Drawing.Size(368, 20);
+            this.textFileName.Size = new System.Drawing.Size(287, 20);
             this.textFileName.TabIndex = 0;
             this.textFileName.DoubleClick += new System.EventHandler(this.ButtonBrowse_Click);
             // 
@@ -129,9 +130,9 @@ namespace Flash_Multi
             // buttonBrowse
             // 
             this.buttonBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonBrowse.Location = new System.Drawing.Point(451, 19);
+            this.buttonBrowse.Location = new System.Drawing.Point(370, 18);
             this.buttonBrowse.Name = "buttonBrowse";
-            this.buttonBrowse.Size = new System.Drawing.Size(75, 22);
+            this.buttonBrowse.Size = new System.Drawing.Size(75, 23);
             this.buttonBrowse.TabIndex = 1;
             this.buttonBrowse.Text = "Browse";
             this.buttonBrowse.UseVisualStyleBackColor = true;
@@ -141,6 +142,7 @@ namespace Flash_Multi
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.buttonSaveBackup);
             this.groupBox1.Controls.Add(this.buttonRead);
             this.groupBox1.Controls.Add(this.buttonSerialMonitor);
             this.groupBox1.Controls.Add(this.buttonRefresh);
@@ -316,6 +318,17 @@ namespace Flash_Multi
             this.splitContainer1.SplitterWidth = 3;
             this.splitContainer1.TabIndex = 16;
             // 
+            // buttonSaveBackup
+            // 
+            this.buttonSaveBackup.Location = new System.Drawing.Point(426, 47);
+            this.buttonSaveBackup.Name = "buttonSaveBackup";
+            this.buttonSaveBackup.Size = new System.Drawing.Size(75, 23);
+            this.buttonSaveBackup.TabIndex = 17;
+            this.buttonSaveBackup.Text = "Backup";
+            this.buttonSaveBackup.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
+            this.buttonSaveBackup.UseVisualStyleBackColor = true;
+            this.buttonSaveBackup.Click += new System.EventHandler(this.ButtonSaveBackup_Click);
+            // 
             // FlashMulti
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -364,6 +377,7 @@ namespace Flash_Multi
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Button buttonRead;
         private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.Button buttonSaveBackup;
     }
 }
 

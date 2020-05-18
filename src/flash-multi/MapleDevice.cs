@@ -134,7 +134,14 @@ namespace Flash_Multi
             }
         }
 
-        public static async Task ReadFlash(FlashMulti flashMulti, string fileName, string comPort)
+        /// <summary>
+        /// Reads the flash memory of a Maple USB device.
+        /// </summary>
+        /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
+        /// <param name="fileName">The path of the file to write to.</param>
+        /// <param name="comPort">The COM port where the Maple USB device can be found.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public static async Task<bool> ReadFlash(FlashMulti flashMulti, string fileName, string comPort)
         {
             string command;
             string commandArgs;
@@ -169,7 +176,7 @@ namespace Flash_Multi
                 flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
                 MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 flashMulti.EnableControls(true);
-                return;
+                return false;
             }
 
             string mapleMode = MapleDevice.FindMaple().Mode;
@@ -201,13 +208,13 @@ namespace Flash_Multi
                         {
                             flashMulti.AppendLog("DFU Recovery cancelled.");
                             flashMulti.EnableControls(true);
-                            return;
+                            return false;
                         }
                         else if (recoveryResult == DialogResult.Abort)
                         {
                             flashMulti.AppendLog("DFU Recovery failed.");
                             flashMulti.EnableControls(true);
-                            return;
+                            return false;
                         }
                     }
                     else
@@ -247,25 +254,25 @@ namespace Flash_Multi
                         flashMulti.AppendLog(" failed!\r\n");
                         MessageBox.Show("Failed to read the module.", "MULTI-Module Read", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         flashMulti.EnableControls(true);
-                        return;
+                        return false;
                     }
                 }
                 else if (recoveryResult == DialogResult.Cancel)
                 {
                     flashMulti.AppendLog("DFU Recovery cancelled.");
                     flashMulti.EnableControls(true);
-                    return;
+                    return false;
                 }
                 else
                 {
                     flashMulti.AppendLog("DFU Recovery failed.");
                     flashMulti.EnableControls(true);
-                    return;
+                    return false;
                 }
             }
 
+            // Write a success message to the log
             flashMulti.AppendLog(" done\r\n\r\n");
-            // flashMulti.AppendLog("\r\nMULTI-Module read successfully.\r\n\r\n");
 
             // Reconnect the serial monitor
             if (serialMonitor != null && reconnectSerialMonitor)
@@ -274,8 +281,10 @@ namespace Flash_Multi
                 serialMonitor.SerialConnect(comPort);
             }
 
-            // MessageBox.Show("MULTI-Module read successfully.", "MULTI-Module Read", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // Re-enable the form controls
             flashMulti.EnableControls(true);
+
+            return true;
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------
 // <copyright file="SerialDevice.cs" company="Ben Lye">
-// Copyright 2019 Ben Lye
+// Copyright 2020 Ben Lye
 //
 // This file is part of Flash Multi.
 //
@@ -32,20 +32,16 @@ namespace Flash_Multi
     internal class SerialDevice
     {
         /// <summary>
-        /// Writes the firmware to a serial device.
+        /// Reads the flash memory of a serial device.
         /// </summary>
         /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
-        /// <param name="fileName">The path of the file to flash.</param>
+        /// <param name="fileName">The path of the file to write to.</param>
         /// <param name="comPort">The COM port where the serial device can be found.</param>
-        /// <param name="writeBootloader">Indicates whether or not the bootloader should be written.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public static async Task ReadFlash(FlashMulti flashMulti, string fileName, string comPort)
+        public static async Task<bool> ReadFlash(FlashMulti flashMulti, string fileName, string comPort)
         {
             // Path to the flashing tool, stm32flash.exe
             string command = ".\\tools\\stm32flash.exe";
-
-            // Path to the bootloader file
-            string bootLoaderPath = ".\\bootloaders\\StmMulti4in1.bin";
 
             // Baud rate for serial flash commands
             int serialBaud = Properties.Settings.Default.SerialBaudRate;
@@ -55,12 +51,6 @@ namespace Flash_Multi
 
             // Variable to keep the return code from executed commands
             int returnCode = -1;
-
-            // Page in the STM32 flash memory where we will begin writing
-            int flashStart = 0;
-
-            // Address where we will start execution after flashing
-            string executionAddress = "0x8000000";
 
             // Write to the log
             flashMulti.AppendLog("Reading MULTI-Module via serial\r\n");
@@ -92,14 +82,13 @@ namespace Flash_Multi
                 flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
                 MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 flashMulti.EnableControls(true);
-                return;
+                return false;
             }
 
             // Write to the log
             flashMulti.AppendLog($"[1/1] Reading flash memory ...");
 
             // Prepare the command line arguments for writing the firmware
-            // commandArgs = $"-v -s {flashStart} -e 0 -g {executionAddress} -b {serialBaud} -w \"{fileName}\" {comPort}";
             commandArgs = $"-b {serialBaud} -r \"{fileName}\" {comPort}";
 
             // Run the write command asynchronously and wait for it to finish
@@ -111,7 +100,7 @@ namespace Flash_Multi
                 flashMulti.EnableControls(true);
                 flashMulti.AppendLog(" failed!");
                 MessageBox.Show("Failed to read the MULTI-module.", "Module Read", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                return false;
             }
 
             // Reconnect the serial monitor if it was connected before
@@ -122,13 +111,11 @@ namespace Flash_Multi
 
             // Write a success message to the log
             flashMulti.AppendLog(" done\r\n\r\n");
-            //flashMulti.AppendLog("\r\nMULTI-Module read successfully.\r\n\r\n");
-
-            // Show a success message box
-            // MessageBox.Show("MULTI-Module updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             // Re-enable the form controls
             flashMulti.EnableControls(true);
+
+            return true;
         }
 
         /// <summary>
@@ -139,7 +126,7 @@ namespace Flash_Multi
         /// <param name="comPort">The COM port where the serial device can be found.</param>
         /// <param name="writeBootloader">Indicates whether or not the bootloader should be written.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public static async Task WriteFlash(FlashMulti flashMulti, string fileName, string comPort, bool writeBootloader)
+        public static async Task WriteFlash(FlashMulti flashMulti, string fileName, string comPort, bool writeBootloader, bool writeEeprom)
         {
             // Path to the flashing tool, stm32flash.exe
             string command = ".\\tools\\stm32flash.exe";
@@ -164,6 +151,15 @@ namespace Flash_Multi
 
             // Page in the STM32 flash memory where we will begin writing
             int flashStart = 0;
+
+            // By default we preserve the last 2KB of flash, which is where the EEPROM data lives.
+            int eraseBytes = 129024;
+
+            // But if we're writing the EEPROM we need to erase it first
+            if (writeEeprom)
+            {
+                eraseBytes = 131072;
+            }
 
             // Address where we will start execution after flashing
             string executionAddress = "0x8000000";
@@ -217,8 +213,7 @@ namespace Flash_Multi
             flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Erasing flash memory ...");
 
             // Set the stm32flash.exe command line arguments for erasing
-            // We preserve the last 2KB of flash, which is where the EEPROM data lives.
-            commandArgs = $"-o -S 0x8000000:129024 -b {serialBaud} {comPort}";
+            commandArgs = $"-o -S 0x8000000:{eraseBytes} -b {serialBaud} {comPort}";
 
             // Run the erase command asynchronously and wait for it to finish
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });

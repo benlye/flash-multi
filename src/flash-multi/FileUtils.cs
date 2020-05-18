@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------
 // <copyright file="FileUtils.cs" company="Ben Lye">
-// Copyright 2019 Ben Lye
+// Copyright 2020 Ben Lye
 //
 // This file is part of Flash Multi.
 //
@@ -173,6 +173,13 @@ namespace Flash_Multi
             // If the file is smaller we can check if it has USB support and throw a more specific error
             int maxFileSize = CheckForUsbSupport(filename) ? 120832 : 129024;
 
+            // Check if the file contains EEPROM data
+            byte[] eePromData = EepromUtils.GetEepromDataFromBackup(filename);
+            if (EepromUtils.FindValidPage(eePromData) >= 0)
+            {
+                maxFileSize += 2048;
+            }
+
             if (length > maxFileSize)
             {
                 string sizeMessage = $"Firmware file is too large.\r\n\r\nSelected file is {length / 1024:n0} KB, maximum size is {maxFileSize / 1024:n0} KB.";
@@ -296,6 +303,144 @@ namespace Flash_Multi
 
             // Didn't find a signature in either format, return null
             return null;
+        }
+
+        /// <summary>
+        /// Uses the temporary file read from the module to extract and save a firmware backup.
+        /// </summary>
+        /// <param name="backupFileName">The temporary file containing the module's flash data.</param>
+        internal static void SaveFirmwareBackup(FlashMulti flashMulti, string backupFileName)
+        {
+            Debug.WriteLine($"Backup file is {backupFileName}");
+
+            // Stop if the backup file isn't found
+            if (!File.Exists(backupFileName))
+            {
+                MessageBox.Show("Backup file not found. Please read the MULTI-Module again.", "Save Backup", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Ask the user if they want to include the EEPROM
+            DialogResult includeEeprom = MessageBox.Show("Include the EEPROM data in the backup?", "Include EEPROM", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+
+            // Stop if the user cancelled
+            if (includeEeprom == DialogResult.Cancel)
+            {
+                return;
+            }
+
+            // Get the size of the back up file
+            long backupFileSize = new System.IO.FileInfo(backupFileName).Length;
+            Debug.WriteLine($"Backup file is {backupFileSize} bytes long.");
+
+            // Get the start byte
+            long backupStartByte;
+            if (backupFileSize == 120 * 1024)
+            {
+                backupStartByte = 0;
+            }
+            else if (backupFileSize == 128 * 1024)
+            {
+                bool backupIncludesBootloader = FirmwareContainsBootloader(backupFileName);
+
+                if (backupIncludesBootloader)
+                {
+                    backupStartByte = 8192;
+                }
+                else
+                {
+                    backupStartByte = 0;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Incorrect backup file size.", "Save Backup", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Get the end byte
+            long backupEndByte;
+            if (includeEeprom == DialogResult.Yes)
+            {
+                backupEndByte = backupFileSize;
+            }
+            else
+            {
+                backupEndByte = backupFileSize - 2048;
+            }
+
+            // Create the file save dialog
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                // Title for the dialog
+                saveFileDialog.Title = "Choose a location to save the backup";
+
+                // Filter for .bin files
+                saveFileDialog.Filter = ".bin File|*.bin";
+
+                // Return if the dialog was cancelled
+                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                // Extract the firmware from the backup file
+                byte[] firmwareData;
+
+                // Read the last firmware from the binary file
+                using (BinaryReader b = new BinaryReader(File.Open(backupFileName, FileMode.Open, FileAccess.Read)))
+                {
+                    // Length of data to read
+                    long byteLength = backupEndByte - backupStartByte;
+                    Debug.WriteLine($"Capturing {byteLength} bytes between {backupStartByte} and {backupEndByte}");
+
+                    // Seek to the start position
+                    b.BaseStream.Seek(backupStartByte, SeekOrigin.Begin);
+
+                    // Read the firmware data
+                    firmwareData = b.ReadBytes((int)byteLength);
+                }
+
+                // Save the file
+                using (BinaryWriter b = new BinaryWriter(File.Open(saveFileDialog.FileName, FileMode.Create, FileAccess.Write)))
+                {
+                    // Write the data
+                    b.Write(firmwareData);
+                }
+
+                flashMulti.AppendLog($"\r\n\r\nFirmware backup saved to '{saveFileDialog.FileName}'.");
+                MessageBox.Show($"Backup saved to '{saveFileDialog.FileName}'.", "Save Backup", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        /// <summary>
+        /// Checks the first 32 bytes of a firmware file and compares it to the first 32 bytes of the MULTI-Module bootloader.
+        /// </summary>
+        /// <param name="filename">Name of the file to check.</param>
+        /// <returns>Boolean indicating whether or not the file contains the bootloader.</returns>
+        internal static bool FirmwareContainsBootloader(string filename)
+        {
+            using (BinaryReader b = new BinaryReader(File.Open(filename, FileMode.Open, FileAccess.Read)))
+            {
+                // Read the first 32 bytes of the file
+                byte[] firmwareHeader;
+                b.BaseStream.Seek(0, SeekOrigin.Begin);
+                firmwareHeader = b.ReadBytes(32);
+
+                // Convert the bytes to a string
+                string firmwareHeaderAsString = System.Text.Encoding.ASCII.GetString(firmwareHeader);
+
+                // Compare the read bytes against the known value of the bootloader
+                if (firmwareHeaderAsString == "\0P\0 ?\0\0\b9\u0001\0\b9\u0001\0\b9\u0001\0\b9\u0001\0\b9\u0001\0\b\0\0\0\0")
+                {
+                    Debug.WriteLine($"Backup file contains bootloader");
+                    return true;
+                } else
+                {
+                    Debug.WriteLine($"Backup file does not contain bootloader");
+                    return false;
+                }
+            }
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------
 // <copyright file="FlashMulti.cs" company="Ben Lye">
-// Copyright 2019 Ben Lye
+// Copyright 2020 Ben Lye
 //
 // This file is part of Flash Multi.
 //
@@ -54,6 +54,16 @@ namespace Flash_Multi
         /// Keep track of the current avrdude activity.
         /// </summary>
         private string avrdudeActivity = string.Empty;
+
+        /// <summary>
+        /// Keep track of the temp file used for backups from the module.
+        /// </summary>
+        private string backupFileName = string.Empty;
+
+        /// <summary>
+        /// Keep track of whether or not the controls are globally disabled.
+        /// </summary>
+        private bool controlsDisabled = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FlashMulti"/> class.
@@ -363,6 +373,9 @@ namespace Flash_Multi
                 Debug.WriteLine("Disabling the controls...");
             }
 
+            // Set the global state
+            this.controlsDisabled = !arg;
+
             if (arg)
             {
                 // Populate the COM ports
@@ -378,6 +391,7 @@ namespace Flash_Multi
             this.buttonRefresh.Enabled = arg;
             this.buttonSerialMonitor.Enabled = arg;
             this.buttonRead.Enabled = arg;
+            this.buttonSaveBackup.Enabled = arg;
             this.textFileName.Enabled = arg;
             this.comPortSelector.Enabled = arg;
 
@@ -493,6 +507,12 @@ namespace Flash_Multi
                return;
             }
 
+            if (this.controlsDisabled)
+            {
+                // Controls are globally disabled
+                return;
+            }
+
             if (this.textFileName.Text != string.Empty && this.comPortSelector.SelectedItem != null)
             {
                 this.buttonUpload.Enabled = true;
@@ -520,6 +540,15 @@ namespace Flash_Multi
             else
             {
                 this.buttonRead.Enabled = false;
+            }
+
+            if (this.backupFileName != string.Empty)
+            {
+                this.buttonSaveBackup.Enabled = true;
+            }
+            else
+            {
+                this.buttonSaveBackup.Enabled = false;
             }
         }
 
@@ -660,65 +689,73 @@ namespace Flash_Multi
             Debug.WriteLine($"TEMP file: {tempFileName}");
 
             // Do the selected flash using the appropriate method
+            bool readSucceeded;
             if (mapleResult.DeviceFound == true)
             {
                 Debug.WriteLine($"Maple device found in {mapleResult.Mode} mode");
-                await MapleDevice.ReadFlash(this, tempFileName, comPort);
+                readSucceeded = await MapleDevice.ReadFlash(this, tempFileName, comPort);
             }
             else
             {
-                await SerialDevice.ReadFlash(this, tempFileName, comPort);
+                readSucceeded = await SerialDevice.ReadFlash(this, tempFileName, comPort);
             }
 
-            // Get the file size
-            long length = new System.IO.FileInfo(tempFileName).Length;
-
-            // Parse the firmware file
-            if (length > 0)
+            if (readSucceeded)
             {
-                // Get the signature from the firmware file
-                FileUtils.FirmwareFile fileDetails = FileUtils.GetFirmwareSignature(tempFileName);
+                // Get the file size
+                long length = new System.IO.FileInfo(tempFileName).Length;
 
-                // If we got details from the signature write them to the log window
-                if (fileDetails != null)
+                // Parse the firmware file
+                if (length > 0)
                 {
-                    this.AppendLog($"Multi Firmware Version:   {fileDetails.Version} ({fileDetails.ModuleType})\r\n");
-                    this.AppendLog($"Expected Channel Order:   {fileDetails.ChannelOrder}\r\n");
-                    this.AppendLog($"Multi Telemetry Type:     {fileDetails.MultiTelemetryType}\r\n");
-                    this.AppendLog($"Invert Telemetry Enabled: {fileDetails.InvertTelemetry}\r\n");
-                    this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader}\r\n");
-                    this.AppendLog($"Bootloader Enabled:       {fileDetails.BootloaderSupport}\r\n");
-                    this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}\r\n");
-                }
-                else
-                {
-                    this.AppendLog($"Firmware signature not found in file, extended information is not available. This is expected for modules with firmware prior to v1.2.1.79.\r\n");
-                }
+                    // Get the signature from the firmware file
+                    FileUtils.FirmwareFile fileDetails = FileUtils.GetFirmwareSignature(tempFileName);
 
-                byte[] eepromData = EepromUtils.GetEepromDataFromBackup(tempFileName);
-
-                if (eepromData.Length > 0)
-                {
-                    int globalId = EepromUtils.ReadGlobalId(eepromData);
-                    if (globalId > 0)
+                    // If we got details from the signature write them to the log window
+                    if (fileDetails != null)
                     {
-                        this.AppendLog($"EEPROM Global ID:         0x{globalId:X8}");
-                    } else
-                    {
-                        this.AppendLog($"EEPROM Global ID:         Not found");
+                        this.AppendLog($"Multi Firmware Version:   {fileDetails.Version} ({fileDetails.ModuleType})\r\n");
+                        this.AppendLog($"Expected Channel Order:   {fileDetails.ChannelOrder}\r\n");
+                        this.AppendLog($"Multi Telemetry Type:     {fileDetails.MultiTelemetryType}\r\n");
+                        this.AppendLog($"Invert Telemetry Enabled: {fileDetails.InvertTelemetry}\r\n");
+                        this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader}\r\n");
+                        this.AppendLog($"Bootloader Enabled:       {fileDetails.BootloaderSupport}\r\n");
+                        this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}\r\n");
                     }
-                } else
-                {
-                    this.AppendLog($"Unable to parse EEPROM data.");
+                    else
+                    {
+                        this.AppendLog($"Firmware signature not found in file, extended information is not available. This is expected for modules with firmware prior to v1.2.1.79.\r\n\r\n");
+                    }
+
+                    byte[] eepromData = EepromUtils.GetEepromDataFromBackup(tempFileName);
+
+                    if (eepromData.Length > 0)
+                    {
+                        int globalId = EepromUtils.ReadGlobalId(eepromData);
+                        if (globalId > 0)
+                        {
+                            this.AppendLog($"EEPROM Global ID:         0x{globalId:X8}");
+                        }
+                        else
+                        {
+                            this.AppendLog($"EEPROM Global ID:         Not found");
+                        }
+                    }
+                    else
+                    {
+                        this.AppendLog($"Unable to parse EEPROM data.");
+                    }
+
+                    // Keep track of the temp file
+                    this.backupFileName = tempFileName;
                 }
-
-                // Remove the temp file
-                //File.Delete(tempFileName);
-                //Debug.WriteLine($"TEMP {tempFileName} file deleted");
-
-                // Populate the COM ports in case they changed
-                await this.PopulateComPortsAsync();
             }
+
+            // Re-enable the controls
+            this.CheckControls();
+
+            // Populate the COM ports in case they changed
+            await this.PopulateComPortsAsync();
         }
 
         /// <summary>
@@ -754,6 +791,20 @@ namespace Flash_Multi
                 return;
             }
 
+            // Check if the file contains EEPROM data
+            bool firmwareContainsEeprom = false;
+            byte[] eePromData = EepromUtils.GetEepromDataFromBackup(this.textFileName.Text);
+            if (EepromUtils.FindValidPage(eePromData) >= 0)
+            {
+                firmwareContainsEeprom = true;
+                DialogResult overwriteEeprom = MessageBox.Show("The selected file contains EEPROM data. Continuing will overwrite the existing EEPROM.", "Overwrite EEPROM", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                if (overwriteEeprom == DialogResult.Cancel)
+                {
+                    this.EnableControls(true);
+                    return;
+                }
+            }
+
             // Determine if we should use Maple device
             MapleDevice mapleResult = MapleDevice.FindMaple();
 
@@ -777,6 +828,9 @@ namespace Flash_Multi
 
             // Get the selected COM port
             string comPort = this.comPortSelector.SelectedValue.ToString();
+
+            // Clear the backup file name - the backup will be invalid after an upload
+            this.backupFileName = string.Empty;
 
             // Do the selected flash using the appropriate method
             if (mapleResult.DeviceFound == true)
@@ -806,7 +860,7 @@ namespace Flash_Multi
             }
             else
             {
-                await SerialDevice.WriteFlash(this, this.textFileName.Text, comPort, firmwareSupportsUsb);
+                await SerialDevice.WriteFlash(this, this.textFileName.Text, comPort, firmwareSupportsUsb, firmwareContainsEeprom);
             }
 
             // Populate the COM ports in case they changed
@@ -861,6 +915,13 @@ namespace Flash_Multi
                     {
                         this.AppendLog($"Firmware File Name: {this.textFileName.Text.Substring(this.textFileName.Text.LastIndexOf("\\") + 1)}\r\n\r\n");
                         this.AppendLog($"Firmware signature not found in file, extended information is not available. This is normal for firmware prior to v1.2.1.79.\r\n");
+                    }
+
+                    byte[] eePromData = EepromUtils.GetEepromDataFromBackup(this.textFileName.Text);
+                    int globalId = EepromUtils.ReadGlobalId(eePromData);
+                    if (globalId >= 0)
+                    {
+                        this.AppendLog($"\r\nEEPROM Global ID:         0x{globalId:X8}");
                     }
 
                     // Check if the binary file contains USB / bootloader support
@@ -991,6 +1052,28 @@ namespace Flash_Multi
             {
                 SerialMonitor serialMonitor = new SerialMonitor(this.comPortSelector.SelectedValue.ToString());
                 serialMonitor.Show();
+            }
+        }
+
+        /// <summary>
+        /// Handles the Backup button being clicked.
+        /// </summary>
+        private void ButtonSaveBackup_Click(object sender, EventArgs e)
+        {
+            if (this.backupFileName != string.Empty)
+            {
+                // Disable the controls
+                this.EnableControls(false);
+
+                // Create the backup
+                FileUtils.SaveFirmwareBackup(this, this.backupFileName);
+
+                // Re-enable the controls
+                this.EnableControls(true);
+            }
+            else
+            {
+                MessageBox.Show("No backup file. Read the MULTI-Module first.", "Save Backup", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

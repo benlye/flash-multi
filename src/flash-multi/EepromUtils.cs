@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------
 // <copyright file="EepromUtils.cs" company="Ben Lye">
-// Copyright 2019 Ben Lye
+// Copyright 2020 Ben Lye
 //
 // This file is part of Flash Multi.
 //
@@ -21,17 +21,45 @@
 namespace Flash_Multi
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
-    class EepromUtils
+    /// <summary>
+    /// Functions for working with the emulated EEPROM of the STM32F103.
+    /// </summary>
+    internal class EepromUtils
     {
-        private static int PageSize = 1024;
+        /// <summary>
+        /// EEPROM page size; 1024 bytes on the STM32F103.
+        /// </summary>
+        private const int PageSize = 0x400;
 
+        /// <summary>
+        /// Base address of EEPROM page 0.
+        /// </summary>
+        private const int PageBase0 = 0;
+
+        /// <summary>
+        /// Base address of EEPROM page 1.
+        /// </summary>
+        private const int PageBase1 = 0x400;
+
+        /// <summary>
+        /// Page header of an erased EEPROM page.
+        /// </summary>
+        private const int EepromPageErased = 0xFFFF;
+
+        /// <summary>
+        /// Page header of a valid EEPROM page.
+        /// </summary>
+        private const int EepromPageValid = 0x0000;
+
+        /// <summary>
+        /// Extract the EEPROM data from a backup file.
+        /// The EEPROM data is the last 2048 bytes of the file.
+        /// </summary>
+        /// <param name="filename">The name of the backup file to parse.</param>
+        /// <returns>The EEPROM data.</returns>
         internal static byte[] GetEepromDataFromBackup(string filename)
         {
             byte[] eepromData;
@@ -46,44 +74,47 @@ namespace Flash_Multi
 
                 // Read the next 2048 bytes.
                 eepromData = b.ReadBytes(2048);
-
-                Debug.WriteLine(BitConverter.ToString(eepromData));
-
             }
 
             return eepromData;
         }
 
+        /// <summary>
+        /// Find the valid page in the EEPROM data.
+        /// </summary>
+        /// <param name="eepromData">A byte array containing the EEPROM data.</param>
+        /// <returns>The start address of the valid page.</returns>
         internal static int FindValidPage(byte[] eepromData)
         {
-            int pageBase0 = 0;
-            int pageBase1 = 1024;
-            int eepromErased = 0xffff;
-            int eepromValidPage = 0x0000;
-
             // Get the status page bytes
-            byte[] status0Bytes = { eepromData[pageBase0 + 1], eepromData[pageBase0] };
-            byte[] status1Bytes = { eepromData[pageBase1 + 1], eepromData[pageBase1] };
+            byte[] status0Bytes = { eepromData[PageBase0 + 1], eepromData[PageBase0] };
+            byte[] status1Bytes = { eepromData[PageBase1 + 1], eepromData[PageBase1] };
 
             // Convert the bytes to integers
             int status0 = System.Convert.ToInt32(BitConverter.ToString(status0Bytes).Replace("-", string.Empty), 16);
             int status1 = System.Convert.ToInt32(BitConverter.ToString(status1Bytes).Replace("-", string.Empty), 16);
 
             // Compare the page status values to determine the valid page
-            if (status0 == eepromValidPage && status1 == eepromErased)
+            if (status0 == EepromPageValid && status1 == EepromPageErased)
             {
-                return pageBase0;
+                return PageBase0;
             }
 
-            if (status0 == eepromErased && status1 == eepromValidPage)
+            if (status0 == EepromPageErased && status1 == EepromPageValid)
             {
-                return pageBase1;
+                return PageBase1;
             }
 
             Debug.WriteLine($"No valid EEPROM page found!");
             return -1;
         }
 
+        /// <summary>
+        /// Read a single address from the EEPROM data and retun the value.
+        /// </summary>
+        /// <param name="address">The virtual address to read.</param>
+        /// <param name="eepromData">A byte array containing the EEPROM data.</param>
+        /// <returns>The variable value or -1 if the address was not found.</returns>
         internal static int ReadEepromVariable(int address, byte[] eepromData)
         {
             int pageBase = FindValidPage(eepromData);
@@ -111,15 +142,25 @@ namespace Flash_Multi
             return -1;
         }
 
+        /// <summary>
+        /// Retrieves the Global ID from the EEPROM data.
+        /// </summary>
+        /// <param name="eepromData">A byte array containing the EEPROM data.</param>
+        /// <returns>The Global ID.</returns>
         internal static int ReadGlobalId(byte[] eepromData)
         {
             int id = 0;
 
+            // Read the four EEPROM variables containing the Global ID
             for (int i = 3; i >= 0; i--)
             {
+                // Get the variable data
                 int var = ReadEepromVariable(10 + i, eepromData);
-                Debug.WriteLine(var);
+
+                // Stored variable is 16 bits but we only need 8
                 id <<= 8;
+
+                // OR the variables together
                 id |= var;
             }
 
