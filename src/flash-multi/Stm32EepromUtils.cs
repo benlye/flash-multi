@@ -1,5 +1,5 @@
 ﻿// -------------------------------------------------------------------------------
-// <copyright file="EepromUtils.cs" company="Ben Lye">
+// <copyright file="Stm32EepromUtils.cs" company="Ben Lye">
 // Copyright 2020 Ben Lye
 //
 // This file is part of Flash Multi.
@@ -23,11 +23,12 @@ namespace Flash_Multi
     using System;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
 
     /// <summary>
     /// Functions for working with the emulated EEPROM of the STM32F103.
     /// </summary>
-    internal class EepromUtils
+    internal class Stm32EepromUtils
     {
         /// <summary>
         /// EEPROM page size; 1024 bytes on the STM32F103.
@@ -147,24 +148,57 @@ namespace Flash_Multi
         /// </summary>
         /// <param name="eepromData">A byte array containing the EEPROM data.</param>
         /// <returns>The Global ID.</returns>
-        internal static int ReadGlobalId(byte[] eepromData)
+        internal static uint ReadGlobalId(byte[] eepromData)
         {
-            int id = 0;
+            uint id = 0;
 
             // Read the four EEPROM variables containing the Global ID
             for (int i = 3; i >= 0; i--)
             {
                 // Get the variable data
                 int var = ReadEepromVariable(10 + i, eepromData);
+                if (var < 0)
+                {
+                    return 0;
+                }
 
-                // Stored variable is 16 bits but we only need 8
+                // Shift the ID left 8 bits for the next value
                 id <<= 8;
 
                 // OR the variables together
-                id |= var;
+                id |= (uint)var;
             }
 
             return id;
+        }
+
+        /// <summary>
+        /// Check if the firmware section of the flash memory is empty (contains all 0xFF).
+        /// </summary>
+        /// <param name="filename">The name of the firmware backup file to evaluate.</param>
+        /// <returns>A boolean indicating whether or not the firmware data is empty.</returns>
+        internal static bool FirmwareIsEmpty(string filename)
+        {
+            long filesize = new System.IO.FileInfo(filename).Length;
+            using (BinaryReader b = new BinaryReader(File.Open(filename, FileMode.Open, FileAccess.Read)))
+            {
+                // Read the file, excluding the EEPROM data
+                b.BaseStream.Seek(0, SeekOrigin.Begin);
+                byte[] data = b.ReadBytes((int)filesize - 2048);
+
+                return data.Distinct().Count() == 1 && data.Distinct().FirstOrDefault() == 255;
+            }
+        }
+
+        /// <summary>
+        /// Check if the EEPROM section of the flash memory is empty (contains all 0xFF).
+        /// </summary>
+        /// <param name="filename">The name of the firmware backup file to evaluate.</param>
+        /// <returns>A boolean indicating whether or not the EEPROM data is empty.</returns>
+        internal static bool EepromIsEmpty(string filename)
+        {
+            byte[] data = GetEepromDataFromBackup(filename);
+            return data.Distinct().Count() == 1 && data.Distinct().FirstOrDefault() == 255;
         }
     }
 }
