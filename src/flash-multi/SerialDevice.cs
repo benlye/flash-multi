@@ -36,6 +36,7 @@ namespace Flash_Multi
         /// </summary>
         /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
         /// <param name="comPort">The COM port where the serial device can be found.</param>
+        /// <param name="eraseEeprom">Flag indicating if the EEPROM should be erased.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public static async Task<bool> EraseFlash(FlashMulti flashMulti, string comPort, bool eraseEeprom)
         {
@@ -104,12 +105,13 @@ namespace Flash_Multi
             {
                 flashMulti.EnableControls(true);
                 flashMulti.AppendLog(" failed!");
-                MessageBox.Show("Failed to erase the MULTI-module.", "Module Erase", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Failed to erase the MULTI-module.", "MULTI-Module Erase", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
             // Write a success message to the log
-            flashMulti.AppendLog(" done\r\n\r\n");
+            flashMulti.AppendLog(" done\r\n");
+            flashMulti.AppendLog("\r\nMULTI-Module erased successfully");
 
             // Re-enable the form controls
             flashMulti.EnableControls(true);
@@ -185,7 +187,7 @@ namespace Flash_Multi
             {
                 flashMulti.EnableControls(true);
                 flashMulti.AppendLog(" failed!");
-                MessageBox.Show("Failed to read the MULTI-module.", "Module Read", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Failed to read the MULTI-module.", "MULTI-Module Read", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
@@ -211,6 +213,7 @@ namespace Flash_Multi
         /// <param name="fileName">The path of the file to flash.</param>
         /// <param name="comPort">The COM port where the serial device can be found.</param>
         /// <param name="writeBootloader">Indicates whether or not the bootloader should be written.</param>
+        /// <param name="writeEeprom">Indicates whether or not the EEPROM is being written, therefore should be erased before the write.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public static async Task WriteFlash(FlashMulti flashMulti, string fileName, string comPort, bool writeBootloader, bool writeEeprom)
         {

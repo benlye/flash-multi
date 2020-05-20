@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------
 // <copyright file="MapleDevice.cs" company="Ben Lye">
-// Copyright 2019 Ben Lye
+// Copyright 2020 Ben Lye
 //
 // This file is part of Flash Multi.
 //
@@ -139,6 +139,7 @@ namespace Flash_Multi
         /// </summary>
         /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
         /// <param name="comPort">The COM port where the Maple USB device can be found.</param>
+        /// <param name="eraseEeprom">Flag indicating if the EEPROM should be erased.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public static async Task<bool> EraseFlash(FlashMulti flashMulti, string comPort, bool eraseEeprom)
         {
@@ -193,30 +194,9 @@ namespace Flash_Multi
                     if (MapleDevice.FindMaple().DfuMode == false)
                     {
                         flashMulti.AppendLog(" failed!\r\n");
-                        flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
-
-                        // Show the recovery mode dialog
-                        DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
-                        var recoveryResult = recoveryDialog.ShowDialog();
-
-                        // Stop if we didn't make it into recovery mode
-                        if (recoveryResult == DialogResult.Cancel)
-                        {
-                            flashMulti.AppendLog("DFU Recovery cancelled.");
-                            flashMulti.EnableControls(true);
-                            return false;
-                        }
-                        else if (recoveryResult == DialogResult.Abort)
-                        {
-                            flashMulti.AppendLog("DFU Recovery failed.");
-                            flashMulti.EnableControls(true);
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        flashMulti.AppendLog(" done\r\n");
-                        flashMulti.AppendVerbose(string.Empty);
+                        MessageBox.Show("Failed to erase the MULTI-module.", "Erase MULTI-Module", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        flashMulti.EnableControls(true);
+                        return false;
                     }
                 }
             }
@@ -234,54 +214,22 @@ namespace Flash_Multi
                 fileName = ".\\tools\\erase118.bin";
             }
 
-            // First attempt to flash the firmware
+            // Erase the the flash
             flashMulti.AppendLog("Erasing flash memory ...");
-            command = ".\\tools\\dfu-util.exe";
+            command = ".\\tools\\dfu-util-multi.exe";
             commandArgs = string.Format("-a 2 -d 1EAF:0003 -D \"{0}\" -v", fileName, comPort);
-
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
-
             if (returnCode != 0)
             {
-                // First attempt failed so we need to try bootloader recovery
                 flashMulti.AppendLog(" failed!\r\n");
-
-                flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
-
-                // Show the recovery mode dialog
-                DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
-                var recoveryResult = recoveryDialog.ShowDialog();
-
-                // If we made it into recovery mode, flash the module
-                if (recoveryResult == DialogResult.OK)
-                {
-                    // Run the recovery flash command
-                    flashMulti.AppendLog("Erasing flash memory ...");
-                    await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
-                    if (returnCode != 0)
-                    {
-                        flashMulti.AppendLog(" failed!\r\n");
-                        MessageBox.Show("Failed to erase the module.", "Erase Flash", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        flashMulti.EnableControls(true);
-                        return false;
-                    }
-                }
-                else if (recoveryResult == DialogResult.Cancel)
-                {
-                    flashMulti.AppendLog("DFU Recovery cancelled.");
-                    flashMulti.EnableControls(true);
-                    return false;
-                }
-                else
-                {
-                    flashMulti.AppendLog("DFU Recovery failed.");
-                    flashMulti.EnableControls(true);
-                    return false;
-                }
+                MessageBox.Show("Failed to erase the MULTI-Module.", "Erase MULTI-Module", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.EnableControls(true);
+                return false;
             }
 
             // Write a success message to the log
-            flashMulti.AppendLog(" done\r\n\r\n");
+            flashMulti.AppendLog(" done\r\n");
+            flashMulti.AppendLog("\r\nMULTI-Module erased successfully");
 
             // Re-enable the form controls
             flashMulti.EnableControls(true);
@@ -352,78 +300,24 @@ namespace Flash_Multi
                     if (MapleDevice.FindMaple().DfuMode == false)
                     {
                         flashMulti.AppendLog(" failed!\r\n");
-                        flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
-
-                        // Show the recovery mode dialog
-                        DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
-                        var recoveryResult = recoveryDialog.ShowDialog();
-
-                        // Stop if we didn't make it into recovery mode
-                        if (recoveryResult == DialogResult.Cancel)
-                        {
-                            flashMulti.AppendLog("DFU Recovery cancelled.");
-                            flashMulti.EnableControls(true);
-                            return false;
-                        }
-                        else if (recoveryResult == DialogResult.Abort)
-                        {
-                            flashMulti.AppendLog("DFU Recovery failed.");
-                            flashMulti.EnableControls(true);
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        flashMulti.AppendLog(" done\r\n");
-                        flashMulti.AppendVerbose(string.Empty);
-                    }
-                }
-            }
-
-            // First attempt to flash the firmware
-            flashMulti.AppendLog("Reading flash memory ...");
-            command = ".\\tools\\dfu-util.exe";
-            commandArgs = string.Format("-a 2 -d 1EAF:0003 -U \"{0}\" -v", fileName, comPort);
-
-            await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
-
-            if (returnCode != 0)
-            {
-                // First attempt failed so we need to try bootloader recovery
-                flashMulti.AppendLog(" failed!\r\n");
-
-                flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
-
-                // Show the recovery mode dialog
-                DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
-                var recoveryResult = recoveryDialog.ShowDialog();
-
-                // If we made it into recovery mode, flash the module
-                if (recoveryResult == DialogResult.OK)
-                {
-                    // Run the recovery flash command
-                    flashMulti.AppendLog("Reading flash memory ...");
-                    await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
-                    if (returnCode != 0)
-                    {
-                        flashMulti.AppendLog(" failed!\r\n");
-                        MessageBox.Show("Failed to read the module.", "MULTI-Module Read", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Failed to read the MULTI-Module.", "MULTI-Module Read", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         flashMulti.EnableControls(true);
                         return false;
                     }
                 }
-                else if (recoveryResult == DialogResult.Cancel)
-                {
-                    flashMulti.AppendLog("DFU Recovery cancelled.");
-                    flashMulti.EnableControls(true);
-                    return false;
-                }
-                else
-                {
-                    flashMulti.AppendLog("DFU Recovery failed.");
-                    flashMulti.EnableControls(true);
-                    return false;
-                }
+            }
+
+            // Read the flash memory
+            flashMulti.AppendLog("Reading flash memory ...");
+            command = ".\\tools\\dfu-util-multi.exe";
+            commandArgs = string.Format("-a 2 -d 1EAF:0003 -U \"{0}\" -v", fileName, comPort);
+            await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+            if (returnCode != 0)
+            {
+                flashMulti.AppendLog(" failed!\r\n");
+                MessageBox.Show("Failed to read the MULTI-Module.", "MULTI-Module Read", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.EnableControls(true);
+                return false;
             }
 
             // Write a success message to the log
@@ -535,11 +429,9 @@ namespace Flash_Multi
 
             // First attempt to flash the firmware
             flashMulti.AppendLog("Writing firmware to MULTI-Module ...");
-            command = ".\\tools\\dfu-util.exe";
+            command = ".\\tools\\dfu-util-multi.exe";
             commandArgs = string.Format("-R -a 2 -d 1EAF:0003 -D \"{0}\" -v", fileName, comPort);
-
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
-
             if (returnCode != 0)
             {
                 // First attempt failed so we need to try bootloader recovery

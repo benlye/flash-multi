@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------
 // <copyright file="UsbAspDevice.cs" company="Ben Lye">
-// Copyright 2019 Ben Lye
+// Copyright 2020 Ben Lye
 //
 // This file is part of Flash Multi.
 //
@@ -28,6 +28,14 @@ namespace Flash_Multi
     /// </summary>
     internal class UsbAspDevice
     {
+        // Fuses
+        private const string UnlockBits = "0x3F";
+        private const string LockBits = "0x0F";
+        private const string ExtendedFuses = "0xFD";
+        private const string HighFusesBoot = "0xD6";
+        private const string HighFusesNoBoot = "0xD7";
+        private const string LowFuses = "0xFF";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UsbAspDevice"/> class.
         /// </summary>
@@ -71,7 +79,107 @@ namespace Flash_Multi
         }
 
         /// <summary>
-        /// Writes the firmware to a serial device.
+        /// Erases the module via a USBasp device.
+        /// </summary>
+        /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
+        /// <param name="eraseEeprom">Flag indicating if the EEPROM should be erased.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public static async Task<bool> EraseFlash(FlashMulti flashMulti, bool eraseEeprom)
+        {
+            // Path to the flashing tool, stm32flash.exe
+            string command = ".\\tools\\avrdude.exe";
+
+            // Arguments for the command line
+            string commandArgs;
+
+            // Variable to keep the return code from executed commands
+            int returnCode = -1;
+
+            // First step in flash process
+            flashMulti.FlashStep = 1;
+
+            // Avrdude command arguments
+            if (eraseEeprom)
+            {
+                flashMulti.FlashSteps = 6;
+                commandArgs = $"-C.\\tools\\avrdude.conf -patmega328p -cusbasp -Ulock:w:{UnlockBits}:m -Uefuse:w:{ExtendedFuses}:m -Uhfuse:w:{HighFusesNoBoot}:m -Ulfuse:w:{LowFuses}:m -Uflash:w:.\\tools\\erase32.bin:a -Ueeprom:w:.\\tools\\erase1.bin:r";
+            }
+            else
+            {
+                flashMulti.FlashSteps = 4;
+                commandArgs = $"-C.\\tools\\avrdude.conf -patmega328p -cusbasp -Ulock:w:{UnlockBits}:m -Uefuse:w:{ExtendedFuses}:m -Uhfuse:w:{HighFusesNoBoot}:m -Ulfuse:w:{LowFuses}:m -Uflash:w:.\\tools\\erase32.bin:a";
+            }
+
+            // Write to the log
+            flashMulti.AppendLog("Erasing MULTI-Module via USBasp\r\n");
+
+            // Run the command asynchronously and wait for it to finish
+            await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+
+            // Show an error message if the command failed for any reason
+            if (returnCode != 0)
+            {
+                flashMulti.EnableControls(true);
+                flashMulti.AppendLog("\r\nModule erase failed!");
+                MessageBox.Show("Failed to erase the module.", "MULTI-Module Erase", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            flashMulti.AppendLog("\r\nMULTI-Module erased successfully");
+
+            flashMulti.EnableControls(true);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Reads the firmware via a USBasp device.
+        /// </summary>
+        /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
+        /// <param name="firmwareFileName">The path of the file to save the firmware in.</param>
+        /// <param name="eepromFilename">The path of the file to save the EEPROM in.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public static async Task<bool> ReadFlash(FlashMulti flashMulti, string firmwareFileName, string eepromFilename)
+        {
+            // Path to the flashing tool, stm32flash.exe
+            string command = ".\\tools\\avrdude.exe";
+
+            // Arguments for the command line
+            string commandArgs = $"-C.\\tools\\avrdude.conf -patmega328p -cusbasp -Uflash:r:{firmwareFileName}:r -Ueeprom:r:{eepromFilename}:r";
+
+            // Variable to keep the return code from executed commands
+            int returnCode = -1;
+
+            // First step in flash process
+            flashMulti.FlashStep = 1;
+
+            // Total number of steps in flash process
+            flashMulti.FlashSteps = 2;
+
+            // Write to the log
+            flashMulti.AppendLog("Reading MULTI-Module via USBasp\r\n");
+
+            // Run the command asynchronously and wait for it to finish
+            await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+
+            // Show an error message if the command failed for any reason
+            if (returnCode != 0)
+            {
+                flashMulti.EnableControls(true);
+                flashMulti.AppendLog("\r\nMULTI-Module read failed!");
+                MessageBox.Show("Failed to read the MULTI-module.", "MULTI-Module Read", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            flashMulti.AppendLog("\r\n");
+
+            flashMulti.EnableControls(true);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Writes the firmware via a USBasp device.
         /// </summary>
         /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
         /// <param name="fileName">The path of the file to flash.</param>
@@ -97,25 +205,15 @@ namespace Flash_Multi
             // Total number of steps in flash process
             flashMulti.FlashSteps = 4;
 
-            // Fuses
-            string unlockBits = "0x3F";
-            string lockBits = "0x0F";
-            string extendedFuses = "0xFD";
-            string highFuses = "0xD7";
-            string lowFuses = "0xFF";
-
             // Default avrdude command arguments (no bootloader)
-            commandArgs = $"-C.\\tools\\avrdude.conf -patmega328p -cusbasp -Ulock:w:{unlockBits}:m -Uefuse:w:{extendedFuses}:m -Uhfuse:w:{highFuses}:m -Ulfuse:w:{lowFuses}:m -Uflash:w:{fileName}:a";
+            commandArgs = $"-C.\\tools\\avrdude.conf -patmega328p -cusbasp -Ulock:w:{UnlockBits}:m -Uefuse:w:{ExtendedFuses}:m -Uhfuse:w:{HighFusesNoBoot}:m -Ulfuse:w:{LowFuses}:m -Uflash:w:{fileName}:a";
 
             if (writeBootloader)
             {
                 // Increase the total number of steps
                 flashMulti.FlashSteps = 5;
 
-                // Set the high fuses
-                highFuses = "0xD6";
-
-                commandArgs = $"-C.\\tools\\avrdude.conf -patmega328p -cusbasp -Ulock:w:{unlockBits}:m -Uefuse:w:{extendedFuses}:m -Uhfuse:w:{highFuses}:m -Ulfuse:w:{lowFuses}:m -Uflash:w:{bootLoaderPath}:i -Ulock:w:{lockBits}:m -Uflash:w:{fileName}:a";
+                commandArgs = $"-C.\\tools\\avrdude.conf -patmega328p -cusbasp -Ulock:w:{UnlockBits}:m -Uefuse:w:{ExtendedFuses}:m -Uhfuse:w:{HighFusesBoot}:m -Ulfuse:w:{LowFuses}:m -Uflash:w:{bootLoaderPath}:i -Ulock:w:{LockBits}:m -Uflash:w:{fileName}:a";
             }
 
             // Write to the log
@@ -133,7 +231,6 @@ namespace Flash_Multi
                 return;
             }
 
-            flashMulti.AppendLog("\r\nDone.");
             flashMulti.AppendLog("\r\nMULTI-Module updated successfully");
 
             MessageBox.Show("MULTI-Module updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);

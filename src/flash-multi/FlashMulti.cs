@@ -35,6 +35,11 @@ namespace Flash_Multi
     /// </summary>
     public partial class FlashMulti : Form
     {
+        internal const int NoBackup = 0;
+        internal const int AtmegaBackup = 1;
+        internal const int Stm32BackupDfuUtil = 2;
+        internal const int Stm32BackupStm32Flash = 3;
+
         /// <summary>
         ///  The number of steps required for a flash.
         /// </summary>
@@ -44,6 +49,11 @@ namespace Flash_Multi
         /// The current flash step.
         /// </summary>
         internal int FlashStep = 1;
+
+        /// <summary>
+        /// Keep track of the type of backup we have.
+        /// </summary>
+        internal int BackupModuleType;
 
         /// <summary>
         /// Buffer for verbose output logging.
@@ -56,9 +66,14 @@ namespace Flash_Multi
         private string avrdudeActivity = string.Empty;
 
         /// <summary>
-        /// Keep track of the temp file used for backups from the module.
+        /// Keep track of the temp file used for firmware backups from the module.
         /// </summary>
-        private string backupFileName = string.Empty;
+        private string firmwareBackupFileName = string.Empty;
+
+        /// <summary>
+        /// Keep track of the temp file used for EEPROM backups from an Atmega328p module.
+        /// </summary>
+        private string eepromBackupFileName = string.Empty;
 
         /// <summary>
         /// Keep track of whether or not the controls are globally disabled.
@@ -238,6 +253,20 @@ namespace Flash_Multi
                     this.FlashStep++;
                 }
 
+                if (this.outputLineBuffer == "avrdude.exe: reading flash memory:")
+                {
+                    this.AppendLog($"[{this.FlashStep}/{this.FlashSteps}] Reading flash ... ");
+                    this.avrdudeActivity = "readflash";
+                    this.FlashStep++;
+                }
+
+                if (this.outputLineBuffer == "avrdude.exe: reading eeprom memory:")
+                {
+                    this.AppendLog($"done\r\n[{this.FlashStep}/{this.FlashSteps}] Reading EEPROM ... ");
+                    this.avrdudeActivity = "readeeprom";
+                    this.FlashStep++;
+                }
+
                 if (this.outputLineBuffer.StartsWith("avrdude.exe: writing flash ") && this.outputLineBuffer.EndsWith("):"))
                 {
                     if (this.avrdudeActivity == "writebootloader" && this.FlashSteps == 5)
@@ -247,7 +276,7 @@ namespace Flash_Multi
                         this.avrdudeActivity = "writefirmware";
                         this.FlashStep++;
                     }
-                    else if (this.avrdudeActivity == "fuses" && this.FlashSteps == 4)
+                    else if (this.avrdudeActivity == "fuses" && (this.FlashSteps == 4 || this.FlashSteps == 6))
                     {
                         // Writing firmware after fuses
                         this.AppendLog($"done\r\n[{this.FlashStep}/{this.FlashSteps}] Writing flash ... ");
@@ -270,7 +299,21 @@ namespace Flash_Multi
                     this.FlashStep++;
                 }
 
-                if (this.outputLineBuffer == "avrdude.exe done.  Thank you." && this.avrdudeActivity == "verifyfirmware")
+                if (this.outputLineBuffer.StartsWith("avrdude.exe: writing eeprom ") && this.outputLineBuffer.EndsWith("):"))
+                {
+                    this.avrdudeActivity = "writeeeprom";
+                    this.AppendLog($"done\r\n[{this.FlashStep}/{this.FlashSteps}] Writing EEPROM ...");
+                    this.FlashStep++;
+                }
+
+                if (this.outputLineBuffer == "avrdude.exe: reading on-chip eeprom data:" && this.avrdudeActivity == "writeeeprom")
+                {
+                    this.avrdudeActivity = "verifyeeprom";
+                    this.AppendLog($"done\r\n[{this.FlashStep}/{this.FlashSteps}] Verifying EEPROM ...");
+                    this.FlashStep++;
+                }
+
+                if (this.outputLineBuffer == "avrdude.exe done.  Thank you." && this.avrdudeActivity != string.Empty)
                 {
                     this.avrdudeActivity = string.Empty;
                     this.AppendLog(" done\r\n");
@@ -284,7 +327,7 @@ namespace Flash_Multi
                 if (this.outputLineBuffer.StartsWith("Reading | #") || this.outputLineBuffer.StartsWith("Writing | #"))
                 {
                     // Update the progress bar only when writing and verifying the firmware
-                    if (data == '#' && (this.avrdudeActivity == "writefirmware" || this.avrdudeActivity == "verifyfirmware"))
+                    if (data == '#' && (this.avrdudeActivity == "writefirmware" || this.avrdudeActivity == "verifyfirmware" || this.avrdudeActivity == "readflash" || this.avrdudeActivity == "readeeprom"))
                     {
                         // Convert number of hashes in string to progress bar percentage
                         int avrdudeProgress = (this.outputLineBuffer.Length - 10) * 2;
@@ -526,7 +569,6 @@ namespace Flash_Multi
             if (this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() != "USBasp" && this.comPortSelector.SelectedValue.ToString() != "DFU Device")
             {
                 this.buttonSerialMonitor.Enabled = true;
-                this.buttonRead.Enabled = true;
             }
             else
             {
@@ -534,7 +576,7 @@ namespace Flash_Multi
                 this.buttonRead.Enabled = false;
             }
 
-            if (this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() != "USBasp")
+            if (this.comPortSelector.SelectedItem != null)
             {
                 this.buttonRead.Enabled = true;
                 this.buttonErase.Enabled = true;
@@ -545,7 +587,7 @@ namespace Flash_Multi
                 this.buttonErase.Enabled = false;
             }
 
-            if (this.backupFileName != string.Empty)
+            if (this.BackupModuleType != NoBackup)
             {
                 this.buttonSaveBackup.Enabled = true;
             }
@@ -681,38 +723,69 @@ namespace Flash_Multi
             this.progressBar1.Value = 0;
             this.outputLineBuffer = string.Empty;
 
+            // Discard the last backup
+            this.BackupModuleType = NoBackup;
+            this.firmwareBackupFileName = string.Empty;
+            this.eepromBackupFileName = string.Empty;
+
             // Determine if we should use Maple device
             MapleDevice mapleResult = MapleDevice.FindMaple();
+
+            // Determine if we should use a USBasp device
+            UsbAspDevice usbaspResult = UsbAspDevice.FindUsbAsp();
 
             // Get the selected COM port
             string comPort = this.comPortSelector.SelectedValue.ToString();
 
-            // Generate a temp file to read into
-            string tempFileName = Path.GetTempFileName();
-            Debug.WriteLine($"TEMP file: {tempFileName}");
+            // Generate a temp file to read the firmware into
+            string tempFirmwareFileName = Path.GetTempFileName();
+            Debug.WriteLine($"TEMP firmware file: {tempFirmwareFileName}");
+
+            string tempEepromFilename = string.Empty;
 
             // Do the selected flash using the appropriate method
             bool readSucceeded;
             if (mapleResult.DeviceFound == true)
             {
                 Debug.WriteLine($"Maple device found in {mapleResult.Mode} mode");
-                readSucceeded = await MapleDevice.ReadFlash(this, tempFileName, comPort);
+
+                // Set the backup type
+                this.BackupModuleType = Stm32BackupDfuUtil;
+
+                // Make the backup
+                readSucceeded = await MapleDevice.ReadFlash(this, tempFirmwareFileName, comPort);
+            }
+            else if (usbaspResult.DeviceFound == true && comPort == "USBasp")
+            {
+                // Set the backup type
+                this.BackupModuleType = AtmegaBackup;
+
+                // Generate a temp file to read the EEPROM into
+                tempEepromFilename = Path.GetTempFileName();
+                Debug.WriteLine($"TEMP EEPROM file: {tempEepromFilename}");
+
+                // Make the backup
+                readSucceeded = await UsbAspDevice.ReadFlash(this, tempFirmwareFileName, tempEepromFilename);
             }
             else
             {
-                readSucceeded = await SerialDevice.ReadFlash(this, tempFileName, comPort);
+                // Set the backup type
+                this.BackupModuleType = Stm32BackupStm32Flash;
+                readSucceeded = await SerialDevice.ReadFlash(this, tempFirmwareFileName, comPort);
             }
 
             if (readSucceeded)
             {
+                byte[] eepromData = { };
+
                 // Get the file size
-                long length = new System.IO.FileInfo(tempFileName).Length;
+                long length = new System.IO.FileInfo(tempFirmwareFileName).Length;
 
                 // Parse the firmware file
                 if (length > 0)
                 {
                     // Get the signature from the firmware file
-                    FileUtils.FirmwareFile fileDetails = FileUtils.GetFirmwareSignature(tempFileName);
+                    FileUtils.FirmwareFile fileDetails = FileUtils.GetFirmwareSignature(tempFirmwareFileName);
 
                     // If we got details from the signature write them to the log window
                     if (fileDetails != null)
@@ -727,31 +800,69 @@ namespace Flash_Multi
                     }
                     else
                     {
-                        this.AppendLog($"Firmware signature not found; extended information is not available. This is expected for modules with firmware prior to v1.2.1.79.\r\n\r\n");
-                    }
-
-                    byte[] eepromData = EepromUtils.GetEepromDataFromBackup(tempFileName);
-
-                    if (eepromData.Length > 0)
-                    {
-                        int globalId = EepromUtils.ReadGlobalId(eepromData);
-                        if (globalId > 0)
+                        // Check if the firmware actually contains any data
+                        if (Stm32EepromUtils.FirmwareIsEmpty(tempFirmwareFileName))
                         {
-                            this.AppendLog($"EEPROM Global ID:         0x{globalId:X8}");
+                            this.AppendLog("MULTI-Module flash did not contain any data.\r\n");
                         }
                         else
                         {
-                            this.AppendLog($"EEPROM Global ID:         Not found");
+                            this.AppendLog($"Firmware signature not found; extended information is not available. This is expected for modules with firmware prior to v1.2.1.79.\r\n");
                         }
                     }
-                    else
+
+                    // Get the EEPROM data from an STM32 flash backup
+                    if (this.BackupModuleType == Stm32BackupDfuUtil || this.BackupModuleType == Stm32BackupStm32Flash)
                     {
-                        this.AppendLog($"Unable to parse EEPROM data.");
+                        if (!Stm32EepromUtils.EepromIsEmpty(tempFirmwareFileName))
+                        {
+                            eepromData = Stm32EepromUtils.GetEepromDataFromBackup(tempFirmwareFileName);
+                        }
                     }
 
                     // Keep track of the temp file
-                    this.backupFileName = tempFileName;
+                    this.firmwareBackupFileName = tempFirmwareFileName;
                 }
+                else
+                {
+                    this.AppendLog("MULTI-Module flash did not contain any data.\r\n");
+                }
+
+                // Get the EEPROM data from an Atmega EEPROM backup
+                if (this.BackupModuleType == AtmegaBackup)
+                {
+                    this.eepromBackupFileName = tempEepromFilename;
+                    eepromData = AtmegaEepromUtils.GetEepromDataFromBackup(tempEepromFilename);
+                }
+
+                // Parse the EEPROM data
+                if (eepromData.Length > 0)
+                {
+                    uint globalId;
+                    if (tempEepromFilename != string.Empty)
+                    {
+                        globalId = AtmegaEepromUtils.ReadGlobalId(eepromData);
+                    }
+                    else
+                    {
+                        globalId = Stm32EepromUtils.ReadGlobalId(eepromData);
+                    }
+
+                    if (globalId > 0)
+                    {
+                        this.AppendLog($"\r\nEEPROM Global ID:         0x{globalId:X8}\r\n");
+                    }
+                    else
+                    {
+                        this.AppendLog($"\r\nEEPROM Global ID:         Not found\r\n");
+                    }
+                }
+                else
+                {
+                    this.AppendLog($"\r\nMULTI-Module EEPROM did not contain any data.\r\n");
+                }
+
+                this.AppendLog("\r\nMULTI-Module read successfully");
             }
 
             // Re-enable the controls
@@ -770,6 +881,11 @@ namespace Flash_Multi
             // Disable the buttons until this flash attempt is complete
             Debug.WriteLine("Disabling the controls...");
             this.EnableControls(false);
+
+            // Discard the last backup
+            this.BackupModuleType = NoBackup;
+            this.firmwareBackupFileName = string.Empty;
+            this.eepromBackupFileName = string.Empty;
 
             // Clear the output box
             Debug.WriteLine("Clearing the output textboxes...");
@@ -796,8 +912,8 @@ namespace Flash_Multi
 
             // Check if the file contains EEPROM data
             bool firmwareContainsEeprom = false;
-            byte[] eePromData = EepromUtils.GetEepromDataFromBackup(this.textFileName.Text);
-            if (EepromUtils.FindValidPage(eePromData) >= 0)
+            byte[] eePromData = Stm32EepromUtils.GetEepromDataFromBackup(this.textFileName.Text);
+            if (Stm32EepromUtils.FindValidPage(eePromData) >= 0)
             {
                 firmwareContainsEeprom = true;
                 DialogResult overwriteEeprom = MessageBox.Show("The selected file contains EEPROM data. Continuing will overwrite the existing EEPROM.", "Overwrite EEPROM", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
@@ -833,7 +949,7 @@ namespace Flash_Multi
             string comPort = this.comPortSelector.SelectedValue.ToString();
 
             // Clear the backup file name - the backup will be invalid after an upload
-            this.backupFileName = string.Empty;
+            this.firmwareBackupFileName = string.Empty;
 
             // Do the selected flash using the appropriate method
             if (mapleResult.DeviceFound == true)
@@ -920,9 +1036,9 @@ namespace Flash_Multi
                         this.AppendLog($"Firmware signature not found in file, extended information is not available. This is normal for firmware prior to v1.2.1.79.\r\n");
                     }
 
-                    byte[] eePromData = EepromUtils.GetEepromDataFromBackup(this.textFileName.Text);
-                    int globalId = EepromUtils.ReadGlobalId(eePromData);
-                    if (globalId >= 0)
+                    byte[] eePromData = Stm32EepromUtils.GetEepromDataFromBackup(this.textFileName.Text);
+                    uint globalId = Stm32EepromUtils.ReadGlobalId(eePromData);
+                    if (globalId > 0)
                     {
                         this.AppendLog($"\r\nEEPROM Global ID:         0x{globalId:X8}");
                     }
@@ -1063,13 +1179,13 @@ namespace Flash_Multi
         /// </summary>
         private void ButtonSaveBackup_Click(object sender, EventArgs e)
         {
-            if (this.backupFileName != string.Empty)
+            if (this.firmwareBackupFileName != string.Empty)
             {
                 // Disable the controls
                 this.EnableControls(false);
 
                 // Create the backup
-                FileUtils.SaveFirmwareBackup(this, this.backupFileName);
+                FileUtils.SaveFirmwareBackup(this, this.firmwareBackupFileName, this.eepromBackupFileName);
 
                 // Re-enable the controls
                 this.EnableControls(true);
@@ -1087,7 +1203,7 @@ namespace Flash_Multi
             this.EnableControls(false);
 
             // Prompt for confirmation
-            DialogResult eraseConfirm = MessageBox.Show("Are you sure you want to erase the MULTI-Module?", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            DialogResult eraseConfirm = MessageBox.Show("Are you sure you want to erase the MULTI-Module?", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
             if (eraseConfirm != DialogResult.Yes)
             {
                 this.EnableControls(true);
@@ -1096,14 +1212,14 @@ namespace Flash_Multi
 
             // Ask if we should erase the EEPROM as well
             bool eraseEeprom = false;
-            DialogResult eraseEepromConfirm = MessageBox.Show("Also erase the EEPROM data?", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            DialogResult eraseEepromConfirm = MessageBox.Show("Also erase the EEPROM data?", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
             if (eraseEepromConfirm == DialogResult.Yes)
             {
                 eraseEeprom = true;
             }
 
             // Prompt for second confirmation
-            DialogResult eraseReallyConfirm = MessageBox.Show("Are you really sure you want to erase the MULTI-Module?\r\nThis action cannot be undone.", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+            DialogResult eraseReallyConfirm = MessageBox.Show("Are you really sure you want to erase the MULTI-Module?\r\nThis action cannot be undone.", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2);
             if (eraseReallyConfirm != DialogResult.Yes)
             {
                 this.EnableControls(true);
@@ -1120,6 +1236,9 @@ namespace Flash_Multi
             // Determine if we should use Maple device
             MapleDevice mapleResult = MapleDevice.FindMaple();
 
+            // Determine if we should use a USBasp device
+            UsbAspDevice usbaspResult = UsbAspDevice.FindUsbAsp();
+
             // Get the selected COM port
             string comPort = this.comPortSelector.SelectedValue.ToString();
 
@@ -1129,6 +1248,10 @@ namespace Flash_Multi
             {
                 Debug.WriteLine($"Maple device found in {mapleResult.Mode} mode");
                 eraseSucceeded = await MapleDevice.EraseFlash(this, comPort, eraseEeprom);
+            }
+            else if (usbaspResult.DeviceFound == true && comPort == "USBasp")
+            {
+                eraseSucceeded = await UsbAspDevice.EraseFlash(this, eraseEeprom);
             }
             else
             {
