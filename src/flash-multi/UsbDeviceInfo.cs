@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------
 // <copyright file="UsbDeviceInfo.cs" company="Ben Lye">
-// Copyright 2019 Ben Lye
+// Copyright 2020 Ben Lye
 //
 // This file is part of Flash Multi.
 //
