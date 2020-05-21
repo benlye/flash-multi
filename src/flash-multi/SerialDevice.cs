@@ -185,9 +185,9 @@ namespace Flash_Multi
             // Show an error message if the command failed for any reason
             if (returnCode != 0)
             {
-                flashMulti.EnableControls(true);
                 flashMulti.AppendLog(" failed!");
                 MessageBox.Show("Failed to read the MULTI-module.", "MULTI-Module Read", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.EnableControls(true);
                 return false;
             }
 
