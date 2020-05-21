@@ -56,6 +56,15 @@ namespace Flash_Multi
         {
             bool usbSupportEnabled = false;
 
+            // Get the file size
+            long length = new System.IO.FileInfo(filename).Length;
+
+            // File is too small to contain a USB support
+            if (length < 8192)
+            {
+                return usbSupportEnabled;
+            }
+
             byte[] byteBuffer = File.ReadAllBytes(filename);
             string byteBufferAsString = System.Text.Encoding.ASCII.GetString(byteBuffer);
             int offset = byteBufferAsString.IndexOf("M\0a\0p\0l\0e\0\u0012\u0003L\0e\0a\0f\0L\0a\0b\0s\0\u0012\u0001");
@@ -177,7 +186,7 @@ namespace Flash_Multi
 
             // Check if the file contains EEPROM data
             byte[] eePromData = Stm32EepromUtils.GetEepromDataFromBackup(filename);
-            if (Stm32EepromUtils.FindValidPage(eePromData) >= 0)
+            if (eePromData != null && Stm32EepromUtils.FindValidPage(eePromData) >= 0)
             {
                 maxFileSize += 2048;
             }
@@ -200,6 +209,15 @@ namespace Flash_Multi
         internal static FirmwareFile GetFirmwareSignature(string filename)
         {
             string signature = string.Empty;
+
+            // Get the file size
+            long length = new System.IO.FileInfo(filename).Length;
+
+            // File is too small to contain a signature
+            if (length < 24)
+            {
+                return null;
+            }
 
             // Read the last 24 bytes of the binary file so we can see if it contains a signature string
             using (var reader = new StreamReader(filename))
@@ -316,7 +334,6 @@ namespace Flash_Multi
         internal static void SaveFirmwareBackup(FlashMulti flashMulti, string flashFileName, string eepromFileName)
         {
             Debug.WriteLine($"Flash backup file:  {flashFileName}");
-            Debug.WriteLine($"EEPROM backup file: {flashFileName}");
 
             // Stop if the backup file isn't found or the type isn't valid
             if (!File.Exists(flashFileName) || flashMulti.BackupModuleType < 1)
@@ -335,6 +352,7 @@ namespace Flash_Multi
             else if (flashMulti.BackupModuleType == FlashMulti.AtmegaBackup)
             {
                 // Atmega328p backup - ask if the EEPROM should be save seperately
+                Debug.WriteLine($"EEPROM backup file: {eepromFileName}");
                 includeEeprom = MessageBox.Show("Save the EEPROM data?  It will be saved in a separate file.", "Include EEPROM", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
             }
 
@@ -383,9 +401,9 @@ namespace Flash_Multi
             long backupEndByte = flashFileSize;
 
             // If this is an STM32 backup and the EEPROM is not being included we don't need the last 2KB of the backup
-            if (flashMulti.BackupModuleType != FlashMulti.AtmegaBackup && includeEeprom == DialogResult.Yes)
+            if (flashMulti.BackupModuleType != FlashMulti.AtmegaBackup && includeEeprom == DialogResult.No)
             {
-                // Discard the last 2KB
+                // Discard the last 2KB of the flash backup
                 backupEndByte = flashFileSize - 2048;
             }
 
@@ -428,8 +446,8 @@ namespace Flash_Multi
                     b.Write(firmwareData);
                 }
 
-                flashMulti.AppendLog($"\r\r\nFirmware saved to '{saveFileDialog.FileName}'");
-                MessageBox.Show($"MULTI-Module firmware saved to '{saveFileDialog.FileName}'", "Save Backup", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                flashMulti.AppendLog($"\r\n\r\nMULTI-Module firmware saved succesfully");
+                flashMulti.AppendVerbose($"Firmware saved to '{flashFileName}'");
             }
 
             // Save the Atmega328p EEPROM to a separate file
@@ -441,7 +459,7 @@ namespace Flash_Multi
                     // Title for the dialog
                     saveFileDialog.Title = "Location to save the EEPROM backup";
 
-                    // Filter for .bin files
+                    // Filter for .eep files
                     saveFileDialog.Filter = ".eep File|*.eep";
 
                     // Return if the dialog was cancelled
@@ -470,8 +488,8 @@ namespace Flash_Multi
                         b.Write(firmwareData);
                     }
 
-                    flashMulti.AppendLog($"\r\nEEPROM saved to '{saveFileDialog.FileName}'");
-                    MessageBox.Show($"MULTI-Module EEPROM saved to '{saveFileDialog.FileName}'", "Save Backup", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    flashMulti.AppendLog($"\r\nMULTI-Module EEPROM saved succesfully");
+                    flashMulti.AppendVerbose($"EEPROM saved to '{eepromFileName}'");
                 }
             }
         }
