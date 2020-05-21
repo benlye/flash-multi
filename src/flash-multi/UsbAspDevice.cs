@@ -120,8 +120,8 @@ namespace Flash_Multi
             if (returnCode != 0)
             {
                 flashMulti.EnableControls(true);
-                flashMulti.AppendLog("\r\nModule erase failed!");
-                MessageBox.Show("Failed to erase the module.", "MULTI-Module Erase", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.AppendLog("\r\nMULTI-Module erase failed!");
+                MessageBox.Show("Failed to erase the MULTI-Module.", "MULTI-Module Erase", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
@@ -217,7 +217,7 @@ namespace Flash_Multi
             }
 
             // Write to the log
-            flashMulti.AppendLog("Starting MULTI-Module update via USBasp\r\n");
+            flashMulti.AppendLog("Writing MULTI-Module firmware via USBasp\r\n");
 
             // Run the command asynchronously and wait for it to finish
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
@@ -226,14 +226,62 @@ namespace Flash_Multi
             if (returnCode != 0)
             {
                 flashMulti.EnableControls(true);
-                flashMulti.AppendLog("\r\nFirmware update failed!");
-                MessageBox.Show("Failed to write flash memory.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.AppendLog("\r\nWriting MULTI-Module firmware failed!");
+                MessageBox.Show("Failed to write MULTI-Module firmware.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            flashMulti.AppendLog("\r\nMULTI-Module updated successfully");
+            flashMulti.AppendLog("\r\nMULTI-Module firmware written successfully");
 
-            MessageBox.Show("MULTI-Module updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("MULTI-Module firmware written successfully.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            flashMulti.EnableControls(true);
+        }
+
+        /// <summary>
+        /// Writes the firmware via a USBasp device.
+        /// </summary>
+        /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
+        /// <param name="fileName">The path of the file to flash.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public static async Task WriteEeprom(FlashMulti flashMulti, string fileName)
+        {
+            // Path to the flashing tool, stm32flash.exe
+            string command = ".\\tools\\avrdude.exe";
+
+            // Arguments for the command line - will vary at each step of the process
+            string commandArgs;
+
+            // Variable to keep the return code from executed commands
+            int returnCode = -1;
+
+            // First step in flash process
+            flashMulti.FlashStep = 1;
+
+            // Total number of steps in flash process
+            flashMulti.FlashSteps = 2;
+
+            // Avrdude command arguments
+            commandArgs = $"-C.\\tools\\avrdude.conf -patmega328p -cusbasp -Ueeprom:w:{fileName}:r";
+
+            // Write to the log
+            flashMulti.AppendLog("Writing MULTI-Module EEPROM via USBasp\r\n");
+
+            // Run the command asynchronously and wait for it to finish
+            await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+
+            // Show an error message if the command failed for any reason
+            if (returnCode != 0)
+            {
+                flashMulti.EnableControls(true);
+                flashMulti.AppendLog("\r\nWriting MULTI-Module EEPROM failed!");
+                MessageBox.Show("Failed to write MULTI-Module EEPROM.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            flashMulti.AppendLog("\r\nMULTI-Module EEPROM written successfully");
+
+            MessageBox.Show("MULTI-Module EEPROM written successfully.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             flashMulti.EnableControls(true);
         }
