@@ -320,6 +320,7 @@ namespace Flash_Multi
                     {
                         this.AppendLog($"done\r\n");
                     }
+
                     this.avrdudeActivity = "writeeeprom";
                     this.AppendLog($"[{this.FlashStep}/{this.FlashSteps}] Writing EEPROM ...");
                     this.FlashStep++;
@@ -947,7 +948,8 @@ namespace Flash_Multi
                 {
                     firmwareContainsEeprom = true;
                 }
-            } else if (this.textFileName.Text.EndsWith(".eep"))
+            }
+            else if (this.textFileName.Text.EndsWith(".eep"))
             {
                 firmwareContainsEeprom = true;
             }
@@ -1068,7 +1070,6 @@ namespace Flash_Multi
                     uint globalId = 0;
                     if (openFileDialog.FileName.EndsWith(".bin"))
                     {
-
                         // Get the signature from the firmware file
                         FileUtils.FirmwareFile fileDetails = FileUtils.GetFirmwareSignature(this.textFileName.Text);
 
