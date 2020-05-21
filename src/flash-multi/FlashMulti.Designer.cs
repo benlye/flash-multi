@@ -86,7 +86,7 @@ namespace Flash_Multi
             this.buttonUpload.Name = "buttonUpload";
             this.buttonUpload.Size = new System.Drawing.Size(90, 27);
             this.buttonUpload.TabIndex = 6;
-            this.buttonUpload.Text = "Write Firmware";
+            this.buttonUpload.Text = "Write Module";
             this.buttonUpload.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
             this.buttonUpload.UseVisualStyleBackColor = true;
             this.buttonUpload.Click += new System.EventHandler(this.ButtonUpload_Click);
@@ -106,8 +106,10 @@ namespace Flash_Multi
             // 
             this.textFileName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.textFileName.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.textFileName.Location = new System.Drawing.Point(91, 20);
             this.textFileName.Name = "textFileName";
+            this.textFileName.ReadOnly = true;
             this.textFileName.Size = new System.Drawing.Size(354, 20);
             this.textFileName.TabIndex = 0;
             this.textFileName.DoubleClick += new System.EventHandler(this.ButtonBrowse_Click);
@@ -208,7 +210,7 @@ namespace Flash_Multi
             this.showVerboseOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.showVerboseOutput.AutoSize = true;
             this.showVerboseOutput.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.showVerboseOutput.Location = new System.Drawing.Point(402, 144);
+            this.showVerboseOutput.Location = new System.Drawing.Point(402, 143);
             this.showVerboseOutput.Name = "showVerboseOutput";
             this.showVerboseOutput.Size = new System.Drawing.Size(130, 17);
             this.showVerboseOutput.TabIndex = 8;
@@ -227,7 +229,7 @@ namespace Flash_Multi
             this.textVerbose.Name = "textVerbose";
             this.textVerbose.ReadOnly = true;
             this.textVerbose.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textVerbose.Size = new System.Drawing.Size(529, 17);
+            this.textVerbose.Size = new System.Drawing.Size(529, 18);
             this.textVerbose.TabIndex = 10;
             this.textVerbose.TabStop = false;
             // 
@@ -236,7 +238,7 @@ namespace Flash_Multi
             this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.progressBar1, 2);
-            this.progressBar1.Location = new System.Drawing.Point(3, 115);
+            this.progressBar1.Location = new System.Drawing.Point(3, 114);
             this.progressBar1.Maximum = 1000;
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(529, 23);
@@ -253,14 +255,14 @@ namespace Flash_Multi
             this.textActivity.Name = "textActivity";
             this.textActivity.ReadOnly = true;
             this.textActivity.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textActivity.Size = new System.Drawing.Size(529, 105);
+            this.textActivity.Size = new System.Drawing.Size(529, 104);
             this.textActivity.TabIndex = 7;
             this.textActivity.TabStop = false;
             // 
             // linkLabel1
             // 
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(3, 144);
+            this.linkLabel1.Location = new System.Drawing.Point(3, 143);
             this.linkLabel1.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(182, 13);
@@ -300,7 +302,7 @@ namespace Flash_Multi
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(535, 166);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(535, 165);
             this.tableLayoutPanel1.TabIndex = 15;
             // 
             // splitContainer1
@@ -327,7 +329,7 @@ namespace Flash_Multi
             this.splitContainer1.Panel2.Padding = new System.Windows.Forms.Padding(3, 8, 3, 0);
             this.splitContainer1.Panel2MinSize = 0;
             this.splitContainer1.Size = new System.Drawing.Size(535, 194);
-            this.splitContainer1.SplitterDistance = 166;
+            this.splitContainer1.SplitterDistance = 165;
             this.splitContainer1.SplitterWidth = 3;
             this.splitContainer1.TabIndex = 16;
             // 
