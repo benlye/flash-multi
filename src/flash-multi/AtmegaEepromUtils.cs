@@ -43,10 +43,18 @@ namespace Flash_Multi
         {
             byte[] eepromData;
 
-            // Read the last 2048 bytes of the binary file
+            // Get the file size
+            long length = new System.IO.FileInfo(filename).Length;
+
+            // File is not the right size to contain EEPROM data
+            if (length != 1024)
+            {
+                return null;
+            }
+
+            // Read the binary file
             using (BinaryReader b = new BinaryReader(File.Open(filename, FileMode.Open, FileAccess.Read)))
             {
-                // Read the next 2048 bytes.
                 eepromData = b.ReadBytes(EepromSize);
             }
 
