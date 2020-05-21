@@ -266,7 +266,7 @@ namespace Flash_Multi
             }
 
             // Write to the log
-            flashMulti.AppendLog("Starting MULTI-Module update via serial\r\n");
+            flashMulti.AppendLog("Writing MULTI-Module firmware via serial port\r\n");
 
             // Stop the serial monitor if it's active
             SerialMonitor serialMonitor = null;
@@ -293,7 +293,7 @@ namespace Flash_Multi
             if (!ComPort.CheckPort(comPort))
             {
                 flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
-                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 flashMulti.EnableControls(true);
                 return;
             }
@@ -312,7 +312,7 @@ namespace Flash_Multi
             {
                 flashMulti.EnableControls(true);
                 flashMulti.AppendLog(" failed!");
-                MessageBox.Show("Failed to erase flash memory.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Failed to erase flash memory.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -336,7 +336,7 @@ namespace Flash_Multi
                 {
                     flashMulti.EnableControls(true);
                     flashMulti.AppendLog(" failed!");
-                    MessageBox.Show("Failed to write the bootloader.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Failed to write the bootloader.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -358,7 +358,7 @@ namespace Flash_Multi
             {
                 flashMulti.EnableControls(true);
                 flashMulti.AppendLog(" failed!");
-                MessageBox.Show("Failed to write the firmware.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Failed to write the firmware.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -370,10 +370,10 @@ namespace Flash_Multi
 
             // Write a success message to the log
             flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMULTI-Module updated successfully");
+            flashMulti.AppendLog("\r\nMULTI-Module firmware written successfully");
 
             // Show a success message box
-            MessageBox.Show("MULTI-Module updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("MULTI-Module firmware written successfully.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             // Re-enable the form controls
             flashMulti.EnableControls(true);

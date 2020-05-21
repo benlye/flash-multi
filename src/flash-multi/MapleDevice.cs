@@ -349,7 +349,7 @@ namespace Flash_Multi
             string commandArgs;
             int returnCode = -1;
 
-            flashMulti.AppendLog("Starting MULTI-Module update via native USB\r\n");
+            flashMulti.AppendLog("Writing MULTI-Module firmware via native USB\r\n");
 
             // Stop the serial monitor if it's active
             SerialMonitor serialMonitor = null;
@@ -376,7 +376,7 @@ namespace Flash_Multi
             if (!ComPort.CheckPort(comPort))
             {
                 flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
-                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 flashMulti.EnableControls(true);
                 return;
             }
@@ -452,7 +452,7 @@ namespace Flash_Multi
                     if (returnCode != 0)
                     {
                         flashMulti.AppendLog(" failed!\r\n");
-                        MessageBox.Show("Failed to write the firmware.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Failed to write the firmware.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         flashMulti.EnableControls(true);
                         return;
                     }
@@ -472,7 +472,7 @@ namespace Flash_Multi
             }
 
             flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMULTI-Module updated successfully");
+            flashMulti.AppendLog("\r\nMULTI-Module firmware written successfully");
 
             // Reconnect the serial monitor
             if (serialMonitor != null && reconnectSerialMonitor)
@@ -481,7 +481,7 @@ namespace Flash_Multi
                 serialMonitor.SerialConnect(comPort);
             }
 
-            MessageBox.Show("MULTI-Module updated successfully.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("MULTI-Module firmware written successfully.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Information);
             flashMulti.EnableControls(true);
         }
     }
