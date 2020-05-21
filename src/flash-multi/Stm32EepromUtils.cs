@@ -65,6 +65,15 @@ namespace Flash_Multi
         {
             byte[] eepromData;
 
+            // Get the file size
+            long length = new System.IO.FileInfo(filename).Length;
+
+            // File is too small to contain EEPROM data
+            if (length < 2048)
+            {
+                return null;
+            }
+
             // Read the last 2048 bytes of the binary file
             using (BinaryReader b = new BinaryReader(File.Open(filename, FileMode.Open, FileAccess.Read)))
             {
@@ -87,23 +96,26 @@ namespace Flash_Multi
         /// <returns>The start address of the valid page.</returns>
         internal static int FindValidPage(byte[] eepromData)
         {
-            // Get the status page bytes
-            byte[] status0Bytes = { eepromData[PageBase0 + 1], eepromData[PageBase0] };
-            byte[] status1Bytes = { eepromData[PageBase1 + 1], eepromData[PageBase1] };
-
-            // Convert the bytes to integers
-            int status0 = System.Convert.ToInt32(BitConverter.ToString(status0Bytes).Replace("-", string.Empty), 16);
-            int status1 = System.Convert.ToInt32(BitConverter.ToString(status1Bytes).Replace("-", string.Empty), 16);
-
-            // Compare the page status values to determine the valid page
-            if (status0 == EepromPageValid && status1 == EepromPageErased)
+            if (eepromData != null)
             {
-                return PageBase0;
-            }
+                // Get the status page bytes
+                byte[] status0Bytes = { eepromData[PageBase0 + 1], eepromData[PageBase0] };
+                byte[] status1Bytes = { eepromData[PageBase1 + 1], eepromData[PageBase1] };
 
-            if (status0 == EepromPageErased && status1 == EepromPageValid)
-            {
-                return PageBase1;
+                // Convert the bytes to integers
+                int status0 = System.Convert.ToInt32(BitConverter.ToString(status0Bytes).Replace("-", string.Empty), 16);
+                int status1 = System.Convert.ToInt32(BitConverter.ToString(status1Bytes).Replace("-", string.Empty), 16);
+
+                // Compare the page status values to determine the valid page
+                if (status0 == EepromPageValid && status1 == EepromPageErased)
+                {
+                    return PageBase0;
+                }
+
+                if (status0 == EepromPageErased && status1 == EepromPageValid)
+                {
+                    return PageBase1;
+                }
             }
 
             Debug.WriteLine($"No valid EEPROM page found!");
