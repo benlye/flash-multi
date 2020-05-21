@@ -273,9 +273,9 @@ namespace Flash_Multi
             // Show an error message if the command failed for any reason
             if (returnCode != 0)
             {
-                flashMulti.EnableControls(true);
                 flashMulti.AppendLog("\r\nWriting MULTI-Module EEPROM failed!");
                 MessageBox.Show("Failed to write MULTI-Module EEPROM.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.EnableControls(true);
                 return;
             }
 
