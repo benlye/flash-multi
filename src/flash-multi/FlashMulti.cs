@@ -35,9 +35,24 @@ namespace Flash_Multi
     /// </summary>
     public partial class FlashMulti : Form
     {
+        /// <summary>
+        /// Indicates that no backup data is available.
+        /// </summary>
         internal const int NoBackup = 0;
+
+        /// <summary>
+        /// Indicates that the last backup was from an Atmega328p.
+        /// </summary>
         internal const int AtmegaBackup = 1;
+
+        /// <summary>
+        /// Indicates that the available backup was from an STM32F103 with dfu-util.
+        /// </summary>
         internal const int Stm32BackupDfuUtil = 2;
+
+        /// <summary>
+        /// Indicates that the available backup was from an STM32F103 with stm32flash.
+        /// </summary>
         internal const int Stm32BackupStm32Flash = 3;
 
         /// <summary>
@@ -301,8 +316,12 @@ namespace Flash_Multi
 
                 if (this.outputLineBuffer.StartsWith("avrdude.exe: writing eeprom ") && this.outputLineBuffer.EndsWith("):"))
                 {
+                    if (this.FlashStep > 1)
+                    {
+                        this.AppendLog($"done\r\n");
+                    }
                     this.avrdudeActivity = "writeeeprom";
-                    this.AppendLog($"done\r\n[{this.FlashStep}/{this.FlashSteps}] Writing EEPROM ...");
+                    this.AppendLog($"[{this.FlashStep}/{this.FlashSteps}] Writing EEPROM ...");
                     this.FlashStep++;
                 }
 
@@ -894,6 +913,15 @@ namespace Flash_Multi
             this.progressBar1.Value = 0;
             this.outputLineBuffer = string.Empty;
 
+            // Check if the file extension matches our expectation
+            if (!(this.textFileName.Text.EndsWith(".bin") || this.textFileName.Text.EndsWith(".eep")))
+            {
+                this.AppendLog(string.Format("Unknown file type '{0}'", this.textFileName.Text.Substring(this.textFileName.Text.Length - 4, 4)));
+                MessageBox.Show("Unknown file type '{0}'. File extension must be '.bin' or '.eep'.", "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.EnableControls(true);
+                return;
+            }
+
             // Check if the file exists
             if (!File.Exists(this.textFileName.Text))
             {
@@ -912,11 +940,22 @@ namespace Flash_Multi
 
             // Check if the file contains EEPROM data
             bool firmwareContainsEeprom = false;
-            byte[] eePromData = Stm32EepromUtils.GetEepromDataFromBackup(this.textFileName.Text);
-            if (Stm32EepromUtils.FindValidPage(eePromData) >= 0)
+            if (this.textFileName.Text.EndsWith(".bin"))
+            {
+                byte[] eePromData = Stm32EepromUtils.GetEepromDataFromBackup(this.textFileName.Text);
+                if (eePromData != null && Stm32EepromUtils.FindValidPage(eePromData) >= 0)
+                {
+                    firmwareContainsEeprom = true;
+                }
+            } else if (this.textFileName.Text.EndsWith(".eep"))
             {
                 firmwareContainsEeprom = true;
-                DialogResult overwriteEeprom = MessageBox.Show("The selected file contains EEPROM data. Continuing will overwrite the existing EEPROM.", "Overwrite EEPROM", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            }
+
+            // Warn if we're restoring EEPROM data
+            if (firmwareContainsEeprom)
+            {
+                DialogResult overwriteEeprom = MessageBox.Show("The selected file contains EEPROM data. Continuing will overwrite the existing EEPROM data in the flash memory.", "Overwrite EEPROM", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                 if (overwriteEeprom == DialogResult.Cancel)
                 {
                     this.EnableControls(true);
@@ -959,7 +998,8 @@ namespace Flash_Multi
             }
             else if (usbaspResult.DeviceFound == true && comPort == "USBasp")
             {
-                if (fileSignature == null)
+                // Stop if this is a firmware file without a signature - we can't be sure that it's for an Atmega328p module
+                if (this.textFileName.Text.EndsWith(".bin") && fileSignature == null)
                 {
                     string msgBoxMessage = "Unable to check the specified firmware file for compatibility with this upload method.";
                     MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -967,7 +1007,8 @@ namespace Flash_Multi
                     return;
                 }
 
-                if (fileSignature.ModuleType != "AVR")
+                // Stop if this is a bin file with a signature that doesn't match an Atmega328p module
+                if (this.textFileName.Text.EndsWith(".bin") && fileSignature.ModuleType != "AVR")
                 {
                     string msgBoxMessage = "The selected firmware file is not compatible with this upload method.";
                     MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -975,7 +1016,16 @@ namespace Flash_Multi
                     return;
                 }
 
-                await UsbAspDevice.WriteFlash(this, this.textFileName.Text, fileSignature.BootloaderSupport);
+                if (this.textFileName.Text.EndsWith(".eep"))
+                {
+                    // Writing EEPROM data
+                    await UsbAspDevice.WriteEeprom(this, this.textFileName.Text);
+                }
+                else
+                {
+                    // Writing flash data
+                    await UsbAspDevice.WriteFlash(this, this.textFileName.Text, fileSignature.BootloaderSupport);
+                }
             }
             else
             {
@@ -998,7 +1048,7 @@ namespace Flash_Multi
                 openFileDialog.Title = "Choose file to flash";
 
                 // Filter for .bin files
-                openFileDialog.Filter = ".bin File|*.bin";
+                openFileDialog.Filter = "Firmware Files (*.bin)|*.bin|EEPROM Files (*.eep)|*.eep|All files (*.*)|*.*";
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
@@ -1015,29 +1065,48 @@ namespace Flash_Multi
                         return;
                     }
 
-                    // Get the signature from the firmware file
-                    FileUtils.FirmwareFile fileDetails = FileUtils.GetFirmwareSignature(this.textFileName.Text);
-
-                    // If we got details from the signature write them to the log window
-                    if (fileDetails != null)
+                    uint globalId = 0;
+                    if (openFileDialog.FileName.EndsWith(".bin"))
                     {
-                        this.AppendLog($"Firmware File Name:       {this.textFileName.Text.Substring(this.textFileName.Text.LastIndexOf("\\") + 1)}\r\n");
-                        this.AppendLog($"Multi Firmware Version:   {fileDetails.Version} ({fileDetails.ModuleType})\r\n");
-                        this.AppendLog($"Expected Channel Order:   {fileDetails.ChannelOrder}\r\n");
-                        this.AppendLog($"Multi Telemetry Type:     {fileDetails.MultiTelemetryType}\r\n");
-                        this.AppendLog($"Invert Telemetry Enabled: {fileDetails.InvertTelemetry}\r\n");
-                        this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader}\r\n");
-                        this.AppendLog($"Bootloader Enabled:       {fileDetails.BootloaderSupport}\r\n");
-                        this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}");
+
+                        // Get the signature from the firmware file
+                        FileUtils.FirmwareFile fileDetails = FileUtils.GetFirmwareSignature(this.textFileName.Text);
+
+                        // If we got details from the signature write them to the log window
+                        if (fileDetails != null)
+                        {
+                            this.AppendLog($"Firmware File Name:       {this.textFileName.Text.Substring(this.textFileName.Text.LastIndexOf("\\") + 1)}\r\n");
+                            this.AppendLog($"Multi Firmware Version:   {fileDetails.Version} ({fileDetails.ModuleType})\r\n");
+                            this.AppendLog($"Expected Channel Order:   {fileDetails.ChannelOrder}\r\n");
+                            this.AppendLog($"Multi Telemetry Type:     {fileDetails.MultiTelemetryType}\r\n");
+                            this.AppendLog($"Invert Telemetry Enabled: {fileDetails.InvertTelemetry}\r\n");
+                            this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader}\r\n");
+                            this.AppendLog($"Bootloader Enabled:       {fileDetails.BootloaderSupport}\r\n");
+                            this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}");
+                        }
+                        else
+                        {
+                            this.AppendLog($"Firmware File Name: {this.textFileName.Text.Substring(this.textFileName.Text.LastIndexOf("\\") + 1)}\r\n\r\n");
+                            this.AppendLog($"Firmware signature not found in file, extended information is not available. This is normal for firmware prior to v1.2.1.79.\r\n");
+                        }
+
+                        byte[] eePromData = Stm32EepromUtils.GetEepromDataFromBackup(this.textFileName.Text);
+                        if (eePromData != null)
+                        {
+                            globalId = Stm32EepromUtils.ReadGlobalId(eePromData);
+                        }
                     }
-                    else
+                    else if (openFileDialog.FileName.EndsWith(".eep"))
                     {
-                        this.AppendLog($"Firmware File Name: {this.textFileName.Text.Substring(this.textFileName.Text.LastIndexOf("\\") + 1)}\r\n\r\n");
-                        this.AppendLog($"Firmware signature not found in file, extended information is not available. This is normal for firmware prior to v1.2.1.79.\r\n");
+                        this.AppendLog($"EEPROM File Name:         {this.textFileName.Text.Substring(this.textFileName.Text.LastIndexOf("\\") + 1)}");
+
+                        byte[] eePromData = AtmegaEepromUtils.GetEepromDataFromBackup(this.textFileName.Text);
+                        if (eePromData != null)
+                        {
+                            globalId = AtmegaEepromUtils.ReadGlobalId(eePromData);
+                        }
                     }
 
-                    byte[] eePromData = Stm32EepromUtils.GetEepromDataFromBackup(this.textFileName.Text);
-                    uint globalId = Stm32EepromUtils.ReadGlobalId(eePromData);
                     if (globalId > 0)
                     {
                         this.AppendLog($"\r\nEEPROM Global ID:         0x{globalId:X8}");
