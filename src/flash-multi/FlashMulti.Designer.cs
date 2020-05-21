@@ -274,13 +274,14 @@ namespace Flash_Multi
             // linkLabel2
             // 
             this.linkLabel2.AutoSize = true;
-            this.linkLabel2.LinkArea = new System.Windows.Forms.LinkArea(65, 4);
+            this.linkLabel2.LinkArea = new System.Windows.Forms.LinkArea(77, 4);
             this.linkLabel2.Location = new System.Drawing.Point(14, 16);
             this.linkLabel2.Name = "linkLabel2";
-            this.linkLabel2.Size = new System.Drawing.Size(353, 17);
+            this.linkLabel2.Size = new System.Drawing.Size(417, 17);
             this.linkLabel2.TabIndex = 14;
             this.linkLabel2.TabStop = true;
-            this.linkLabel2.Text = "Flash firmware to a MULTI-Module.  Get the latest firmware files here.";
+            this.linkLabel2.Text = "Read, write, and erase MULTI-Module firmware.  Get the latest firmware files here" +
+    ".";
             this.linkLabel2.UseCompatibleTextRendering = true;
             this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ReleasesLink_LinkClicked);
             // 
