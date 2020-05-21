@@ -71,6 +71,11 @@ namespace Flash_Multi
         internal int BackupModuleType;
 
         /// <summary>
+        /// Keep track of whether or not the controls are globally disabled.
+        /// </summary>
+        private bool controlsDisabled = false;
+
+        /// <summary>
         /// Buffer for verbose output logging.
         /// </summary>
         private string outputLineBuffer = string.Empty;
@@ -89,11 +94,6 @@ namespace Flash_Multi
         /// Keep track of the temp file used for EEPROM backups from an Atmega328p module.
         /// </summary>
         private string eepromBackupFileName = string.Empty;
-
-        /// <summary>
-        /// Keep track of whether or not the controls are globally disabled.
-        /// </summary>
-        private bool controlsDisabled = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FlashMulti"/> class.
@@ -637,15 +637,15 @@ namespace Flash_Multi
             var oldPortList = this.comPortSelector.Items;
 
             // Cache the selected item so we can try to re-select it later
-            object selectedValue = null;
-            selectedValue = this.GetSelectedPort();
+            object selectedValue = this.GetSelectedPort();
+            object portToSelect = selectedValue;
 
             // Enumerate the COM ports and bind the COM port selector
-            List<ComPort> comPorts = new List<ComPort>();
-            comPorts = ComPort.EnumeratePortList();
+            _ = new List<ComPort>();
+            List<ComPort> comPorts = ComPort.EnumeratePortList();
 
             // Check if we have a Maple device
-            MapleDevice mapleCheck = MapleDevice.FindMaple();
+            _ = MapleDevice.FindMaple();
 
             // Populate the COM port selector
             this.PopulatePortSelector(comPorts);
@@ -667,13 +667,13 @@ namespace Flash_Multi
                     if (found == false)
                     {
                         Debug.WriteLine($"{newPort.Name} was added.");
-                        selectedValue = newPort.Name;
+                        portToSelect = newPort.Name;
                     }
                 }
             }
 
             // Re-select the previously selected item
-            this.SelectPort(selectedValue);
+            this.SelectPort(portToSelect);
 
             // Set the width of the dropdown
             // this.comPortSelector.DropDownWidth = comPorts.Select(c => c.DisplayName).ToList().Max(x => TextRenderer.MeasureText(x, this.comPortSelector.Font).Width);
@@ -883,6 +883,10 @@ namespace Flash_Multi
                 }
 
                 this.AppendLog("\r\nMULTI-Module read successfully");
+            }
+            else
+            {
+                this.BackupModuleType = NoBackup;
             }
 
             // Re-enable the controls
