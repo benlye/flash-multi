@@ -60,32 +60,21 @@ namespace Flash_Multi
             // 
             // dialogText
             // 
-            this.dialogText.Location = new System.Drawing.Point(54, 13);
+            resources.ApplyResources(this.dialogText, "dialogText");
             this.dialogText.Name = "dialogText";
-            this.dialogText.Size = new System.Drawing.Size(306, 84);
-            this.dialogText.TabIndex = 0;
-            this.dialogText.Text = "Could not find a MULTI-Module in DFU mode.  \r\n\r\nPlease unplug and then re" +
-    "-plug your module.\r\n\r\nFlashing will continue automatically when the module is pl" +
-    "ugged back in.";
             // 
             // buttonCancel
             // 
-            this.buttonCancel.Location = new System.Drawing.Point(320, 154);
+            resources.ApplyResources(this.buttonCancel, "buttonCancel");
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(67, 24);
-            this.buttonCancel.TabIndex = 1;
             this.buttonCancel.TabStop = false;
-            this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
             // 
             // warningIcon
             // 
-            this.warningIcon.Image = ((System.Drawing.Image)(resources.GetObject("warningIcon.Image")));
-            this.warningIcon.Location = new System.Drawing.Point(19, 13);
+            resources.ApplyResources(this.warningIcon, "warningIcon");
             this.warningIcon.Name = "warningIcon";
-            this.warningIcon.Size = new System.Drawing.Size(30, 34);
-            this.warningIcon.TabIndex = 2;
             this.warningIcon.TabStop = false;
             // 
             // panel2
@@ -94,26 +83,21 @@ namespace Flash_Multi
             this.panel2.Controls.Add(this.timerProgressBar);
             this.panel2.Controls.Add(this.dialogText);
             this.panel2.Controls.Add(this.warningIcon);
-            this.panel2.Location = new System.Drawing.Point(-2, -1);
+            resources.ApplyResources(this.panel2, "panel2");
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(405, 147);
-            this.panel2.TabIndex = 4;
             // 
             // timerProgressBar
             // 
-            this.timerProgressBar.Location = new System.Drawing.Point(58, 100);
+            resources.ApplyResources(this.timerProgressBar, "timerProgressBar");
             this.timerProgressBar.Maximum = 30;
             this.timerProgressBar.Name = "timerProgressBar";
-            this.timerProgressBar.Size = new System.Drawing.Size(302, 23);
             this.timerProgressBar.Step = 1;
-            this.timerProgressBar.TabIndex = 3;
             this.timerProgressBar.Value = 30;
             // 
             // DfuRecoveryDialog
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(404, 187);
             this.ControlBox = false;
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.panel2);
@@ -121,8 +105,6 @@ namespace Flash_Multi
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "DfuRecoveryDialog";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "DFU Recovery Mode";
             ((System.ComponentModel.ISupportInitialize)(this.warningIcon)).EndInit();
             this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);

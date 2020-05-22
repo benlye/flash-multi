@@ -78,6 +78,11 @@
     <Compile Include="SerialMonitor.Designer.cs">
       <DependentUpon>SerialMonitor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
     <Compile Include="UpdateCheck.cs" />
     <Compile Include="UsbAspDevice.cs" />
     <Compile Include="UsbDeviceInfo.cs" />
@@ -100,6 +105,10 @@
     </Compile>
     <EmbeddedResource Include="SerialMonitor.resx">
       <DependentUpon>SerialMonitor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="packages.config" />
