@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Flash_Multi.Localization {
+namespace Flash_Multi {
     using System;
     
     
