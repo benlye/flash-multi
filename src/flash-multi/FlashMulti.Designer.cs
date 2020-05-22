@@ -50,6 +50,13 @@ namespace Flash_Multi
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FlashMulti));
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.textActivity = new System.Windows.Forms.TextBox();
+            this.showVerboseOutput = new System.Windows.Forms.CheckBox();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.textVerbose = new System.Windows.Forms.TextBox();
             this.buttonUpload = new System.Windows.Forms.Button();
             this.comPortSelector = new System.Windows.Forms.ComboBox();
             this.textFileName = new System.Windows.Forms.TextBox();
@@ -61,38 +68,108 @@ namespace Flash_Multi
             this.buttonSaveBackup = new System.Windows.Forms.Button();
             this.buttonRead = new System.Windows.Forms.Button();
             this.buttonSerialMonitor = new System.Windows.Forms.Button();
-            this.showVerboseOutput = new System.Windows.Forms.CheckBox();
-            this.textVerbose = new System.Windows.Forms.TextBox();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.textActivity = new System.Windows.Forms.TextBox();
-            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.linkLabel2 = new System.Windows.Forms.LinkLabel();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.buttonErase = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.groupBox1.SuspendLayout();
-            this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // splitContainer1
+            // 
+            resources.ApplyResources(this.splitContainer1, "splitContainer1");
+            this.splitContainer1.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            resources.ApplyResources(this.splitContainer1.Panel1, "splitContainer1.Panel1");
+            this.splitContainer1.Panel1.BackColor = System.Drawing.SystemColors.Control;
+            this.splitContainer1.Panel1.Controls.Add(this.tableLayoutPanel1);
+            this.toolTip1.SetToolTip(this.splitContainer1.Panel1, resources.GetString("splitContainer1.Panel1.ToolTip"));
+            // 
+            // splitContainer1.Panel2
+            // 
+            resources.ApplyResources(this.splitContainer1.Panel2, "splitContainer1.Panel2");
+            this.splitContainer1.Panel2.BackColor = System.Drawing.SystemColors.Control;
+            this.splitContainer1.Panel2.Controls.Add(this.textVerbose);
+            this.toolTip1.SetToolTip(this.splitContainer1.Panel2, resources.GetString("splitContainer1.Panel2.ToolTip"));
+            this.toolTip1.SetToolTip(this.splitContainer1, resources.GetString("splitContainer1.ToolTip"));
+            // 
+            // tableLayoutPanel1
+            // 
+            resources.ApplyResources(this.tableLayoutPanel1, "tableLayoutPanel1");
+            this.tableLayoutPanel1.Controls.Add(this.textActivity, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.showVerboseOutput, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(this.progressBar1, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.linkLabel1, 0, 2);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.toolTip1.SetToolTip(this.tableLayoutPanel1, resources.GetString("tableLayoutPanel1.ToolTip"));
+            // 
+            // textActivity
+            // 
+            resources.ApplyResources(this.textActivity, "textActivity");
+            this.textActivity.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.tableLayoutPanel1.SetColumnSpan(this.textActivity, 2);
+            this.textActivity.Name = "textActivity";
+            this.textActivity.ReadOnly = true;
+            this.textActivity.TabStop = false;
+            this.toolTip1.SetToolTip(this.textActivity, resources.GetString("textActivity.ToolTip"));
+            // 
+            // showVerboseOutput
+            // 
+            resources.ApplyResources(this.showVerboseOutput, "showVerboseOutput");
+            this.showVerboseOutput.Name = "showVerboseOutput";
+            this.toolTip1.SetToolTip(this.showVerboseOutput, resources.GetString("showVerboseOutput.ToolTip"));
+            this.showVerboseOutput.UseVisualStyleBackColor = true;
+            this.showVerboseOutput.CheckedChanged += new System.EventHandler(this.ShowVerboseOutput_OnChange);
+            // 
+            // progressBar1
+            // 
+            resources.ApplyResources(this.progressBar1, "progressBar1");
+            this.tableLayoutPanel1.SetColumnSpan(this.progressBar1, 2);
+            this.progressBar1.Maximum = 1000;
+            this.progressBar1.Name = "progressBar1";
+            this.toolTip1.SetToolTip(this.progressBar1, resources.GetString("progressBar1.ToolTip"));
+            // 
+            // linkLabel1
+            // 
+            resources.ApplyResources(this.linkLabel1, "linkLabel1");
+            this.linkLabel1.Name = "linkLabel1";
+            this.linkLabel1.TabStop = true;
+            this.toolTip1.SetToolTip(this.linkLabel1, resources.GetString("linkLabel1.ToolTip"));
+            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.RepoLink_LinkClicked);
+            // 
+            // textVerbose
+            // 
+            resources.ApplyResources(this.textVerbose, "textVerbose");
+            this.textVerbose.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.textVerbose.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.textVerbose.Name = "textVerbose";
+            this.textVerbose.ReadOnly = true;
+            this.textVerbose.TabStop = false;
+            this.toolTip1.SetToolTip(this.textVerbose, resources.GetString("textVerbose.ToolTip"));
             // 
             // buttonUpload
             // 
             resources.ApplyResources(this.buttonUpload, "buttonUpload");
             this.buttonUpload.Name = "buttonUpload";
+            this.toolTip1.SetToolTip(this.buttonUpload, resources.GetString("buttonUpload.ToolTip"));
             this.buttonUpload.UseVisualStyleBackColor = true;
             this.buttonUpload.Click += new System.EventHandler(this.ButtonUpload_Click);
             // 
             // comPortSelector
             // 
+            resources.ApplyResources(this.comPortSelector, "comPortSelector");
             this.comPortSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comPortSelector.DropDownWidth = 90;
             this.comPortSelector.FormattingEnabled = true;
-            resources.ApplyResources(this.comPortSelector, "comPortSelector");
             this.comPortSelector.Name = "comPortSelector";
+            this.toolTip1.SetToolTip(this.comPortSelector, resources.GetString("comPortSelector.ToolTip"));
             this.comPortSelector.SelectedIndexChanged += new System.EventHandler(this.ComPortSelector_SelectionChanged);
             // 
             // textFileName
@@ -101,22 +178,26 @@ namespace Flash_Multi
             this.textFileName.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.textFileName.Name = "textFileName";
             this.textFileName.ReadOnly = true;
+            this.toolTip1.SetToolTip(this.textFileName, resources.GetString("textFileName.ToolTip"));
             this.textFileName.DoubleClick += new System.EventHandler(this.ButtonBrowse_Click);
             // 
             // label2
             // 
             resources.ApplyResources(this.label2, "label2");
             this.label2.Name = "label2";
+            this.toolTip1.SetToolTip(this.label2, resources.GetString("label2.ToolTip"));
             // 
             // label3
             // 
             resources.ApplyResources(this.label3, "label3");
             this.label3.Name = "label3";
+            this.toolTip1.SetToolTip(this.label3, resources.GetString("label3.ToolTip"));
             // 
             // buttonBrowse
             // 
             resources.ApplyResources(this.buttonBrowse, "buttonBrowse");
             this.buttonBrowse.Name = "buttonBrowse";
+            this.toolTip1.SetToolTip(this.buttonBrowse, resources.GetString("buttonBrowse.ToolTip"));
             this.buttonBrowse.UseVisualStyleBackColor = true;
             this.buttonBrowse.Click += new System.EventHandler(this.ButtonBrowse_Click);
             // 
@@ -131,11 +212,13 @@ namespace Flash_Multi
             this.groupBox1.Controls.Add(this.textFileName);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.TabStop = false;
+            this.toolTip1.SetToolTip(this.groupBox1, resources.GetString("groupBox1.ToolTip"));
             // 
             // buttonRefresh
             // 
             resources.ApplyResources(this.buttonRefresh, "buttonRefresh");
             this.buttonRefresh.Name = "buttonRefresh";
+            this.toolTip1.SetToolTip(this.buttonRefresh, resources.GetString("buttonRefresh.ToolTip"));
             this.buttonRefresh.UseVisualStyleBackColor = true;
             this.buttonRefresh.Click += new System.EventHandler(this.ButtonRefresh_Click);
             // 
@@ -143,6 +226,7 @@ namespace Flash_Multi
             // 
             resources.ApplyResources(this.buttonSaveBackup, "buttonSaveBackup");
             this.buttonSaveBackup.Name = "buttonSaveBackup";
+            this.toolTip1.SetToolTip(this.buttonSaveBackup, resources.GetString("buttonSaveBackup.ToolTip"));
             this.buttonSaveBackup.UseVisualStyleBackColor = true;
             this.buttonSaveBackup.Click += new System.EventHandler(this.ButtonSaveBackup_Click);
             // 
@@ -150,6 +234,7 @@ namespace Flash_Multi
             // 
             resources.ApplyResources(this.buttonRead, "buttonRead");
             this.buttonRead.Name = "buttonRead";
+            this.toolTip1.SetToolTip(this.buttonRead, resources.GetString("buttonRead.ToolTip"));
             this.buttonRead.UseVisualStyleBackColor = true;
             this.buttonRead.Click += new System.EventHandler(this.ButtonRead_Click);
             // 
@@ -157,86 +242,24 @@ namespace Flash_Multi
             // 
             resources.ApplyResources(this.buttonSerialMonitor, "buttonSerialMonitor");
             this.buttonSerialMonitor.Name = "buttonSerialMonitor";
+            this.toolTip1.SetToolTip(this.buttonSerialMonitor, resources.GetString("buttonSerialMonitor.ToolTip"));
             this.buttonSerialMonitor.UseVisualStyleBackColor = true;
             this.buttonSerialMonitor.Click += new System.EventHandler(this.ButtonSerialMonitor_Click);
-            // 
-            // showVerboseOutput
-            // 
-            resources.ApplyResources(this.showVerboseOutput, "showVerboseOutput");
-            this.showVerboseOutput.Name = "showVerboseOutput";
-            this.showVerboseOutput.UseVisualStyleBackColor = true;
-            this.showVerboseOutput.CheckedChanged += new System.EventHandler(this.ShowVerboseOutput_OnChange);
-            // 
-            // textVerbose
-            // 
-            this.textVerbose.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.textVerbose.Cursor = System.Windows.Forms.Cursors.IBeam;
-            resources.ApplyResources(this.textVerbose, "textVerbose");
-            this.textVerbose.Name = "textVerbose";
-            this.textVerbose.ReadOnly = true;
-            this.textVerbose.TabStop = false;
-            // 
-            // progressBar1
-            // 
-            resources.ApplyResources(this.progressBar1, "progressBar1");
-            this.tableLayoutPanel1.SetColumnSpan(this.progressBar1, 2);
-            this.progressBar1.Maximum = 1000;
-            this.progressBar1.Name = "progressBar1";
-            // 
-            // textActivity
-            // 
-            this.textActivity.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.tableLayoutPanel1.SetColumnSpan(this.textActivity, 2);
-            resources.ApplyResources(this.textActivity, "textActivity");
-            this.textActivity.Name = "textActivity";
-            this.textActivity.ReadOnly = true;
-            this.textActivity.TabStop = false;
-            // 
-            // linkLabel1
-            // 
-            resources.ApplyResources(this.linkLabel1, "linkLabel1");
-            this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.TabStop = true;
-            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.RepoLink_LinkClicked);
             // 
             // linkLabel2
             // 
             resources.ApplyResources(this.linkLabel2, "linkLabel2");
             this.linkLabel2.Name = "linkLabel2";
             this.linkLabel2.TabStop = true;
+            this.toolTip1.SetToolTip(this.linkLabel2, resources.GetString("linkLabel2.ToolTip"));
             this.linkLabel2.UseCompatibleTextRendering = true;
             this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ReleasesLink_LinkClicked);
-            // 
-            // tableLayoutPanel1
-            // 
-            resources.ApplyResources(this.tableLayoutPanel1, "tableLayoutPanel1");
-            this.tableLayoutPanel1.Controls.Add(this.textActivity, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.showVerboseOutput, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this.progressBar1, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.linkLabel1, 0, 2);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            // 
-            // splitContainer1
-            // 
-            resources.ApplyResources(this.splitContainer1, "splitContainer1");
-            this.splitContainer1.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.splitContainer1.Name = "splitContainer1";
-            // 
-            // splitContainer1.Panel1
-            // 
-            this.splitContainer1.Panel1.BackColor = System.Drawing.SystemColors.Control;
-            this.splitContainer1.Panel1.Controls.Add(this.tableLayoutPanel1);
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.BackColor = System.Drawing.SystemColors.Control;
-            this.splitContainer1.Panel2.Controls.Add(this.textVerbose);
-            resources.ApplyResources(this.splitContainer1.Panel2, "splitContainer1.Panel2");
             // 
             // buttonErase
             // 
             resources.ApplyResources(this.buttonErase, "buttonErase");
             this.buttonErase.Name = "buttonErase";
+            this.toolTip1.SetToolTip(this.buttonErase, resources.GetString("buttonErase.ToolTip"));
             this.buttonErase.UseVisualStyleBackColor = true;
             this.buttonErase.Click += new System.EventHandler(this.ButtonErase_Click);
             // 
@@ -255,15 +278,16 @@ namespace Flash_Multi
             this.MaximizeBox = false;
             this.Name = "FlashMulti";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
+            this.toolTip1.SetToolTip(this, resources.GetString("$this.ToolTip"));
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
