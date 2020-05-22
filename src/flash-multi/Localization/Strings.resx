@@ -160,13 +160,13 @@
     <value>Failed to write MULTI-Module firmware!</value>
   </data>
   <data name="modeErasing" xml:space="preserve">
-    <value>Erasing</value>
+    <value>Erasing MULTI-Module</value>
   </data>
   <data name="modeReading" xml:space="preserve">
-    <value>Reading</value>
+    <value>Reading MULTI-Module</value>
   </data>
   <data name="modeWriting" xml:space="preserve">
-    <value>Writing</value>
+    <value>Writing MULTI-Module</value>
   </data>
   <data name="progressErasingFlash" xml:space="preserve">
     <value>Erasing flash memory ...</value>

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Flash_Multi {
+namespace Flash_Multi.Localization {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Flash_Multi {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Flash_Multi.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Flash_Multi.Localization.Strings", typeof(Strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -187,7 +187,7 @@ namespace Flash_Multi {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Erasing.
+        ///   Looks up a localized string similar to Erasing MULTI-Module.
         /// </summary>
         internal static string modeErasing {
             get {
@@ -196,7 +196,7 @@ namespace Flash_Multi {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Reading.
+        ///   Looks up a localized string similar to Reading MULTI-Module.
         /// </summary>
         internal static string modeReading {
             get {
@@ -205,7 +205,7 @@ namespace Flash_Multi {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Writing.
+        ///   Looks up a localized string similar to Writing MULTI-Module.
         /// </summary>
         internal static string modeWriting {
             get {
