@@ -132,6 +132,9 @@
   <data name="dialogTitleRead" xml:space="preserve">
     <value>MULTI-Module Read</value>
   </data>
+  <data name="dialogTitleUpdateAvailable" xml:space="preserve">
+    <value>Flash Multi Update Available</value>
+  </data>
   <data name="dialogTitleWrite" xml:space="preserve">
     <value>MULTI-Module Write</value>
   </data>
@@ -191,6 +194,15 @@
   </data>
   <data name="succeededWritingFirmware" xml:space="preserve">
     <value>MULTI-Module firmware written successfully.</value>
+  </data>
+  <data name="updatePromptPart1" xml:space="preserve">
+    <value>A newer version of Flash Multi is available.\n\nYou have Flash Multi</value>
+  </data>
+  <data name="updatePromptPart2" xml:space="preserve">
+    <value>and Flash Multi</value>
+  </data>
+  <data name="updatePromptPart3" xml:space="preserve">
+    <value>is available.\n\nSee the latest release on Github?</value>
   </data>
   <data name="viaNativeUSB" xml:space="preserve">
     <value>via native USB</value>

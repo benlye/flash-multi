@@ -106,6 +106,15 @@ namespace Flash_Multi {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Flash Multi Update Available.
+        /// </summary>
+        internal static string dialogTitleUpdateAvailable {
+            get {
+                return ResourceManager.GetString("dialogTitleUpdateAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MULTI-Module Write.
         /// </summary>
         internal static string dialogTitleWrite {
@@ -282,6 +291,33 @@ namespace Flash_Multi {
         internal static string succeededWritingFirmware {
             get {
                 return ResourceManager.GetString("succeededWritingFirmware", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A newer version of Flash Multi is available.\n\nYou have Flash Multi.
+        /// </summary>
+        internal static string updatePromptPart1 {
+            get {
+                return ResourceManager.GetString("updatePromptPart1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to and Flash Multi.
+        /// </summary>
+        internal static string updatePromptPart2 {
+            get {
+                return ResourceManager.GetString("updatePromptPart2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to is available.\n\nSee the latest release on Github?.
+        /// </summary>
+        internal static string updatePromptPart3 {
+            get {
+                return ResourceManager.GetString("updatePromptPart3", resourceCulture);
             }
         }
         
