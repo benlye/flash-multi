@@ -1,6 +1,48 @@
 # Troubleshooting
 Fortunately it is nearly impossible to 'brick' an STM32, so whatever state your Multiprotocol module is in, it should be possible to recover it.
 
+1. [Re-installing the Maple DFU device drivers](#re-installing-the-maple-dfu-device-drivers)
+1. [Flashing fails with JP4IN1 in the radio](#flashing-fails-when-flashing-a-jp4in1-in-the-radio)
+1. [Module stuck in DFU mode after flashing](#module-stuck-in-dfu-mode-after-flashing-and-cannot-be-re-flashed)
+
+## Re-installing the Maple DFU device drivers
+If reading or writing your MULTI-Module fails, and the verbose output is like the example below, you need to re-install the Maple DFU device driver.
+
+This is especially true for Flash Multi 0.3.0 (or newer) as it includes a newer version of dfu-util.exe, which seems more sensitive to driver-related problems than the older version which was included with Flash Multi 0.2.x.
+```
+Filter on vendor = 0x1eaf product = 0x0003
+Opening DFU capable USB device... ID 1eaf:0003
+Run-time device DFU version 0110
+Found DFU: [1eaf:0003] devnum=0, cfg=1, intf=0, alt=2, name="UNDEFINED"
+Claiming USB DFU Interface...
+Cannot claim interface
+```
+### Solution
+1. Download and extract or install the latest version  of Zadig from https://zadig.akeo.ie/
+1. Put the MULTI-Module into DFU mode
+   1. Open a **Command Prompt**
+   1. Change to the directory where you have installed or extracted Flash Multi
+   1. Plug your MULTI-Module in, noting the COM port which appears in Device Manager
+   1. Run this command, substituting `COMX` for your COM port
+   
+      `.\tools\maple-reset.exe COMX`
+      
+      ![Maple Reset Output](/img/maple-reset.jpg)
+      
+   1. Device Manager should now show the Maple DFU device
+      
+      ![Maple DFU  Device](/img/maple-dfu.jpg)
+1. Use Zadig to reinstall the driver
+   1. Run **Zadig** from the location where you installed or extracted it
+   1. Click **Options** -> **List all Devices**
+   1. In the drop-down device list select `Maple 003` or `Maple DFU`, whichever is listed
+   1. Set the right-hand driver selector to `libusb-win32 (v1.2.6.0)`
+   1. Click the **Reinstall Driver** button
+      
+      ![Zadig](/img/zadig.jpg)
+
+If you still receive an error when using Flash Multi, try the same process with Zadig, but replace the driver with `libusbK (v3.0.7.0)`
+
 ## Flashing fails when flashing a JP4IN1 in the radio
 If the module is in the radio, make sure that the radio is **switched off**.  The JP4IN1 will only go into 'flashing mode' (i.e. BOOT0 mode) when it is powered up from the USB port.
 
@@ -19,7 +61,7 @@ Most likely you have flashed a non-USB enabled firmware over the USB port, makin
 
 Luckily, the USB bootloader always starts the module up briefly in DFU mode, and we can take advantage of that to re-flash it.
 
-### Recovery
+### Solution
 1. Download or compile the correct, **USB-enabled**, firmware
 1. Open a **Command Prompt** and change to the 'tools' sub-folder in the Flash Multi folder
    
