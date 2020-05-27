@@ -40,8 +40,6 @@ Cannot claim interface
       
       ![Zadig](/img/zadig.jpg)
 
-If you still receive an error when using Flash Multi, try the same process with Zadig, but replace the driver with `libusbK (v3.0.7.0)`
-
 ## Flashing fails when flashing a JP4IN1 in the radio
 If the module is in the radio, make sure that the radio is **switched off**.  The JP4IN1 will only go into 'flashing mode' (i.e. BOOT0 mode) when it is powered up from the USB port.
 
