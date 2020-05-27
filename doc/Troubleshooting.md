@@ -6,9 +6,8 @@ Fortunately it is nearly impossible to 'brick' an STM32, so whatever state your 
 1. [Module stuck in DFU mode after flashing](#module-stuck-in-dfu-mode-after-flashing-and-cannot-be-re-flashed)
 
 ## Re-installing the Maple DFU device drivers
-If reading or writing your MULTI-Module fails, and the verbose output is like the example below, you need to re-install the Maple DFU device driver.
+If reading or writing your MULTI-Module fails, and the verbose output is like the example below, you need to replace the Maple DFU device driver with a different one.
 
-This is especially true for Flash Multi 0.3.0 (or newer) as it includes a newer version of dfu-util.exe, which seems more sensitive to driver-related problems than the older version which was included with Flash Multi 0.2.x.
 ```
 Filter on vendor = 0x1eaf product = 0x0003
 Opening DFU capable USB device... ID 1eaf:0003
@@ -32,12 +31,12 @@ Cannot claim interface
    1. Device Manager should now show the Maple DFU device
       
       ![Maple DFU  Device](/img/maple-dfu.jpg)
-1. Use Zadig to reinstall the driver
+1. Use Zadig to replace the driver
    1. Run **Zadig** from the location where you installed or extracted it
    1. Click **Options** -> **List all Devices**
    1. In the drop-down device list select `Maple 003` or `Maple DFU`, whichever is listed
-   1. Set the right-hand driver selector to `libusb-win32 (v1.2.6.0)`
-   1. Click the **Reinstall Driver** button
+   1. Set the right-hand driver selector to `libusbK (v3.0.7.0)`
+   1. Click the **Replace Driver** button
       
       ![Zadig](/img/zadig.jpg)
 
