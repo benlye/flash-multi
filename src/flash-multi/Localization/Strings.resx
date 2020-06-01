@@ -46,7 +46,7 @@
     
     mimetype: application/x-microsoft.net.object.binary.base64
     value   : The object must be serialized with 
-            : System.Serialization.Formatters.Binary.BinaryFormatter
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
     
     mimetype: application/x-microsoft.net.object.soap.base64
@@ -60,6 +60,7 @@
             : and then encoded with base64 encoding.
     -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
@@ -68,9 +69,10 @@
               <xsd:sequence>
                 <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="name" use="required" type="xsd:string" />
               <xsd:attribute name="type" type="xsd:string" />
               <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
@@ -85,9 +87,10 @@
                 <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
                 <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
               <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
               <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
@@ -109,9 +112,105 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="dfuAttemptingRecovery" xml:space="preserve">
+    <value>Attempting DFU Recovery Mode.</value>
+  </data>
+  <data name="dfuRecoveryCancelled" xml:space="preserve">
+    <value>DFU Recovery cancelled.</value>
+  </data>
+  <data name="dfuRecoveryFailed" xml:space="preserve">
+    <value>DFU Recovery failed.</value>
+  </data>
+  <data name="dialogTitleErase" xml:space="preserve">
+    <value>MULTI-Module Erase</value>
+  </data>
+  <data name="dialogTitleRead" xml:space="preserve">
+    <value>MULTI-Module Read</value>
+  </data>
+  <data name="dialogTitleUpdateAvailable" xml:space="preserve">
+    <value>Flash Multi Update Available</value>
+  </data>
+  <data name="dialogTitleWrite" xml:space="preserve">
+    <value>MULTI-Module Write</value>
+  </data>
+  <data name="done" xml:space="preserve">
+    <value>done</value>
+  </data>
+  <data name="failed" xml:space="preserve">
+    <value>failed!</value>
+  </data>
+  <data name="failedtoEraseModule" xml:space="preserve">
+    <value>Failed to erase the MULTI-Module!</value>
+  </data>
+  <data name="failedToOpenPort" xml:space="preserve">
+    <value>Couldn't open port</value>
+  </data>
+  <data name="failedToReadModule" xml:space="preserve">
+    <value>Failed to read the MULTI-Module!</value>
+  </data>
+  <data name="failedToWriteBootloader" xml:space="preserve">
+    <value>Failed to write the bootloader.</value>
+  </data>
+  <data name="failedToWriteEeprom" xml:space="preserve">
+    <value>Failed to write MULTI-Module EEPROM!</value>
+  </data>
+  <data name="failedToWriteFirmware" xml:space="preserve">
+    <value>Failed to write MULTI-Module firmware!</value>
+  </data>
+  <data name="modeErasing" xml:space="preserve">
+    <value>Erasing MULTI-Module</value>
+  </data>
+  <data name="modeReading" xml:space="preserve">
+    <value>Reading MULTI-Module</value>
+  </data>
+  <data name="modeWriting" xml:space="preserve">
+    <value>Writing MULTI-Module</value>
+  </data>
+  <data name="progressErasingFlash" xml:space="preserve">
+    <value>Erasing flash memory ...</value>
+  </data>
+  <data name="progressReadingFlash" xml:space="preserve">
+    <value>Reading flash memory ...</value>
+  </data>
+  <data name="progressSwitchingToDfuMode" xml:space="preserve">
+    <value>Switching MULTI-Module into DFU mode ...</value>
+  </data>
+  <data name="progressWritingBootloader" xml:space="preserve">
+    <value>Writing bootloader ...</value>
+  </data>
+  <data name="progressWritingFirmware" xml:space="preserve">
+    <value>Writing firmware to MULTI-Module ...</value>
+  </data>
+  <data name="succeededErasing" xml:space="preserve">
+    <value>MULTI-Module erased successfully.</value>
+  </data>
+  <data name="succeededWritingEeprom" xml:space="preserve">
+    <value>MULTI-Module EEPROM written successfully.</value>
+  </data>
+  <data name="succeededWritingFirmware" xml:space="preserve">
+    <value>MULTI-Module firmware written successfully.</value>
+  </data>
+  <data name="updatePromptPart1" xml:space="preserve">
+    <value>A newer version of Flash Multi is available.\n\nYou have Flash Multi</value>
+  </data>
+  <data name="updatePromptPart2" xml:space="preserve">
+    <value>and Flash Multi</value>
+  </data>
+  <data name="updatePromptPart3" xml:space="preserve">
+    <value>is available.\n\nSee the latest release on Github?</value>
+  </data>
+  <data name="viaNativeUSB" xml:space="preserve">
+    <value>via native USB</value>
+  </data>
+  <data name="viaSerial" xml:space="preserve">
+    <value>via serial</value>
+  </data>
+  <data name="viaUSBasp" xml:space="preserve">
+    <value>via USBasp</value>
+  </data>
 </root>

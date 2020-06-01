@@ -73,8 +73,8 @@ namespace Flash_Multi
                     // A newer version is available to show the user a prompt
                     Debug.WriteLine($"App version is older than latest version: {currentVersion} < {latestVersion}");
                     DialogResult showUpdate = MessageBox.Show(
-                        $"A newer version of Flash Multi is available.\n\nYou have Flash Multi v{currentVersion.ToString()} and Flash Multi v{latestVersion.ToString()} is available.\n\nSee the latest release on Github?",
-                        "Flash Multi Update Available",
+                        $"{Strings.updatePromptPart1} v{currentVersion} {Strings.updatePromptPart2} v{latestVersion} {Strings.updatePromptPart3}",
+                        Strings.dialogTitleUpdateAvailable,
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Information);
 

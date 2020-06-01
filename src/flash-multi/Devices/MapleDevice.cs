@@ -147,7 +147,7 @@ namespace Flash_Multi
             string commandArgs;
             int returnCode = -1;
 
-            flashMulti.AppendLog("Erasing MULTI-Module via native USB\r\n");
+            flashMulti.AppendLog($"{Strings.modeErasing} {Strings.viaNativeUSB}\r\n");
 
             // Stop the serial monitor if it's active
             SerialMonitor serialMonitor = null;
@@ -170,8 +170,8 @@ namespace Flash_Multi
             // Check if the port can be opened
             if (!ComPort.CheckPort(comPort))
             {
-                flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
-                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.AppendLog($"{Strings.failedToOpenPort} {comPort}");
+                MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 flashMulti.EnableControls(true);
                 return false;
             }
@@ -180,21 +180,21 @@ namespace Flash_Multi
 
             if (mapleMode == "USB")
             {
-                flashMulti.AppendLog("Switching MULTI-Module into DFU mode ...");
+                flashMulti.AppendLog(Strings.progressSwitchingToDfuMode);
                 command = ".\\tools\\maple-reset.exe";
                 commandArgs = $"{comPort} 2000";
                 await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
                 if (returnCode == 0)
                 {
-                    flashMulti.AppendLog(" done\r\n");
+                    flashMulti.AppendLog($" {Strings.done}\r\n");
                     flashMulti.AppendVerbose(string.Empty);
                 }
                 else
                 {
                     if (MapleDevice.FindMaple().DfuMode == false)
                     {
-                        flashMulti.AppendLog(" failed!\r\n");
-                        MessageBox.Show("Failed to erase the MULTI-module.", "Erase MULTI-Module", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        flashMulti.AppendLog($"  {Strings.failed}\r\n");
+                        MessageBox.Show(Strings.failedtoEraseModule, Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
                         flashMulti.EnableControls(true);
                         return false;
                     }
@@ -215,21 +215,21 @@ namespace Flash_Multi
             }
 
             // Erase the the flash
-            flashMulti.AppendLog("Erasing flash memory ...");
+            flashMulti.AppendLog(Strings.progressErasingFlash);
             command = ".\\tools\\dfu-util-multi.exe";
             commandArgs = string.Format("-a 2 -d 1EAF:0003 -D \"{0}\" -v", fileName, comPort);
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
             if (returnCode != 0)
             {
-                flashMulti.AppendLog(" failed!\r\n");
-                MessageBox.Show("Failed to erase the MULTI-Module.", "Erase MULTI-Module", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.AppendLog($" {Strings.failed}\r\n");
+                MessageBox.Show(Strings.failedtoEraseModule, Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 flashMulti.EnableControls(true);
                 return false;
             }
 
             // Write a success message to the log
-            flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMULTI-Module erased successfully");
+            flashMulti.AppendLog($" {Strings.done}\r\n");
+            flashMulti.AppendLog($"\r\n{Strings.succeededErasing}");
 
             // Re-enable the form controls
             flashMulti.EnableControls(true);
@@ -250,7 +250,7 @@ namespace Flash_Multi
             string commandArgs;
             int returnCode = -1;
 
-            flashMulti.AppendLog("Reading from MULTI-Module via native USB\r\n");
+            flashMulti.AppendLog($"{Strings.modeReading} {Strings.viaNativeUSB}\r\n");
 
             // Stop the serial monitor if it's active
             SerialMonitor serialMonitor = null;
@@ -276,8 +276,8 @@ namespace Flash_Multi
             // Check if the port can be opened
             if (!ComPort.CheckPort(comPort))
             {
-                flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
-                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.AppendLog($"{Strings.failedToOpenPort} {comPort}");
+                MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 flashMulti.EnableControls(true);
                 return false;
             }
@@ -286,21 +286,21 @@ namespace Flash_Multi
 
             if (mapleMode == "USB")
             {
-                flashMulti.AppendLog("Switching MULTI-Module into DFU mode ...");
+                flashMulti.AppendLog($"{Strings.progressSwitchingToDfuMode}");
                 command = ".\\tools\\maple-reset.exe";
                 commandArgs = $"{comPort} 2000";
                 await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
                 if (returnCode == 0)
                 {
-                    flashMulti.AppendLog(" done\r\n");
+                    flashMulti.AppendLog($" {Strings.done}\r\n");
                     flashMulti.AppendVerbose(string.Empty);
                 }
                 else
                 {
                     if (MapleDevice.FindMaple().DfuMode == false)
                     {
-                        flashMulti.AppendLog(" failed!\r\n");
-                        MessageBox.Show("Failed to read the MULTI-Module.", "MULTI-Module Read", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        flashMulti.AppendLog($" {Strings.failed}\r\n");
+                        MessageBox.Show(Strings.failedToReadModule, Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
                         flashMulti.EnableControls(true);
                         return false;
                     }
@@ -308,20 +308,20 @@ namespace Flash_Multi
             }
 
             // Read the flash memory
-            flashMulti.AppendLog("Reading flash memory ...");
+            flashMulti.AppendLog(Strings.progressReadingFlash);
             command = ".\\tools\\dfu-util-multi.exe";
             commandArgs = string.Format("-a 2 -d 1EAF:0003 -U \"{0}\" -v", fileName, comPort);
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
             if (returnCode != 0)
             {
-                flashMulti.AppendLog(" failed!\r\n");
-                MessageBox.Show("Failed to read the MULTI-Module.", "MULTI-Module Read", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.AppendLog($" {Strings.failed}\r\n");
+                MessageBox.Show(Strings.failedToReadModule, Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 flashMulti.EnableControls(true);
                 return false;
             }
 
             // Write a success message to the log
-            flashMulti.AppendLog(" done\r\n\r\n");
+            flashMulti.AppendLog($" {Strings.done}\r\n\r\n");
 
             // Reconnect the serial monitor
             if (serialMonitor != null && reconnectSerialMonitor)
@@ -349,7 +349,7 @@ namespace Flash_Multi
             string commandArgs;
             int returnCode = -1;
 
-            flashMulti.AppendLog("Writing MULTI-Module firmware via native USB\r\n");
+            flashMulti.AppendLog($"{Strings.modeWriting} {Strings.viaNativeUSB}\r\n");
 
             // Stop the serial monitor if it's active
             SerialMonitor serialMonitor = null;
@@ -375,8 +375,8 @@ namespace Flash_Multi
             // Check if the port can be opened
             if (!ComPort.CheckPort(comPort))
             {
-                flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
-                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.AppendLog($"{Strings.failedToOpenPort} {comPort}");
+                MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 flashMulti.EnableControls(true);
                 return;
             }
@@ -385,21 +385,21 @@ namespace Flash_Multi
 
             if (mapleMode == "USB")
             {
-                flashMulti.AppendLog("Switching MULTI-Module into DFU mode ...");
+                flashMulti.AppendLog(Strings.progressSwitchingToDfuMode);
                 command = ".\\tools\\maple-reset.exe";
                 commandArgs = $"{comPort} 2000";
                 await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
                 if (returnCode == 0)
                 {
-                    flashMulti.AppendLog(" done\r\n");
+                    flashMulti.AppendLog($" {Strings.done}\r\n");
                     flashMulti.AppendVerbose(string.Empty);
                 }
                 else
                 {
                     if (MapleDevice.FindMaple().DfuMode == false)
                     {
-                        flashMulti.AppendLog(" failed!\r\n");
-                        flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
+                        flashMulti.AppendLog($" {Strings.failed}\r\n");
+                        flashMulti.AppendLog($"{Strings.dfuAttemptingRecovery}\r\n");
 
                         // Show the recovery mode dialog
                         DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
@@ -408,36 +408,36 @@ namespace Flash_Multi
                         // Stop if we didn't make it into recovery mode
                         if (recoveryResult == DialogResult.Cancel)
                         {
-                            flashMulti.AppendLog("DFU Recovery cancelled.");
+                            flashMulti.AppendLog(Strings.dfuRecoveryCancelled);
                             flashMulti.EnableControls(true);
                             return;
                         }
                         else if (recoveryResult == DialogResult.Abort)
                         {
-                            flashMulti.AppendLog("DFU Recovery failed.");
+                            flashMulti.AppendLog(Strings.dfuRecoveryFailed);
                             flashMulti.EnableControls(true);
                             return;
                         }
                     }
                     else
                     {
-                        flashMulti.AppendLog(" done\r\n");
+                        flashMulti.AppendLog($" {Strings.done}\r\n");
                         flashMulti.AppendVerbose(string.Empty);
                     }
                 }
             }
 
             // First attempt to flash the firmware
-            flashMulti.AppendLog("Writing firmware to MULTI-Module ...");
+            flashMulti.AppendLog(Strings.progressWritingFirmware);
             command = ".\\tools\\dfu-util-multi.exe";
             commandArgs = string.Format("-R -a 2 -d 1EAF:0003 -D \"{0}\" -v", fileName, comPort);
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
             if (returnCode != 0)
             {
                 // First attempt failed so we need to try bootloader recovery
-                flashMulti.AppendLog(" failed!\r\n");
+                flashMulti.AppendLog($" {Strings.failed}\r\n");
 
-                flashMulti.AppendLog("Attempting DFU Recovery Mode.\r\n");
+                flashMulti.AppendLog($"{Strings.dfuAttemptingRecovery}\r\n");
 
                 // Show the recovery mode dialog
                 DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
@@ -447,32 +447,32 @@ namespace Flash_Multi
                 if (recoveryResult == DialogResult.OK)
                 {
                     // Run the recovery flash command
-                    flashMulti.AppendLog("Writing firmware to MULTI-Module ...");
+                    flashMulti.AppendLog(Strings.progressWritingFirmware);
                     await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
                     if (returnCode != 0)
                     {
-                        flashMulti.AppendLog(" failed!\r\n");
-                        MessageBox.Show("Failed to write the firmware.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        flashMulti.AppendLog($" {Strings.failed}!\r\n");
+                        MessageBox.Show(Strings.failedToWriteFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
                         flashMulti.EnableControls(true);
                         return;
                     }
                 }
                 else if (recoveryResult == DialogResult.Cancel)
                 {
-                    flashMulti.AppendLog("DFU Recovery cancelled.");
+                    flashMulti.AppendLog(Strings.dfuRecoveryCancelled);
                     flashMulti.EnableControls(true);
                     return;
                 }
                 else
                 {
-                    flashMulti.AppendLog("DFU Recovery failed.");
+                    flashMulti.AppendLog(Strings.dfuRecoveryFailed);
                     flashMulti.EnableControls(true);
                     return;
                 }
             }
 
-            flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMULTI-Module firmware written successfully");
+            flashMulti.AppendLog($" {Strings.done}\r\n");
+            flashMulti.AppendLog($"\r\n{Strings.succeededWritingFirmware}");
 
             // Reconnect the serial monitor
             if (serialMonitor != null && reconnectSerialMonitor)
@@ -481,7 +481,7 @@ namespace Flash_Multi
                 serialMonitor.SerialConnect(comPort);
             }
 
-            MessageBox.Show("MULTI-Module firmware written successfully.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(Strings.succeededWritingFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Information);
             flashMulti.EnableControls(true);
         }
     }

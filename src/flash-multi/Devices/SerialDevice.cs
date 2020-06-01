@@ -62,7 +62,7 @@ namespace Flash_Multi
             }
 
             // Write to the log
-            flashMulti.AppendLog("Erasing MULTI-Module via serial\r\n");
+            flashMulti.AppendLog($"{Strings.modeErasing} {Strings.viaSerial}\r\n");
 
             // Stop the serial monitor if it's active
             SerialMonitor serialMonitor = null;
@@ -85,14 +85,14 @@ namespace Flash_Multi
             // Check if the port can be opened
             if (!ComPort.CheckPort(comPort))
             {
-                flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
-                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Module Erase", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.AppendLog($"{Strings.failedToOpenPort} {comPort}");
+                MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 flashMulti.EnableControls(true);
                 return false;
             }
 
             // Write to the log
-            flashMulti.AppendLog($"[1/1] Erasing flash memory ...");
+            flashMulti.AppendLog($"[1/1] {Strings.progressErasingFlash}");
 
             // Prepare the command line arguments for erasing the firmware
             commandArgs = $"-o -S 0x8000000:{eraseBytes} -b {serialBaud} {comPort}";
@@ -104,14 +104,14 @@ namespace Flash_Multi
             if (returnCode != 0)
             {
                 flashMulti.EnableControls(true);
-                flashMulti.AppendLog(" failed!");
-                MessageBox.Show("Failed to erase the MULTI-module.", "MULTI-Module Erase", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.AppendLog(Strings.failed);
+                MessageBox.Show(Strings.failedtoEraseModule, Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
             // Write a success message to the log
-            flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMULTI-Module erased successfully");
+            flashMulti.AppendLog($" {Strings.done}\r\n");
+            flashMulti.AppendLog($"\r\n{Strings.succeededErasing}");
 
             // Re-enable the form controls
             flashMulti.EnableControls(true);
@@ -141,7 +141,7 @@ namespace Flash_Multi
             int returnCode = -1;
 
             // Write to the log
-            flashMulti.AppendLog("Reading MULTI-Module via serial\r\n");
+            flashMulti.AppendLog($"{Strings.modeReading} {Strings.viaSerial}\r\n");
 
             // Stop the serial monitor if it's active
             SerialMonitor serialMonitor = null;
@@ -167,14 +167,14 @@ namespace Flash_Multi
             // Check if the port can be opened
             if (!ComPort.CheckPort(comPort))
             {
-                flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
-                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.AppendLog($"{Strings.failedToOpenPort} {comPort}");
+                MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 flashMulti.EnableControls(true);
                 return false;
             }
 
             // Write to the log
-            flashMulti.AppendLog($"[1/1] Reading flash memory ...");
+            flashMulti.AppendLog($"[1/1] {Strings.progressReadingFlash}");
 
             // Prepare the command line arguments for writing the firmware
             commandArgs = $"-b {serialBaud} -r \"{fileName}\" {comPort}";
@@ -185,8 +185,8 @@ namespace Flash_Multi
             // Show an error message if the command failed for any reason
             if (returnCode != 0)
             {
-                flashMulti.AppendLog(" failed!");
-                MessageBox.Show("Failed to read the MULTI-module.", "MULTI-Module Read", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.AppendLog($" {Strings.failed}");
+                MessageBox.Show(Strings.failedToReadModule, Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 flashMulti.EnableControls(true);
                 return false;
             }
@@ -198,7 +198,7 @@ namespace Flash_Multi
             }
 
             // Write a success message to the log
-            flashMulti.AppendLog(" done\r\n\r\n");
+            flashMulti.AppendLog($" {Strings.done}\r\n\r\n");
 
             // Re-enable the form controls
             flashMulti.EnableControls(true);
@@ -266,7 +266,7 @@ namespace Flash_Multi
             }
 
             // Write to the log
-            flashMulti.AppendLog("Writing MULTI-Module firmware via serial port\r\n");
+            flashMulti.AppendLog($"{Strings.modeWriting} {Strings.viaSerial}\r\n");
 
             // Stop the serial monitor if it's active
             SerialMonitor serialMonitor = null;
@@ -292,14 +292,14 @@ namespace Flash_Multi
             // Check if the port can be opened
             if (!ComPort.CheckPort(comPort))
             {
-                flashMulti.AppendLog(string.Format("Couldn't open port {0}", comPort));
-                MessageBox.Show(string.Format("Couldn't open port {0}", comPort), "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.AppendLog($"{Strings.failedToOpenPort} {comPort}");
+                MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 flashMulti.EnableControls(true);
                 return;
             }
 
             // Erase the flash
-            flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Erasing flash memory ...");
+            flashMulti.AppendLog($"[{flashStep}/{flashSteps}] {Strings.progressErasingFlash}");
 
             // Set the stm32flash.exe command line arguments for erasing
             commandArgs = $"-o -S 0x8000000:{eraseBytes} -b {serialBaud} {comPort}";
@@ -311,19 +311,19 @@ namespace Flash_Multi
             if (returnCode != 0)
             {
                 flashMulti.EnableControls(true);
-                flashMulti.AppendLog(" failed!");
-                MessageBox.Show("Failed to erase flash memory.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.AppendLog($" {Strings.failed}");
+                MessageBox.Show(Strings.failedtoEraseModule, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            flashMulti.AppendLog(" done\r\n");
+            flashMulti.AppendLog($" {Strings.done}");
 
             // Write the bootloader if required
             if (writeBootloader)
             {
                 // Increment the step counter and write to the log
                 flashStep++;
-                flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Writing bootloader ...");
+                flashMulti.AppendLog($"[{flashStep}/{flashSteps}] {Strings.progressWritingBootloader}");
 
                 // Prepare the command line arguments for writing the bootloader
                 commandArgs = $"-v -e 0 -g 0x8000000 -b {serialBaud} -w \"{bootLoaderPath}\" {comPort}";
@@ -335,17 +335,17 @@ namespace Flash_Multi
                 if (returnCode != 0)
                 {
                     flashMulti.EnableControls(true);
-                    flashMulti.AppendLog(" failed!");
-                    MessageBox.Show("Failed to write the bootloader.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    flashMulti.AppendLog($" {Strings.failed}");
+                    MessageBox.Show(Strings.failedToWriteBootloader, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                flashMulti.AppendLog(" done\r\n");
+                flashMulti.AppendLog($" {Strings.done}");
             }
 
             // Increment the step counter and write to the log
             flashStep++;
-            flashMulti.AppendLog($"[{flashStep}/{flashSteps}] Writing MULTI-Module firmware ...");
+            flashMulti.AppendLog($"[{flashStep}/{flashSteps}] {Strings.progressWritingFirmware}");
 
             // Prepare the command line arguments for writing the firmware
             commandArgs = $"-v -s {flashStart} -e 0 -g {executionAddress} -b {serialBaud} -w \"{fileName}\" {comPort}";
@@ -357,8 +357,8 @@ namespace Flash_Multi
             if (returnCode != 0)
             {
                 flashMulti.EnableControls(true);
-                flashMulti.AppendLog(" failed!");
-                MessageBox.Show("Failed to write the firmware.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.AppendLog($" {Strings.failed}");
+                MessageBox.Show(Strings.failedToWriteFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -369,11 +369,11 @@ namespace Flash_Multi
             }
 
             // Write a success message to the log
-            flashMulti.AppendLog(" done\r\n");
-            flashMulti.AppendLog("\r\nMULTI-Module firmware written successfully");
+            flashMulti.AppendLog($" {Strings.done}");
+            flashMulti.AppendLog($"\r\n{Strings.succeededWritingFirmware}");
 
             // Show a success message box
-            MessageBox.Show("MULTI-Module firmware written successfully.", "MULTI-Module Write", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(Strings.succeededWritingFirmware, Strings.succeededWritingFirmware, MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             // Re-enable the form controls
             flashMulti.EnableControls(true);

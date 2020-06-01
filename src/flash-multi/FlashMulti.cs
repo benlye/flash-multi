@@ -23,9 +23,12 @@ namespace Flash_Multi
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Security.Cryptography.X509Certificates;
     using System.Text.RegularExpressions;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Timers;
     using System.Windows.Forms;
@@ -95,11 +98,18 @@ namespace Flash_Multi
         /// </summary>
         private string eepromBackupFileName = string.Empty;
 
+        // Get the language from the settings
+        private string language = Properties.Settings.Default.Language;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FlashMulti"/> class.
         /// </summary>
         public FlashMulti()
         {
+            // Set the language
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo(this.language);
+
+            // Initialize
             this.InitializeComponent();
 
             // Include the version in the window title
