@@ -61,6 +61,34 @@ namespace Flash_Multi {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bootloader upgrade app written successfully.
+        ///
+        ///The app will now update the bootloader on the MULTI-Module.
+        ///
+        ///DO NOT UNPLUG THE MULTI-MODULE UNTIL THE RED LED GOES OUT AND REMAINS OFF FOR 5 SECONDS!.
+        /// </summary>
+        internal static string bootloaderUpgradeDone {
+            get {
+                return ResourceManager.GetString("bootloaderUpgradeDone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upgrading the bootloader will erase the MULTI-Module firmware.  New firmware will need to be written to the module before it is usable.
+        ///
+        ///The red LED on the MULTI-Module will indicate the progress of the bootloader upgrade.
+        ///
+        ///Once the bootloader upgrade is started the module must not be unplugged until the red LED remains off for 5s.
+        ///
+        ///Click OK to proceed..
+        /// </summary>
+        internal static string bootloaderUpgradePrompt {
+            get {
+                return ResourceManager.GetString("bootloaderUpgradePrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attempting DFU Recovery Mode..
         /// </summary>
         internal static string dfuAttemptingRecovery {
@@ -88,6 +116,33 @@ namespace Flash_Multi {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reset the MULTI-Module to DFU Mode?.
+        /// </summary>
+        internal static string dfuResetPrompt {
+            get {
+                return ResourceManager.GetString("dfuResetPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bootloader Upgrade.
+        /// </summary>
+        internal static string dialogTitleBootloaderUpgrade {
+            get {
+                return ResourceManager.GetString("dialogTitleBootloaderUpgrade", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset to DFU Mode.
+        /// </summary>
+        internal static string dialogTitleDfuReset {
+            get {
+                return ResourceManager.GetString("dialogTitleDfuReset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MULTI-Module Erase.
         /// </summary>
         internal static string dialogTitleErase {
@@ -106,11 +161,11 @@ namespace Flash_Multi {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Flash Multi Update Available.
+        ///   Looks up a localized string similar to Flash Multi Update Check.
         /// </summary>
-        internal static string dialogTitleUpdateAvailable {
+        internal static string dialogTitleUpdateCheck {
             get {
-                return ResourceManager.GetString("dialogTitleUpdateAvailable", resourceCulture);
+                return ResourceManager.GetString("dialogTitleUpdateCheck", resourceCulture);
             }
         }
         
@@ -178,6 +233,15 @@ namespace Flash_Multi {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to write the bootloader upgrader!.
+        /// </summary>
+        internal static string failedToWriteBootReloader {
+            get {
+                return ResourceManager.GetString("failedToWriteBootReloader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to write MULTI-Module EEPROM!.
         /// </summary>
         internal static string failedToWriteEeprom {
@@ -192,6 +256,15 @@ namespace Flash_Multi {
         internal static string failedToWriteFirmware {
             get {
                 return ResourceManager.GetString("failedToWriteFirmware", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upgrading MULTI-Module Bootloader.
+        /// </summary>
+        internal static string modeBootloaderUpgrade {
+            get {
+                return ResourceManager.GetString("modeBootloaderUpgrade", resourceCulture);
             }
         }
         
@@ -259,6 +332,15 @@ namespace Flash_Multi {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Writing BootReloader to MULTI-Module ....
+        /// </summary>
+        internal static string progressWritingBootReloader {
+            get {
+                return ResourceManager.GetString("progressWritingBootReloader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Writing firmware to MULTI-Module ....
         /// </summary>
         internal static string progressWritingFirmware {
@@ -277,6 +359,15 @@ namespace Flash_Multi {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BootReloader written successfully..
+        /// </summary>
+        internal static string succeededWritingBootReloader {
+            get {
+                return ResourceManager.GetString("succeededWritingBootReloader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MULTI-Module EEPROM written successfully..
         /// </summary>
         internal static string succeededWritingEeprom {
@@ -291,6 +382,24 @@ namespace Flash_Multi {
         internal static string succeededWritingFirmware {
             get {
                 return ResourceManager.GetString("succeededWritingFirmware", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update check failed!.
+        /// </summary>
+        internal static string updateCheckFailed {
+            get {
+                return ResourceManager.GetString("updateCheckFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are running the latest version of Flash Multi..
+        /// </summary>
+        internal static string updateNoUpdate {
+            get {
+                return ResourceManager.GetString("updateNoUpdate", resourceCulture);
             }
         }
         
