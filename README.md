@@ -2,14 +2,16 @@
 <img src=https://img.shields.io/github/downloads/benlye/flash-multi/total.svg> <a href="https://scan.coverity.com/projects/benlye-flash-multi"><img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/18725.svg"/></a>
 
 # About Flash Multi
-Flash Multi is an application for updating (flashing) the firmware on a Jumper, iRangeX, Vantac, 'Banggood', or DIY MULTI-Module.  A GUI application is available for Windows and a shell script for Linux and macOS.
+Flash Multi is an application for managing the firmware on a Jumper, iRangeX, Vantac, 'Banggood', or DIY MULTI-Module.  A GUI application is available for Windows and a shell script for Linux and macOS.
 
-For STM32 modules, firmware upload can be performed using the built-in USB connection or via an external USB-to-serial adapter.  For ATmega328p modules a USBasp programmer is required.
+Flash Multi can read the existing firmware, save a backup, and write new firmware.
+
+For STM32 modules, firmware read/write operations can be performed using the built-in USB connection or via an external USB-to-serial adapter.  For ATmega328p modules a USBasp programmer is required.
 
 Just three steps are required to update your Jumper, iRangeX, or DIY MULTI-Module (full instructions are below):
 1. [Download and install](#installing-flash-multi) Flash Multi and any required [device drivers](#additional-drivers)
 1. Download the appropriate [MULTI-Module firmware file](https://downloads.multi-module.org/)
-1. [Flash](#using-flash-multi) the new firmware to your module
+1. [Write](#using-flash-multi) the new firmware to your module
 
 <p align="center">
   <img src="img/flash-multi.jpg">
@@ -23,8 +25,17 @@ Just three steps are required to update your Jumper, iRangeX, or DIY MULTI-Modul
       1. [Additional Drivers](#additional-drivers)
    1. [Linux and Mac](#linux-and-mac)
 1. [Using Flash Multi](#using-flash-multi)
-   1. [Writing the Bootloader](#writing-the-bootloader)
-   1. [Upload Output](#upload-output)
+   1. [Writing (Updating) Firmware](#writing-updating-firmware)
+      1. [Writing the Bootloader](#writing-the-bootloader)
+      1. [Upload Output](#upload-output)
+   1. [Reading the Module](#writing-updating-firmware)
+      1. [Read Output](#read-output)
+   1. [Saving Backups](#saving-backups)
+   1. [Erasing the Module](#erasing-the-module)
+1. [Cloning a MULTI-Module](#cloning-a-multi-module)
+   1. [How to Clone a Module](#how-to-clone-a-module)
+      1. [EEPROM Backup and Restore](#eeprom-backup-and-restore)
+      1. [Compile Firmware with a Fixed Global ID](#compile-firmware-with-a-fixed-global-id)
 1. [MULTI-Module Firmware](#multi-module-firmware)
 1. [Troubleshooting](#troubleshooting)
 1. [More Information](#more-information)
@@ -86,22 +97,26 @@ Please refer to the [Linux and macOS instructions](doc/Linux.md).
 
 **Note for external USB-to-serial connections:** When using an external USB-to-serial adapter, the `BOOT0` pin on the board must be connected to 3.3V, usually by installing a jumper on the `BOOT0` header pins.
 
+## Writing (Updating) Firmware
+
 1. If the module is installed in the radio and you are connecting to the module's USB port, ensure the radio is powered **off**
 1. Launch **Flash Multi**
 1. Connect your module to the computer using the module's USB port, an external USB-to-serial adapter, or a USBasp device (ATmega328p modules only), as appropriate
    > _Tip: Flash Multi will automatically select the new COM port / device, if it's running when the module is plugged in._
 1. Click the **Browse** button and select a compiled firmware file
+   1. Details of the selected firmware file will be shown.  Carefully check that the file matches your requirements.
 1. If it wasn't automatically selected, select the appropriate COM port or device
-1. Click the **Upload** button
+1. Click the **Write Module** button
+   1. If the selected file was a backup made with EEPROM data, you will be asked to confirm that you want to write it
 
-## Writing the Bootloader
+### Writing the Bootloader
 The bootloader enables flashing the MULTI-Module firmware from a radio which supports this (see [here](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/blob/master/docs/Flash_from_Tx.md)).  It also enables the native USB port on MULTI-Modules which have one, facilitating firmware updates via native USB rather than an external USB-to-serial adapter.
 
 When flashing with a USB-to-serial adapter the bootloader will be written automatically if the selected firmware file was compiled with support for it.
 
 When flashing via the native USB port the firmware being flashed _must be compiled with support for the bootloader_ otherwise, to avoid rendering the module inoperable, Flash Multi will display an error and stop the flash attempt.
 
-## Upload Output
+### Upload Output
 The output will vary depending on the type of module being flashed.
 
 Modules connected via an external USB-to-serial adapter, and the Jumper JP4IN1 module (which has an *internal* USB-to-serial adapter behind the USB port) will see output like this:
@@ -128,6 +143,91 @@ MULTI-Module updated sucessfully
 ```
 
 For both methods, if the 'Show Verbose Output' box is checked the actual output from each of the flash proceses will be shown. If the flash fails for any reason the verbose messages are a good place to look for more details.
+
+## Reading the Module
+Flash Multi can read the existing firmware from the module and, if it is recent (newer than v1.2.1.79), display information about it, as well as the EEPROM Global ID of the module.
+
+1. If the module is installed in the radio and you are connecting to the module's USB port, ensure the radio is powered **off**
+1. Launch **Flash Multi**
+1. Connect your module to the computer using the module's USB port, an external USB-to-serial adapter, or a USBasp device (ATmega328p modules only), as appropriate
+   > _Tip: Flash Multi will automatically select the new COM port / device, if it's running when the module is plugged in._
+1. If it wasn't automatically selected, select the appropriate COM port or device
+1. Click the **Read Module** button
+
+### Read Output
+For a recent firmware version, the output will look similar to this:
+```
+Reading from MULTI-Module via native USB
+Switching MULTI-Module into DFU mode ... done
+Reading flash memory ... done
+
+Multi Firmware Version:   1.3.1.9 (STM32)
+Expected Channel Order:   AETR
+Multi Telemetry Type:     OpenTX
+Invert Telemetry Enabled: True
+Flash from Radio Enabled: True
+Bootloader Enabled:       True
+Serial Debug Enabled:     False
+
+EEPROM Global ID:         0x665DEF2A
+
+MULTI-Module read successfully
+```
+
+## Saving Backups
+Once the module has been read, the existing firmware can be saved.  The backup can optionally include the EEPROM data.  Saving the EEPROM data allows a module to be cloned.
+
+1. Read the Module
+1. Click the **Save Backup** button
+1. Select whether or not to include the EEPROM data (default is no)
+1. Specify a location for the backup file and click **Save**
+
+**NOTE:** When saving a backup from an Atmega328p module, two files will be created - one containing the firmware and a second containing the EEPROM.  For an STM32 module the firmware and EEPROM data are in the same file.
+
+## Erasing the Module
+Erasing the module will remove the firmware, and optionally erase the EEPROM data.  Once erased, new firmware will need to be written to the module.
+
+**THIS OPERATION CANNOT BE UNDONE**
+
+Erasing the EEPROM data is necessary to restore a module which has had a backup which included EEPROM data retored to it (making it a clone) back to having its own unique ID.
+
+1. If the module is installed in the radio and you are connecting to the module's USB port, ensure the radio is powered **off**
+1. Launch **Flash Multi**
+1. Connect your module to the computer using the module's USB port, an external USB-to-serial adapter, or a USBasp device (ATmega328p modules only), as appropriate
+   > _Tip: Flash Multi will automatically select the new COM port / device, if it's running when the module is plugged in._
+1. If it wasn't automatically selected, select the appropriate COM port or device
+1. Click the **Erase Module** button
+   1. Confirm that you want to erase the module
+   1. Tell Flash Multi if you also want to erase the EEPROM data
+   1. Confirm that you really want to erase the module
+
+Once again, **THIS OPERATION CANNOT BE UNDONE**.
+
+# Cloning a MULTI-Module
+Cloning a MULTI-Module means using the Global ID of one module on another.  This may be useful if you have multiple radios or multiple MULTI-Modules and you want all your modules to control all your models without re-binding them.
+
+**NOTE:** The EEPROM Global ID is not used by protocols which use the CYRF6936 RF component.  You must compile your own firmware with a fixed CYRF ID to acheive the same result for those protocols (Devo, DSM, J6Pro, Traxxas, WFly, WK2x01).
+
+## How to Clone a Module
+There are two ways to clone a module:
+
+### EEPROM Backup and Restore
+EEPROM backup and restore can only be performed with modules with the same MCU - e.g. you cannot backup and Atmega328p module and restore it to an STM32 module.
+
+1. Make a backup of the module to be cloned, making sure you include EEPROM data
+1. Restore the backup to the target module
+
+After restoring the EEPROM you can treat the clone target module like any other - firmware can be read, written, updated etc.  The EEPROM data will not be changed.
+
+**Note:**
+
+### Compile Firmware with a Fixed Global ID
+Global IDs can be copied between modules of any type.
+
+1. Use Flash Multi to read the module to be cloned, make a note of the EEPROM Global ID
+1. Use the Arduino IDE to compile your own firmware from source, defining the ID from step one in the `FORCE_GLOBAL_ID` section
+
+**Note:** If you use Flash Multi to read a module which is running firmware which was compiled with a fixed Global ID, the EEPROM Global ID which is read **will not be the ID the module is actually using**.
 
 # MULTI-Module Firmware
 Pre-compiled MULTI-Module firmware can be downloaded from [https://downloads.multi-module.org/](https://downloads.multi-module.org/).
