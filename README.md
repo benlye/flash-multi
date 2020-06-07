@@ -2,14 +2,16 @@
 <img src=https://img.shields.io/github/downloads/benlye/flash-multi/total.svg> <a href="https://scan.coverity.com/projects/benlye-flash-multi"><img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/18725.svg"/></a>
 
 # About Flash Multi
-Flash Multi is an application for updating (flashing) the firmware on a Jumper, iRangeX, Vantac, 'Banggood', or DIY MULTI-Module.  A GUI application is available for Windows and a shell script for Linux and macOS.
+Flash Multi is an application for managing the firmware on a Jumper, iRangeX, Vantac, 'Banggood', or DIY MULTI-Module.  A GUI application is available for Windows and a shell script for Linux and macOS.
 
-For STM32 modules, firmware upload can be performed using the built-in USB connection or via an external USB-to-serial adapter.  For ATmega328p modules a USBasp programmer is required.
+Flash Multi can read the existing firmware, save a backup, and write new firmware.
+
+For STM32 modules, firmware read/write operations can be performed using the built-in USB connection or via an external USB-to-serial adapter.  For ATmega328p modules a USBasp programmer is required.
 
 Just three steps are required to update your Jumper, iRangeX, or DIY MULTI-Module (full instructions are below):
 1. [Download and install](#installing-flash-multi) Flash Multi and any required [device drivers](#additional-drivers)
 1. Download the appropriate [MULTI-Module firmware file](https://downloads.multi-module.org/)
-1. [Flash](#using-flash-multi) the new firmware to your module
+1. [Write](#using-flash-multi) the new firmware to your module
 
 <p align="center">
   <img src="img/flash-multi.jpg">
