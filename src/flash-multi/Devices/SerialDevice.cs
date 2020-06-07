@@ -215,7 +215,7 @@ namespace Flash_Multi
         /// <param name="writeBootloader">Indicates whether or not the bootloader should be written.</param>
         /// <param name="writeEeprom">Indicates whether or not the EEPROM is being written, therefore should be erased before the write.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public static async Task WriteFlash(FlashMulti flashMulti, string fileName, string comPort, bool writeBootloader, bool writeEeprom)
+        public static async Task WriteFlash(FlashMulti flashMulti, string fileName, string comPort, bool writeBootloader, bool writeEeprom, bool runAfterUpload)
         {
             // Path to the flashing tool, stm32flash.exe
             string command = ".\\tools\\stm32flash.exe";
@@ -348,7 +348,12 @@ namespace Flash_Multi
             flashMulti.AppendLog($"[{flashStep}/{flashSteps}] {Strings.progressWritingFirmware}");
 
             // Prepare the command line arguments for writing the firmware
-            commandArgs = $"-v -s {flashStart} -e 0 -g {executionAddress} -b {serialBaud} -w \"{fileName}\" {comPort}";
+            commandArgs = $"-v -s {flashStart} -e 0 -b {serialBaud} -w \"{fileName}\" {comPort}";
+
+            if (runAfterUpload)
+            {
+                commandArgs += $" -g {executionAddress}";
+            }
 
             // Run the write command asynchronously and wait for it to finish
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });

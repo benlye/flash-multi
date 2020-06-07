@@ -132,8 +132,8 @@
   <data name="dialogTitleRead" xml:space="preserve">
     <value>MULTI-Module Read</value>
   </data>
-  <data name="dialogTitleUpdateAvailable" xml:space="preserve">
-    <value>Flash Multi Update Available</value>
+  <data name="dialogTitleUpdateCheck" xml:space="preserve">
+    <value>Flash Multi Update Check</value>
   </data>
   <data name="dialogTitleWrite" xml:space="preserve">
     <value>MULTI-Module Write</value>
@@ -212,5 +212,48 @@
   </data>
   <data name="viaUSBasp" xml:space="preserve">
     <value>via USBasp</value>
+  </data>
+  <data name="updateCheckFailed" xml:space="preserve">
+    <value>Update check failed!</value>
+  </data>
+  <data name="updateNoUpdate" xml:space="preserve">
+    <value>You are running the latest version of Flash Multi.</value>
+  </data>
+  <data name="bootloaderUpgradeDone" xml:space="preserve">
+    <value>Bootloader upgrade app written successfully.
+
+The app will now update the bootloader on the MULTI-Module.
+
+DO NOT UNPLUG THE MULTI-MODULE UNTIL THE RED LED GOES OUT AND REMAINS OFF FOR 5 SECONDS!</value>
+  </data>
+  <data name="bootloaderUpgradePrompt" xml:space="preserve">
+    <value>Upgrading the bootloader will erase the MULTI-Module firmware.  New firmware will need to be written to the module before it is usable.
+
+The red LED on the MULTI-Module will indicate the progress of the bootloader upgrade.
+
+Once the bootloader upgrade is started the module must not be unplugged until the red LED remains off for 5s.
+
+Click OK to proceed.</value>
+  </data>
+  <data name="dfuResetPrompt" xml:space="preserve">
+    <value>Reset the MULTI-Module to DFU Mode?</value>
+  </data>
+  <data name="dialogTitleBootloaderUpgrade" xml:space="preserve">
+    <value>Bootloader Upgrade</value>
+  </data>
+  <data name="dialogTitleDfuReset" xml:space="preserve">
+    <value>Reset to DFU Mode</value>
+  </data>
+  <data name="failedToWriteBootReloader" xml:space="preserve">
+    <value>Failed to write the bootloader upgrader!</value>
+  </data>
+  <data name="modeBootloaderUpgrade" xml:space="preserve">
+    <value>Upgrading MULTI-Module Bootloader</value>
+  </data>
+  <data name="progressWritingBootReloader" xml:space="preserve">
+    <value>Writing BootReloader to MULTI-Module ...</value>
+  </data>
+  <data name="succeededWritingBootReloader" xml:space="preserve">
+    <value>BootReloader written successfully.</value>
   </data>
 </root>

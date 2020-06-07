@@ -343,7 +343,7 @@ namespace Flash_Multi
         /// <param name="fileName">The path of the file to flash.</param>
         /// <param name="comPort">The COM port where the Maple USB device can be found.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public static async Task WriteFlash(FlashMulti flashMulti, string fileName, string comPort)
+        public static async Task WriteFlash(FlashMulti flashMulti, string fileName, string comPort, bool runAfterUpload)
         {
             string command;
             string commandArgs;
@@ -430,7 +430,13 @@ namespace Flash_Multi
             // First attempt to flash the firmware
             flashMulti.AppendLog(Strings.progressWritingFirmware);
             command = ".\\tools\\dfu-util-multi.exe";
-            commandArgs = string.Format("-R -a 2 -d 1EAF:0003 -D \"{0}\" -v", fileName, comPort);
+            commandArgs = string.Format("-a 2 -d 1EAF:0003 -D \"{0}\" -v", fileName, comPort);
+
+            if (runAfterUpload)
+            {
+                commandArgs += " -R";
+            }
+
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
             if (returnCode != 0)
             {
@@ -483,6 +489,171 @@ namespace Flash_Multi
 
             MessageBox.Show(Strings.succeededWritingFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Information);
             flashMulti.EnableControls(true);
+        }
+
+        /// <summary>
+        /// Upgrades the bootloader of a Maple serial or DFU device.
+        /// </summary>
+        /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
+        /// <param name="comPort">The COM port where the Maple USB device can be found.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public static async Task<bool> UpgradeBootloader(FlashMulti flashMulti, string comPort)
+        {
+            string command;
+            string commandArgs;
+            int returnCode = -1;
+
+            flashMulti.AppendLog($"{Strings.modeBootloaderUpgrade} {Strings.viaNativeUSB}\r\n");
+
+            // Stop the serial monitor if it's active
+            SerialMonitor serialMonitor = null;
+            if (Application.OpenForms.OfType<SerialMonitor>().Any())
+            {
+                Debug.WriteLine("Serial monitor window is open");
+                serialMonitor = Application.OpenForms.OfType<SerialMonitor>().First();
+                if (serialMonitor != null && serialMonitor.SerialPort != null && serialMonitor.SerialPort.IsOpen)
+                {
+                    Debug.WriteLine($"Serial monitor is connected to {serialMonitor.SerialPort.PortName}");
+                    Debug.WriteLine($"Closing serial monitor connection to {serialMonitor.SerialPort.PortName}");
+                    serialMonitor.SerialDisconnect();
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Serial monitor is not open");
+            }
+
+            // Check if the port can be opened
+            if (!ComPort.CheckPort(comPort))
+            {
+                flashMulti.AppendLog($"{Strings.failedToOpenPort} {comPort}");
+                MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.EnableControls(true);
+                return false;
+            }
+
+            string mapleMode = MapleDevice.FindMaple().Mode;
+
+            if (mapleMode == "USB")
+            {
+                flashMulti.AppendLog(Strings.progressSwitchingToDfuMode);
+                command = ".\\tools\\maple-reset.exe";
+                commandArgs = $"{comPort} 2000";
+                await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+                if (returnCode == 0)
+                {
+                    flashMulti.AppendLog($" {Strings.done}\r\n");
+                    flashMulti.AppendVerbose(string.Empty);
+                }
+                else
+                {
+                    if (MapleDevice.FindMaple().DfuMode == false)
+                    {
+                        flashMulti.AppendLog($"  {Strings.failed}\r\n");
+                        MessageBox.Show(Strings.failedToWriteBootReloader, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        flashMulti.EnableControls(true);
+                        return false;
+                    }
+                }
+            }
+
+            // The bootreloader.bin file
+            string fileName = ".\\tools\\bootreloader.bin";
+
+            // Erase the the flash
+            flashMulti.AppendLog(Strings.progressWritingBootReloader);
+            command = ".\\tools\\dfu-util-multi.exe";
+            commandArgs = string.Format("-a 2 -d 1EAF:0003 -D \"{0}\" -v -R", fileName, comPort);
+            await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+            if (returnCode != 0)
+            {
+                flashMulti.AppendLog($" {Strings.failed}\r\n");
+                MessageBox.Show(Strings.failedToWriteBootReloader, Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.EnableControls(true);
+                return false;
+            }
+
+            // Write a success message to the log
+            flashMulti.AppendLog($" {Strings.done}\r\n");
+            flashMulti.AppendLog($"\r\n{Strings.succeededWritingBootReloader}");
+
+            // Re-enable the form controls
+            flashMulti.EnableControls(true);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Resets the Maple USB Serial device to DFU mode.
+        /// </summary>
+        /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
+        /// <param name="comPort">The COM port where the Maple USB device can be found.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public static async Task<bool> ResetToDfuMode(FlashMulti flashMulti, string comPort)
+        {
+            string command;
+            string commandArgs;
+            int returnCode = -1;
+
+            flashMulti.AppendLog($"{Strings.modeReading} {Strings.viaNativeUSB}\r\n");
+
+            // Stop the serial monitor if it's active
+            SerialMonitor serialMonitor = null;
+            if (Application.OpenForms.OfType<SerialMonitor>().Any())
+            {
+                Debug.WriteLine("Serial monitor window is open");
+                serialMonitor = Application.OpenForms.OfType<SerialMonitor>().First();
+                if (serialMonitor != null && serialMonitor.SerialPort != null && serialMonitor.SerialPort.IsOpen)
+                {
+                    Debug.WriteLine($"Serial monitor is connected to {serialMonitor.SerialPort.PortName}");
+
+                    Debug.WriteLine($"Closing serial monitor connection to {serialMonitor.SerialPort.PortName}");
+                    serialMonitor.SerialDisconnect();
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Serial monitor is not open");
+            }
+
+            // Check if the port can be opened
+            if (!ComPort.CheckPort(comPort))
+            {
+                flashMulti.AppendLog($"{Strings.failedToOpenPort} {comPort}");
+                MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                flashMulti.EnableControls(true);
+                return false;
+            }
+
+            string mapleMode = MapleDevice.FindMaple().Mode;
+
+            if (mapleMode == "USB")
+            {
+                flashMulti.AppendLog($"{Strings.progressSwitchingToDfuMode}");
+                command = ".\\tools\\maple-reset.exe";
+                commandArgs = $"{comPort} 2000";
+                await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+                if (returnCode == 0)
+                {
+                    flashMulti.AppendLog($" {Strings.done}\r\n");
+                    flashMulti.AppendVerbose(string.Empty);
+                }
+                else
+                {
+                    if (MapleDevice.FindMaple().DfuMode == false)
+                    {
+                        flashMulti.AppendLog($" {Strings.failed}\r\n");
+                        MessageBox.Show(Strings.failedToReadModule, Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        flashMulti.EnableControls(true);
+                        return false;
+                    }
+                }
+            }
+
+            // Re-enable the form controls
+            flashMulti.EnableControls(true);
+
+            return true;
         }
     }
 }

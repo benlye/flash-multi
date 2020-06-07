@@ -26,6 +26,7 @@ namespace Flash_Multi
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Security.Cryptography.X509Certificates;
     using System.Text.RegularExpressions;
     using System.Threading;
@@ -101,6 +102,8 @@ namespace Flash_Multi
         // Get the language from the settings
         private string language = Properties.Settings.Default.Language;
 
+        internal IntPtr windowHandle;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FlashMulti"/> class.
         /// </summary>
@@ -124,6 +127,19 @@ namespace Flash_Multi
             // Disable the Upload button until we're ready
             this.buttonUpload.Enabled = false;
 
+            // Set the serial speed from the settings
+            if (Properties.Settings.Default.SerialBaudRate == 57600)
+            {
+                this.toolStripMenuItemBaudRate57600.Checked = true;
+            }
+            else
+            {
+                this.toolStripMenuItemBaudRate115200.Checked = true;
+            }
+
+            // Set 'Run after upload' from the settings
+            this.runAfterUploadToolStripMenuItem.Checked = Properties.Settings.Default.RunAfterUpload;
+
             // Hide the verbose output panel and set the height of the other panel
             int initialHeight = 215;
             this.splitContainer1.Panel2Collapsed = true;
@@ -137,6 +153,8 @@ namespace Flash_Multi
 
             // Register a handler to run on loading the form
             this.Load += this.FlashMulti_Load;
+
+            this.windowHandle = this.Handle;
 
             // Register a handler to be notified when USB devices are added or removed
             UsbNotification.RegisterUsbDeviceNotification(this.Handle);
@@ -468,6 +486,7 @@ namespace Flash_Multi
             this.buttonErase.Enabled = arg;
             this.textFileName.Enabled = arg;
             this.comPortSelector.Enabled = arg;
+            this.upgradeBootloaderToolStripMenuItem.Enabled = arg;
 
             // Check a couple of things if we're re-enabling
             if (arg)
@@ -624,6 +643,25 @@ namespace Flash_Multi
             else
             {
                 this.buttonSaveBackup.Enabled = false;
+            }
+
+            MapleDevice mapleCheck = MapleDevice.FindMaple();
+            if (mapleCheck.DeviceFound && this.comPortSelector.SelectedItem != null)
+            {
+                this.upgradeBootloaderToolStripMenuItem.Enabled = true;
+            }
+            else
+            {
+                this.upgradeBootloaderToolStripMenuItem.Enabled = false;
+            }
+
+            if (mapleCheck.DeviceFound && mapleCheck.UsbMode == true && this.comPortSelector.SelectedItem != null)
+            {
+                this.resetToDFUModeToolStripMenuItem.Enabled = true;
+            }
+            else
+            {
+                this.resetToDFUModeToolStripMenuItem.Enabled = false;
             }
         }
 
@@ -1010,7 +1048,7 @@ namespace Flash_Multi
             if (mapleResult.DeviceFound == true)
             {
                 Debug.WriteLine($"Maple device found in {mapleResult.Mode} mode\r\n");
-                await MapleDevice.WriteFlash(this, this.textFileName.Text, comPort);
+                await MapleDevice.WriteFlash(this, this.textFileName.Text, comPort, this.runAfterUploadToolStripMenuItem.Checked);
             }
             else if (usbaspResult.DeviceFound == true && comPort == "USBasp")
             {
@@ -1045,7 +1083,7 @@ namespace Flash_Multi
             }
             else
             {
-                await SerialDevice.WriteFlash(this, this.textFileName.Text, comPort, firmwareSupportsUsb, firmwareContainsEeprom);
+                await SerialDevice.WriteFlash(this, this.textFileName.Text, comPort, firmwareSupportsUsb, firmwareContainsEeprom, this.runAfterUploadToolStripMenuItem.Checked);
             }
 
             // Populate the COM ports in case they changed
@@ -1347,6 +1385,221 @@ namespace Flash_Multi
 
             // Populate the COM ports in case they changed
             await this.PopulateComPortsAsync();
+        }
+
+        /// <summary>
+        /// Handles the user clicking the menu item to upgrade the booloader.
+        /// </summary>
+        private async void UpgradeBootloaderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Prompt for confirmation
+            DialogResult confirm = MessageBox.Show(Strings.bootloaderUpgradePrompt, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+
+            // Abort if the user didn't click OK
+            if (confirm != DialogResult.OK)
+            {
+                return;
+            }
+
+            // Disable the buttons until this flash attempt is complete
+            Debug.WriteLine("Disabling the controls...");
+            this.EnableControls(false);
+
+            // Clear the output box
+            Debug.WriteLine("Clearing the output textboxes...");
+            this.textActivity.Clear();
+            this.textVerbose.Clear();
+            this.progressBar1.Value = 0;
+            this.outputLineBuffer = string.Empty;
+
+            // Discard the last backup
+            this.BackupModuleType = NoBackup;
+            this.firmwareBackupFileName = string.Empty;
+            this.eepromBackupFileName = string.Empty;
+
+            // Determine if we should use Maple device
+            MapleDevice mapleResult = MapleDevice.FindMaple();
+
+            // Get the selected COM port
+            string comPort = this.comPortSelector.SelectedValue.ToString();
+
+            // Do the selected flash using the appropriate method
+            bool upgradeSucceeded;
+            if (mapleResult.DeviceFound == true)
+            {
+                Debug.WriteLine($"Maple device found in {mapleResult.Mode} mode");
+
+                // Set the backup type
+                this.BackupModuleType = Stm32BackupDfuUtil;
+
+                // Make the backup
+                upgradeSucceeded = await MapleDevice.UpgradeBootloader(this, comPort);
+
+                if (upgradeSucceeded)
+                {
+                    MessageBox.Show(Strings.bootloaderUpgradeDone, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+        }
+
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void ToolStripMenuItemBaudRate57600_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.SerialBaudRate = 57600;
+            this.toolStripMenuItemBaudRate57600.Checked = true;
+            this.toolStripMenuItemBaudRate115200.Checked = false;
+        }
+
+        private void ToolStripMenuItemBaudRate115200_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.SerialBaudRate = 115200;
+            this.toolStripMenuItemBaudRate57600.Checked = false;
+            this.toolStripMenuItemBaudRate115200.Checked = true;
+        }
+
+        /// <summary>
+        /// Handles the user toggling the Run After Upload menu setting.
+        /// </summary>
+        private void RunAfterUploadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.RunAfterUpload = this.runAfterUploadToolStripMenuItem.Checked;
+        }
+
+        /// <summary>
+        /// Handles the user clicking the Check for Update menu item.
+        /// </summary>
+        private void CheckForUpdateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UpdateCheck.DoCheck(this, true);
+        }
+
+        /// <summary>
+        /// Handles the user clicking the Download Firmware menu item.
+        /// </summary>
+        private void DownloadFirmwareToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.OpenLink("https://downloads.multi-module.org/");
+        }
+
+        private async void ResetToDFUModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Prompt for confirmation
+            DialogResult confirm = MessageBox.Show(Strings.dfuResetPrompt, Strings.dialogTitleDfuReset, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+
+            // Abort if the user didn't click OK
+            if (confirm != DialogResult.OK)
+            {
+                return;
+            }
+
+            // Disable the buttons until this flash attempt is complete
+            Debug.WriteLine("Disabling the controls...");
+            this.EnableControls(false);
+
+            // Clear the output box
+            Debug.WriteLine("Clearing the output textboxes...");
+            this.textActivity.Clear();
+            this.textVerbose.Clear();
+            this.progressBar1.Value = 0;
+            this.outputLineBuffer = string.Empty;
+
+            // Get the selected COM port
+            string comPort = this.comPortSelector.SelectedValue.ToString();
+
+            await MapleDevice.ResetToDfuMode(this, comPort);
+
+            this.PopulateComPorts();
+        }
+
+        private async void installUSBDriversToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Prompt for confirmation
+            DialogResult confirm = MessageBox.Show(Strings.bootloaderUpgradePrompt, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+
+            // Abort if the user didn't click OK
+            if (confirm != DialogResult.OK)
+            {
+                return;
+            }
+
+            string tempDir = GetTemporaryDirectory();
+
+            int returnCode = -1;
+
+            this.AppendLog("Installing MULTI-Module DFU Bootloader Driver ...");
+            await Task.Run(() => { returnCode = this.runDriverInstaller(".\\drivers\\wdi-simple.exe", $"--vid 0x1EAF --pid 0x0003 --type 2 --name \"MULTI-Module DFU Bootloader\" --dest \"{tempDir}\\MULTI-DFU-Bootloader\" --progressbar={this.windowHandle}"); });
+
+            if (returnCode == 0)
+            {
+                this.AppendLog($" {Strings.done}\r\n");
+            }
+            else
+            {
+                this.AppendLog($" {Strings.failed}\r\n");
+            }
+
+            this.AppendLog("Installing MULTI-Module USB Serial Driver ...");
+            await Task.Run(() => { returnCode = this.runDriverInstaller(".\\drivers\\wdi-simple.exe", $"--vid 0x1EAF --pid 0x0004 --type 3 --name \"MULTI-Module USB Serial\" --dest \"{tempDir}\\MULTI-USB-Serial\" --progressbar={this.windowHandle}"); });
+
+            if (returnCode == 0)
+            {
+                this.AppendLog($" {Strings.done}\r\n");
+            }
+            else
+            {
+                this.AppendLog($" {Strings.failed}\r\n");
+            }
+
+        }
+
+        private int runDriverInstaller(string command, string args)
+        {
+            this.AppendVerbose($"{command} {args}");
+
+            Process myProcess = new Process();
+
+            // Process process = new Process();
+            myProcess.StartInfo.FileName = command;
+            myProcess.StartInfo.Arguments = args;
+            myProcess.StartInfo.UseShellExecute = false;
+            myProcess.StartInfo.CreateNoWindow = true;
+            myProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+            myProcess.StartInfo.RedirectStandardOutput = false;
+            myProcess.StartInfo.RedirectStandardError = false;
+            myProcess.StartInfo.UseShellExecute = true;
+            myProcess.StartInfo.Verb = "runas";
+
+            try
+            {
+                myProcess.Start();
+            }
+            catch (Exception e)
+            {
+                this.AppendVerbose(e.Message);
+                return -1;
+            }
+
+            // Loop until the process finishes
+            myProcess.WaitForExit();
+
+            int returnCode = myProcess.ExitCode;
+            myProcess.Dispose();
+
+            // Return the exit code from the process
+            return returnCode;
+
+        }
+
+        public string GetTemporaryDirectory()
+        {
+            string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(tempDirectory);
+            return tempDirectory;
         }
     }
 }

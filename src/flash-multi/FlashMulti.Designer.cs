@@ -71,12 +71,31 @@ namespace Flash_Multi
             this.linkLabel2 = new System.Windows.Forms.LinkLabel();
             this.buttonErase = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.menuStrip2 = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.advancedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.actionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.installUSBDriversToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resetToDFUModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.upgradeBootloaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.baudRateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemBaudRate57600 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemBaudRate115200 = new System.Windows.Forms.ToolStripMenuItem();
+            this.runAfterUploadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkForUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.documentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadFirmwareToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.menuStrip2.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -87,18 +106,14 @@ namespace Flash_Multi
             // 
             // splitContainer1.Panel1
             // 
-            resources.ApplyResources(this.splitContainer1.Panel1, "splitContainer1.Panel1");
             this.splitContainer1.Panel1.BackColor = System.Drawing.SystemColors.Control;
             this.splitContainer1.Panel1.Controls.Add(this.tableLayoutPanel1);
-            this.toolTip1.SetToolTip(this.splitContainer1.Panel1, resources.GetString("splitContainer1.Panel1.ToolTip"));
             // 
             // splitContainer1.Panel2
             // 
-            resources.ApplyResources(this.splitContainer1.Panel2, "splitContainer1.Panel2");
             this.splitContainer1.Panel2.BackColor = System.Drawing.SystemColors.Control;
             this.splitContainer1.Panel2.Controls.Add(this.textVerbose);
-            this.toolTip1.SetToolTip(this.splitContainer1.Panel2, resources.GetString("splitContainer1.Panel2.ToolTip"));
-            this.toolTip1.SetToolTip(this.splitContainer1, resources.GetString("splitContainer1.ToolTip"));
+            resources.ApplyResources(this.splitContainer1.Panel2, "splitContainer1.Panel2");
             // 
             // tableLayoutPanel1
             // 
@@ -108,23 +123,20 @@ namespace Flash_Multi
             this.tableLayoutPanel1.Controls.Add(this.progressBar1, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.linkLabel1, 0, 2);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.toolTip1.SetToolTip(this.tableLayoutPanel1, resources.GetString("tableLayoutPanel1.ToolTip"));
             // 
             // textActivity
             // 
-            resources.ApplyResources(this.textActivity, "textActivity");
             this.textActivity.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.tableLayoutPanel1.SetColumnSpan(this.textActivity, 2);
+            resources.ApplyResources(this.textActivity, "textActivity");
             this.textActivity.Name = "textActivity";
             this.textActivity.ReadOnly = true;
             this.textActivity.TabStop = false;
-            this.toolTip1.SetToolTip(this.textActivity, resources.GetString("textActivity.ToolTip"));
             // 
             // showVerboseOutput
             // 
             resources.ApplyResources(this.showVerboseOutput, "showVerboseOutput");
             this.showVerboseOutput.Name = "showVerboseOutput";
-            this.toolTip1.SetToolTip(this.showVerboseOutput, resources.GetString("showVerboseOutput.ToolTip"));
             this.showVerboseOutput.UseVisualStyleBackColor = true;
             this.showVerboseOutput.CheckedChanged += new System.EventHandler(this.ShowVerboseOutput_OnChange);
             // 
@@ -134,42 +146,37 @@ namespace Flash_Multi
             this.tableLayoutPanel1.SetColumnSpan(this.progressBar1, 2);
             this.progressBar1.Maximum = 1000;
             this.progressBar1.Name = "progressBar1";
-            this.toolTip1.SetToolTip(this.progressBar1, resources.GetString("progressBar1.ToolTip"));
             // 
             // linkLabel1
             // 
             resources.ApplyResources(this.linkLabel1, "linkLabel1");
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.TabStop = true;
-            this.toolTip1.SetToolTip(this.linkLabel1, resources.GetString("linkLabel1.ToolTip"));
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.RepoLink_LinkClicked);
             // 
             // textVerbose
             // 
-            resources.ApplyResources(this.textVerbose, "textVerbose");
             this.textVerbose.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.textVerbose.Cursor = System.Windows.Forms.Cursors.IBeam;
+            resources.ApplyResources(this.textVerbose, "textVerbose");
             this.textVerbose.Name = "textVerbose";
             this.textVerbose.ReadOnly = true;
             this.textVerbose.TabStop = false;
-            this.toolTip1.SetToolTip(this.textVerbose, resources.GetString("textVerbose.ToolTip"));
             // 
             // buttonUpload
             // 
             resources.ApplyResources(this.buttonUpload, "buttonUpload");
             this.buttonUpload.Name = "buttonUpload";
-            this.toolTip1.SetToolTip(this.buttonUpload, resources.GetString("buttonUpload.ToolTip"));
             this.buttonUpload.UseVisualStyleBackColor = true;
             this.buttonUpload.Click += new System.EventHandler(this.ButtonUpload_Click);
             // 
             // comPortSelector
             // 
-            resources.ApplyResources(this.comPortSelector, "comPortSelector");
             this.comPortSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comPortSelector.DropDownWidth = 90;
             this.comPortSelector.FormattingEnabled = true;
+            resources.ApplyResources(this.comPortSelector, "comPortSelector");
             this.comPortSelector.Name = "comPortSelector";
-            this.toolTip1.SetToolTip(this.comPortSelector, resources.GetString("comPortSelector.ToolTip"));
             this.comPortSelector.SelectedIndexChanged += new System.EventHandler(this.ComPortSelector_SelectionChanged);
             // 
             // textFileName
@@ -178,26 +185,22 @@ namespace Flash_Multi
             this.textFileName.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.textFileName.Name = "textFileName";
             this.textFileName.ReadOnly = true;
-            this.toolTip1.SetToolTip(this.textFileName, resources.GetString("textFileName.ToolTip"));
             this.textFileName.DoubleClick += new System.EventHandler(this.ButtonBrowse_Click);
             // 
             // label2
             // 
             resources.ApplyResources(this.label2, "label2");
             this.label2.Name = "label2";
-            this.toolTip1.SetToolTip(this.label2, resources.GetString("label2.ToolTip"));
             // 
             // label3
             // 
             resources.ApplyResources(this.label3, "label3");
             this.label3.Name = "label3";
-            this.toolTip1.SetToolTip(this.label3, resources.GetString("label3.ToolTip"));
             // 
             // buttonBrowse
             // 
             resources.ApplyResources(this.buttonBrowse, "buttonBrowse");
             this.buttonBrowse.Name = "buttonBrowse";
-            this.toolTip1.SetToolTip(this.buttonBrowse, resources.GetString("buttonBrowse.ToolTip"));
             this.buttonBrowse.UseVisualStyleBackColor = true;
             this.buttonBrowse.Click += new System.EventHandler(this.ButtonBrowse_Click);
             // 
@@ -212,13 +215,11 @@ namespace Flash_Multi
             this.groupBox1.Controls.Add(this.textFileName);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.TabStop = false;
-            this.toolTip1.SetToolTip(this.groupBox1, resources.GetString("groupBox1.ToolTip"));
             // 
             // buttonRefresh
             // 
             resources.ApplyResources(this.buttonRefresh, "buttonRefresh");
             this.buttonRefresh.Name = "buttonRefresh";
-            this.toolTip1.SetToolTip(this.buttonRefresh, resources.GetString("buttonRefresh.ToolTip"));
             this.buttonRefresh.UseVisualStyleBackColor = true;
             this.buttonRefresh.Click += new System.EventHandler(this.ButtonRefresh_Click);
             // 
@@ -226,7 +227,6 @@ namespace Flash_Multi
             // 
             resources.ApplyResources(this.buttonSaveBackup, "buttonSaveBackup");
             this.buttonSaveBackup.Name = "buttonSaveBackup";
-            this.toolTip1.SetToolTip(this.buttonSaveBackup, resources.GetString("buttonSaveBackup.ToolTip"));
             this.buttonSaveBackup.UseVisualStyleBackColor = true;
             this.buttonSaveBackup.Click += new System.EventHandler(this.ButtonSaveBackup_Click);
             // 
@@ -234,7 +234,6 @@ namespace Flash_Multi
             // 
             resources.ApplyResources(this.buttonRead, "buttonRead");
             this.buttonRead.Name = "buttonRead";
-            this.toolTip1.SetToolTip(this.buttonRead, resources.GetString("buttonRead.ToolTip"));
             this.buttonRead.UseVisualStyleBackColor = true;
             this.buttonRead.Click += new System.EventHandler(this.ButtonRead_Click);
             // 
@@ -242,7 +241,6 @@ namespace Flash_Multi
             // 
             resources.ApplyResources(this.buttonSerialMonitor, "buttonSerialMonitor");
             this.buttonSerialMonitor.Name = "buttonSerialMonitor";
-            this.toolTip1.SetToolTip(this.buttonSerialMonitor, resources.GetString("buttonSerialMonitor.ToolTip"));
             this.buttonSerialMonitor.UseVisualStyleBackColor = true;
             this.buttonSerialMonitor.Click += new System.EventHandler(this.ButtonSerialMonitor_Click);
             // 
@@ -251,7 +249,6 @@ namespace Flash_Multi
             resources.ApplyResources(this.linkLabel2, "linkLabel2");
             this.linkLabel2.Name = "linkLabel2";
             this.linkLabel2.TabStop = true;
-            this.toolTip1.SetToolTip(this.linkLabel2, resources.GetString("linkLabel2.ToolTip"));
             this.linkLabel2.UseCompatibleTextRendering = true;
             this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ReleasesLink_LinkClicked);
             // 
@@ -259,9 +256,129 @@ namespace Flash_Multi
             // 
             resources.ApplyResources(this.buttonErase, "buttonErase");
             this.buttonErase.Name = "buttonErase";
-            this.toolTip1.SetToolTip(this.buttonErase, resources.GetString("buttonErase.ToolTip"));
             this.buttonErase.UseVisualStyleBackColor = true;
             this.buttonErase.Click += new System.EventHandler(this.ButtonErase_Click);
+            // 
+            // menuStrip2
+            // 
+            this.menuStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem,
+            this.advancedToolStripMenuItem,
+            this.helpToolStripMenuItem});
+            resources.ApplyResources(this.menuStrip2, "menuStrip2");
+            this.menuStrip2.Name = "menuStrip2";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exitToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            resources.ApplyResources(this.fileToolStripMenuItem, "fileToolStripMenuItem");
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            resources.ApplyResources(this.exitToolStripMenuItem, "exitToolStripMenuItem");
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
+            // 
+            // advancedToolStripMenuItem
+            // 
+            this.advancedToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.actionsToolStripMenuItem,
+            this.settingsToolStripMenuItem});
+            this.advancedToolStripMenuItem.Name = "advancedToolStripMenuItem";
+            resources.ApplyResources(this.advancedToolStripMenuItem, "advancedToolStripMenuItem");
+            // 
+            // actionsToolStripMenuItem
+            // 
+            this.actionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.installUSBDriversToolStripMenuItem,
+            this.resetToDFUModeToolStripMenuItem,
+            this.upgradeBootloaderToolStripMenuItem});
+            this.actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
+            resources.ApplyResources(this.actionsToolStripMenuItem, "actionsToolStripMenuItem");
+            // 
+            // installUSBDriversToolStripMenuItem
+            // 
+            this.installUSBDriversToolStripMenuItem.Name = "installUSBDriversToolStripMenuItem";
+            resources.ApplyResources(this.installUSBDriversToolStripMenuItem, "installUSBDriversToolStripMenuItem");
+            this.installUSBDriversToolStripMenuItem.Click += new System.EventHandler(this.installUSBDriversToolStripMenuItem_Click);
+            // 
+            // resetToDFUModeToolStripMenuItem
+            // 
+            this.resetToDFUModeToolStripMenuItem.Name = "resetToDFUModeToolStripMenuItem";
+            resources.ApplyResources(this.resetToDFUModeToolStripMenuItem, "resetToDFUModeToolStripMenuItem");
+            this.resetToDFUModeToolStripMenuItem.Click += new System.EventHandler(this.ResetToDFUModeToolStripMenuItem_Click);
+            // 
+            // upgradeBootloaderToolStripMenuItem
+            // 
+            this.upgradeBootloaderToolStripMenuItem.Name = "upgradeBootloaderToolStripMenuItem";
+            resources.ApplyResources(this.upgradeBootloaderToolStripMenuItem, "upgradeBootloaderToolStripMenuItem");
+            this.upgradeBootloaderToolStripMenuItem.Click += new System.EventHandler(this.UpgradeBootloaderToolStripMenuItem_Click);
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.baudRateToolStripMenuItem,
+            this.runAfterUploadToolStripMenuItem});
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            resources.ApplyResources(this.settingsToolStripMenuItem, "settingsToolStripMenuItem");
+            // 
+            // baudRateToolStripMenuItem
+            // 
+            this.baudRateToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItemBaudRate57600,
+            this.toolStripMenuItemBaudRate115200});
+            this.baudRateToolStripMenuItem.Name = "baudRateToolStripMenuItem";
+            resources.ApplyResources(this.baudRateToolStripMenuItem, "baudRateToolStripMenuItem");
+            // 
+            // toolStripMenuItemBaudRate57600
+            // 
+            this.toolStripMenuItemBaudRate57600.Name = "toolStripMenuItemBaudRate57600";
+            resources.ApplyResources(this.toolStripMenuItemBaudRate57600, "toolStripMenuItemBaudRate57600");
+            // 
+            // toolStripMenuItemBaudRate115200
+            // 
+            this.toolStripMenuItemBaudRate115200.Name = "toolStripMenuItemBaudRate115200";
+            resources.ApplyResources(this.toolStripMenuItemBaudRate115200, "toolStripMenuItemBaudRate115200");
+            // 
+            // runAfterUploadToolStripMenuItem
+            // 
+            this.runAfterUploadToolStripMenuItem.CheckOnClick = true;
+            this.runAfterUploadToolStripMenuItem.Name = "runAfterUploadToolStripMenuItem";
+            resources.ApplyResources(this.runAfterUploadToolStripMenuItem, "runAfterUploadToolStripMenuItem");
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutToolStripMenuItem,
+            this.checkForUpdateToolStripMenuItem,
+            this.documentationToolStripMenuItem,
+            this.downloadFirmwareToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            resources.ApplyResources(this.helpToolStripMenuItem, "helpToolStripMenuItem");
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            resources.ApplyResources(this.aboutToolStripMenuItem, "aboutToolStripMenuItem");
+            // 
+            // checkForUpdateToolStripMenuItem
+            // 
+            this.checkForUpdateToolStripMenuItem.Name = "checkForUpdateToolStripMenuItem";
+            resources.ApplyResources(this.checkForUpdateToolStripMenuItem, "checkForUpdateToolStripMenuItem");
+            this.checkForUpdateToolStripMenuItem.Click += new System.EventHandler(this.CheckForUpdateToolStripMenuItem_Click);
+            // 
+            // documentationToolStripMenuItem
+            // 
+            this.documentationToolStripMenuItem.Name = "documentationToolStripMenuItem";
+            resources.ApplyResources(this.documentationToolStripMenuItem, "documentationToolStripMenuItem");
+            // 
+            // downloadFirmwareToolStripMenuItem
+            // 
+            this.downloadFirmwareToolStripMenuItem.Name = "downloadFirmwareToolStripMenuItem";
+            resources.ApplyResources(this.downloadFirmwareToolStripMenuItem, "downloadFirmwareToolStripMenuItem");
+            this.downloadFirmwareToolStripMenuItem.Click += new System.EventHandler(this.DownloadFirmwareToolStripMenuItem_Click);
             // 
             // FlashMulti
             // 
@@ -275,10 +392,10 @@ namespace Flash_Multi
             this.Controls.Add(this.buttonSerialMonitor);
             this.Controls.Add(this.buttonUpload);
             this.Controls.Add(this.buttonRead);
+            this.Controls.Add(this.menuStrip2);
             this.MaximizeBox = false;
             this.Name = "FlashMulti";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.toolTip1.SetToolTip(this, resources.GetString("$this.ToolTip"));
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
@@ -288,6 +405,8 @@ namespace Flash_Multi
             this.tableLayoutPanel1.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.menuStrip2.ResumeLayout(false);
+            this.menuStrip2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -316,6 +435,24 @@ namespace Flash_Multi
         private System.Windows.Forms.Button buttonSaveBackup;
         private System.Windows.Forms.Button buttonErase;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.MenuStrip menuStrip2;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem advancedToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem checkForUpdateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem documentationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem downloadFirmwareToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem actionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem resetToDFUModeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem upgradeBootloaderToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem baudRateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemBaudRate57600;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemBaudRate115200;
+        private System.Windows.Forms.ToolStripMenuItem runAfterUploadToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem installUSBDriversToolStripMenuItem;
     }
 }
 

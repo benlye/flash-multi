@@ -52,7 +52,7 @@ namespace Flash_Multi
         /// Prompt the user if a newer version is available.
         /// </summary>
         /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
-        public static async void DoCheck(FlashMulti flashMulti)
+        public static async void DoCheck(FlashMulti flashMulti, bool showNoUpdate = false)
         {
             // Get check for the latest version on Github
             UpdateCheck check = new UpdateCheck();
@@ -74,7 +74,7 @@ namespace Flash_Multi
                     Debug.WriteLine($"App version is older than latest version: {currentVersion} < {latestVersion}");
                     DialogResult showUpdate = MessageBox.Show(
                         $"{Strings.updatePromptPart1} v{currentVersion} {Strings.updatePromptPart2} v{latestVersion} {Strings.updatePromptPart3}",
-                        Strings.dialogTitleUpdateAvailable,
+                        Strings.dialogTitleUpdateCheck,
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Information);
 
@@ -83,6 +83,20 @@ namespace Flash_Multi
                     {
                         flashMulti.OpenLink(check.ReleaseUrl);
                     }
+                }
+                else
+                {
+                    if (showNoUpdate)
+                    {
+                        MessageBox.Show(Strings.updateNoUpdate, Strings.dialogTitleUpdateCheck, MessageBoxButtons.OK);
+                    }
+                }
+            }
+            else
+            {
+                if (showNoUpdate)
+                {
+                    MessageBox.Show(Strings.updateCheckFailed, Strings.dialogTitleUpdateCheck, MessageBoxButtons.OK);
                 }
             }
         }
