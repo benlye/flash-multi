@@ -557,16 +557,28 @@ namespace Flash_Multi
                 this.buttonSaveBackup.Enabled = false;
             }
 
+            // Check for a Maple device
             MapleDevice mapleCheck = MapleDevice.FindMaple();
+
+            // If a Maple Serial device is present and the selected port is the Maple COM port, enable the Reset to DFU Mode menu item
             if (mapleCheck.DeviceFound && mapleCheck.UsbMode == true && this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() == MapleDevice.GetMapleComPort())
             {
-                this.upgradeBootloaderToolStripMenuItem.Enabled = true;
                 this.resetToDFUModeToolStripMenuItem.Enabled = true;
             }
             else
             {
-                this.upgradeBootloaderToolStripMenuItem.Enabled = false;
                 this.resetToDFUModeToolStripMenuItem.Enabled = false;
+            }
+
+            // If a Maple DFU is present and the selected port is the Maple COM port or DFU device, enable the upload bootloader menu item
+            if ((mapleCheck.DeviceFound && mapleCheck.UsbMode == true && this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() == MapleDevice.GetMapleComPort())
+                || (mapleCheck.DeviceFound && mapleCheck.DfuMode == true && this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() == "DFU Device"))
+            {
+                this.upgradeBootloaderToolStripMenuItem.Enabled = true;
+            }
+            else
+            {
+                this.upgradeBootloaderToolStripMenuItem.Enabled = false;
             }
         }
 
@@ -1528,24 +1540,23 @@ namespace Flash_Multi
             this.firmwareBackupFileName = string.Empty;
             this.eepromBackupFileName = string.Empty;
 
-            // Get the name of the Maple COM port
-            string mapleComPort = MapleDevice.GetMapleComPort();
-            if (mapleComPort != null)
+            // Get the port
+            string comPort = this.comPortSelector.SelectedValue.ToString();
+
+            bool upgradeSucceeded;
+
+            // Write the bootloader upgrader
+            upgradeSucceeded = await MapleDevice.UpgradeBootloader(this, comPort);
+
+            if (upgradeSucceeded)
             {
-                bool upgradeSucceeded;
-
-                // Write the bootloader upgrader
-                upgradeSucceeded = await MapleDevice.UpgradeBootloader(this, mapleComPort);
-
-                if (upgradeSucceeded)
-                {
-                    MessageBox.Show(Strings.bootloaderUpgradeDone, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-                else
-                {
-                    MessageBox.Show(Strings.bootloaderUpgradeFailed, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
+                MessageBox.Show(Strings.bootloaderUpgradeDone, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+            else
+            {
+                MessageBox.Show(Strings.bootloaderUpgradeFailed, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
         }
 
         /// <summary>
