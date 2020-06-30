@@ -21,6 +21,7 @@
 namespace Flash_Multi
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading;
@@ -37,13 +38,15 @@ namespace Flash_Multi
         /// </summary>
         /// <param name="deviceFound">Indicates if a device was found.</param>
         /// <param name="deviceId">The device ID.</param>
+        /// <param name="deviceName">The device name.</param>
         /// <param name="dfuMode">Indicates if the device is in DFU mode.</param>
         /// <param name="usbMode">Indicates if the device is in USB mode.</param>
         /// <param name="mode">The device mode.</param>
-        public MapleDevice(bool deviceFound = false, string deviceId = null, bool dfuMode = false, bool usbMode = false, string mode = null)
+        public MapleDevice(bool deviceFound = false, string deviceId = null, string deviceName = null, bool dfuMode = false, bool usbMode = false, string mode = null)
         {
             this.DeviceFound = deviceFound;
             this.DeviceId = deviceId;
+            this.DeviceName = deviceName;
             this.DfuMode = dfuMode;
             this.UsbMode = usbMode;
             this.Mode = mode;
@@ -55,9 +58,14 @@ namespace Flash_Multi
         public bool DeviceFound { get; private set; }
 
         /// <summary>
-        /// Gets a string contaiing the device ID.
+        /// Gets a string containing the device ID.
         /// </summary>
         public string DeviceId { get; private set; }
+
+        /// <summary>
+        /// Gets a string containing the device name.
+        /// </summary>
+        public string DeviceName { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the device is in DFU mode.
@@ -89,10 +97,10 @@ namespace Flash_Multi
                 switch (usbDevice.PnpDeviceID.Substring(0, 21))
                 {
                     case "USB\\VID_1EAF&PID_0003":
-                        result = new MapleDevice(true, "USB\\VID_1EAF&PID_0003", true, false, "DFU");
+                        result = new MapleDevice(true, "USB\\VID_1EAF&PID_0003", usbDevice.Name, true, false, "DFU");
                         break;
                     case "USB\\VID_1EAF&PID_0004":
-                        result = new MapleDevice(true, "USB\\VID_1EAF&PID_0004", false, true, "USB");
+                        result = new MapleDevice(true, "USB\\VID_1EAF&PID_0004", usbDevice.Name, false, true, "USB");
                         break;
                     default:
                         break;
@@ -132,6 +140,33 @@ namespace Flash_Multi
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Gets the name of the Maple Device COM port.
+        /// </summary>
+        /// <returns>A string containing the COM port name.</returns>
+        public static string GetMapleComPort()
+        {
+            string portName = null;
+
+            MapleDevice device = FindMaple();
+
+            if (device.DeviceFound)
+            {
+                _ = new List<ComPort>();
+                List<ComPort> comPorts = ComPort.EnumeratePortList();
+
+                foreach (ComPort port in comPorts)
+                {
+                    if (device.DeviceName.Contains(port.Name))
+                    {
+                        portName = port.Name;
+                    }
+                }
+            }
+
+            return portName;
         }
 
         /// <summary>
@@ -342,6 +377,7 @@ namespace Flash_Multi
         /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
         /// <param name="fileName">The path of the file to flash.</param>
         /// <param name="comPort">The COM port where the Maple USB device can be found.</param>
+        /// <param name="runAfterUpload">Indicates if the firmware should be run when the upload is finished.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public static async Task WriteFlash(FlashMulti flashMulti, string fileName, string comPort, bool runAfterUpload)
         {
@@ -594,8 +630,6 @@ namespace Flash_Multi
             string command;
             string commandArgs;
             int returnCode = -1;
-
-            flashMulti.AppendLog($"{Strings.modeReading} {Strings.viaNativeUSB}\r\n");
 
             // Stop the serial monitor if it's active
             SerialMonitor serialMonitor = null;

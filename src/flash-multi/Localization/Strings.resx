@@ -233,6 +233,8 @@ The red LED on the MULTI-Module will indicate the progress of the bootloader upg
 
 Once the bootloader upgrade is started the module must not be unplugged until the red LED remains off for 5s.
 
+Once the LED has been off for 5s, unplug the module, plug it back in, then write new firmware to it.
+
 Click OK to proceed.</value>
   </data>
   <data name="dfuResetPrompt" xml:space="preserve">
@@ -255,5 +257,28 @@ Click OK to proceed.</value>
   </data>
   <data name="succeededWritingBootReloader" xml:space="preserve">
     <value>BootReloader written successfully.</value>
+  </data>
+  <data name="bootloaderUpgradeFailed" xml:space="preserve">
+    <value>Failed to write the bootloader upgrade app!</value>
+  </data>
+  <data name="dialogTitleDriverInstaller" xml:space="preserve">
+    <value>USB Driver Installation</value>
+  </data>
+  <data name="dialogTitleFileOpen" xml:space="preserve">
+    <value>Choose file to flash</value>
+  </data>
+  <data name="driverInstallerPrompt" xml:space="preserve">
+    <value>Install the MULTI-Module USB drivers?
+
+If you are upgrading ore replacing existing drivers, ensure that the MULTI-Module is plugged in before proceeding.</value>
+  </data>
+  <data name="progressInstallingDfuDriver" xml:space="preserve">
+    <value>Installing MULTI-Module DFU Bootloader Driver ...</value>
+  </data>
+  <data name="progressInstallingUsbSerialDriver" xml:space="preserve">
+    <value>Installing MULTI-Module USB Serial Driver ...</value>
+  </data>
+  <data name="modeDfuSwitch" xml:space="preserve">
+    <value />
   </data>
 </root>

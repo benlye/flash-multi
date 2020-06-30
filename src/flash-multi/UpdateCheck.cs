@@ -52,6 +52,7 @@ namespace Flash_Multi
         /// Prompt the user if a newer version is available.
         /// </summary>
         /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
+        /// <param name="showNoUpdate">Indicate whether or not to show a message if there is no update.</param>
         public static async void DoCheck(FlashMulti flashMulti, bool showNoUpdate = false)
         {
             // Get check for the latest version on Github
