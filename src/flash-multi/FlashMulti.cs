@@ -558,7 +558,7 @@ namespace Flash_Multi
             }
 
             MapleDevice mapleCheck = MapleDevice.FindMaple();
-            if (mapleCheck.DeviceFound && mapleCheck.UsbMode == true && this.GetSelectedPort().ToString() == MapleDevice.GetMapleComPort())
+            if (mapleCheck.DeviceFound && mapleCheck.UsbMode == true && this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() == MapleDevice.GetMapleComPort())
             {
                 this.upgradeBootloaderToolStripMenuItem.Enabled = true;
                 this.resetToDFUModeToolStripMenuItem.Enabled = true;
