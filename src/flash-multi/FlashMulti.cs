@@ -1556,7 +1556,6 @@ namespace Flash_Multi
             {
                 MessageBox.Show(Strings.bootloaderUpgradeFailed, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-
         }
 
         /// <summary>
