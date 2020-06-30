@@ -90,6 +90,9 @@
     <EmbeddedResource Include="Dialogs\DfuRecoveryDialog.resx">
       <DependentUpon>DfuRecoveryDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\SerialMonitor.fr.resx">
+      <DependentUpon>SerialMonitor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FlashMulti.fr.resx">
       <DependentUpon>FlashMulti.cs</DependentUpon>
     </EmbeddedResource>
@@ -133,7 +136,9 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Actions\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>XCOPY "$(SolutionDir)tools\*.*" "$(TargetDir)" /S /Y</PostBuildEvent>

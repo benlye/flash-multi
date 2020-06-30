@@ -769,7 +769,7 @@
     <value>&amp;Upgrade Module Bootloader</value>
   </data>
   <data name="actionsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>116, 22</value>
   </data>
   <data name="actionsToolStripMenuItem.Text" xml:space="preserve">
     <value>A&amp;ctions</value>
@@ -787,19 +787,19 @@
     <value>115200</value>
   </data>
   <data name="baudRateToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>217, 22</value>
+    <value>207, 22</value>
   </data>
   <data name="baudRateToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Baud Rate</value>
+    <value>Serial &amp;Baud Rate</value>
   </data>
   <data name="runAfterUploadToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>217, 22</value>
+    <value>207, 22</value>
   </data>
   <data name="runAfterUploadToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Run Firmware After Upload</value>
+    <value>&amp;Run Firmware After Write</value>
   </data>
   <data name="settingsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>116, 22</value>
   </data>
   <data name="settingsToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Settings</value>
@@ -809,12 +809,6 @@
   </data>
   <data name="advancedToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Advanced</value>
-  </data>
-  <data name="aboutToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>226, 22</value>
-  </data>
-  <data name="aboutToolStripMenuItem.Text" xml:space="preserve">
-    <value>About</value>
   </data>
   <data name="checkForUpdateToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>226, 22</value>
@@ -1536,12 +1530,6 @@
     <value>helpToolStripMenuItem</value>
   </data>
   <data name="&gt;&gt;helpToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;aboutToolStripMenuItem.Name" xml:space="preserve">
-    <value>aboutToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;aboutToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;checkForUpdateToolStripMenuItem.Name" xml:space="preserve">

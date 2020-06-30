@@ -85,7 +85,6 @@ namespace Flash_Multi
             this.toolStripMenuItemBaudRate115200 = new System.Windows.Forms.ToolStripMenuItem();
             this.runAfterUploadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.documentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadFirmwareToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -168,7 +167,7 @@ namespace Flash_Multi
             resources.ApplyResources(this.buttonUpload, "buttonUpload");
             this.buttonUpload.Name = "buttonUpload";
             this.buttonUpload.UseVisualStyleBackColor = true;
-            this.buttonUpload.Click += new System.EventHandler(this.ButtonUpload_Click);
+            this.buttonUpload.Click += new System.EventHandler(this.ButtonWrite_Click);
             // 
             // comPortSelector
             // 
@@ -302,7 +301,7 @@ namespace Flash_Multi
             // 
             this.installUSBDriversToolStripMenuItem.Name = "installUSBDriversToolStripMenuItem";
             resources.ApplyResources(this.installUSBDriversToolStripMenuItem, "installUSBDriversToolStripMenuItem");
-            this.installUSBDriversToolStripMenuItem.Click += new System.EventHandler(this.installUSBDriversToolStripMenuItem_Click);
+            this.installUSBDriversToolStripMenuItem.Click += new System.EventHandler(this.InstallUSBDriversToolStripMenuItem_Click);
             // 
             // resetToDFUModeToolStripMenuItem
             // 
@@ -336,11 +335,13 @@ namespace Flash_Multi
             // 
             this.toolStripMenuItemBaudRate57600.Name = "toolStripMenuItemBaudRate57600";
             resources.ApplyResources(this.toolStripMenuItemBaudRate57600, "toolStripMenuItemBaudRate57600");
+            this.toolStripMenuItemBaudRate57600.Click += new System.EventHandler(this.ToolStripMenuItemBaudRate57600_Click);
             // 
             // toolStripMenuItemBaudRate115200
             // 
             this.toolStripMenuItemBaudRate115200.Name = "toolStripMenuItemBaudRate115200";
             resources.ApplyResources(this.toolStripMenuItemBaudRate115200, "toolStripMenuItemBaudRate115200");
+            this.toolStripMenuItemBaudRate115200.Click += new System.EventHandler(this.ToolStripMenuItemBaudRate115200_Click);
             // 
             // runAfterUploadToolStripMenuItem
             // 
@@ -351,17 +352,11 @@ namespace Flash_Multi
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.aboutToolStripMenuItem,
             this.checkForUpdateToolStripMenuItem,
             this.documentationToolStripMenuItem,
             this.downloadFirmwareToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             resources.ApplyResources(this.helpToolStripMenuItem, "helpToolStripMenuItem");
-            // 
-            // aboutToolStripMenuItem
-            // 
-            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            resources.ApplyResources(this.aboutToolStripMenuItem, "aboutToolStripMenuItem");
             // 
             // checkForUpdateToolStripMenuItem
             // 
@@ -373,6 +368,7 @@ namespace Flash_Multi
             // 
             this.documentationToolStripMenuItem.Name = "documentationToolStripMenuItem";
             resources.ApplyResources(this.documentationToolStripMenuItem, "documentationToolStripMenuItem");
+            this.documentationToolStripMenuItem.Click += new System.EventHandler(this.DocumentationToolStripMenuItem_Click);
             // 
             // downloadFirmwareToolStripMenuItem
             // 
@@ -440,7 +436,6 @@ namespace Flash_Multi
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem advancedToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem checkForUpdateToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem documentationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem downloadFirmwareToolStripMenuItem;

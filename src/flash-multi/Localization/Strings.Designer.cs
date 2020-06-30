@@ -74,11 +74,22 @@ namespace Flash_Multi {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to write the bootloader upgrade app!.
+        /// </summary>
+        internal static string bootloaderUpgradeFailed {
+            get {
+                return ResourceManager.GetString("bootloaderUpgradeFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Upgrading the bootloader will erase the MULTI-Module firmware.  New firmware will need to be written to the module before it is usable.
         ///
         ///The red LED on the MULTI-Module will indicate the progress of the bootloader upgrade.
         ///
         ///Once the bootloader upgrade is started the module must not be unplugged until the red LED remains off for 5s.
+        ///
+        ///Once the LED has been off for 5s, unplug the module, plug it back in, then write new firmware to it.
         ///
         ///Click OK to proceed..
         /// </summary>
@@ -143,11 +154,29 @@ namespace Flash_Multi {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to USB Driver Installation.
+        /// </summary>
+        internal static string dialogTitleDriverInstaller {
+            get {
+                return ResourceManager.GetString("dialogTitleDriverInstaller", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MULTI-Module Erase.
         /// </summary>
         internal static string dialogTitleErase {
             get {
                 return ResourceManager.GetString("dialogTitleErase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose file to flash.
+        /// </summary>
+        internal static string dialogTitleFileOpen {
+            get {
+                return ResourceManager.GetString("dialogTitleFileOpen", resourceCulture);
             }
         }
         
@@ -184,6 +213,17 @@ namespace Flash_Multi {
         internal static string done {
             get {
                 return ResourceManager.GetString("done", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install the MULTI-Module USB drivers?
+        ///
+        ///If you are upgrading ore replacing existing drivers, ensure that the MULTI-Module is plugged in before proceeding..
+        /// </summary>
+        internal static string driverInstallerPrompt {
+            get {
+                return ResourceManager.GetString("driverInstallerPrompt", resourceCulture);
             }
         }
         
@@ -269,6 +309,15 @@ namespace Flash_Multi {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string modeDfuSwitch {
+            get {
+                return ResourceManager.GetString("modeDfuSwitch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Erasing MULTI-Module.
         /// </summary>
         internal static string modeErasing {
@@ -301,6 +350,24 @@ namespace Flash_Multi {
         internal static string progressErasingFlash {
             get {
                 return ResourceManager.GetString("progressErasingFlash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installing MULTI-Module DFU Bootloader Driver ....
+        /// </summary>
+        internal static string progressInstallingDfuDriver {
+            get {
+                return ResourceManager.GetString("progressInstallingDfuDriver", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installing MULTI-Module USB Serial Driver ....
+        /// </summary>
+        internal static string progressInstallingUsbSerialDriver {
+            get {
+                return ResourceManager.GetString("progressInstallingUsbSerialDriver", resourceCulture);
             }
         }
         

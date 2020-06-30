@@ -40,8 +40,8 @@
             // 
             // serialOutput
             // 
-            this.serialOutput.BackColor = System.Drawing.SystemColors.ControlLightLight;
             resources.ApplyResources(this.serialOutput, "serialOutput");
+            this.serialOutput.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.serialOutput.Name = "serialOutput";
             this.serialOutput.ReadOnly = true;
             // 
