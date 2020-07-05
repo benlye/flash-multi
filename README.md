@@ -23,6 +23,8 @@ Just three steps are required to update your Jumper, iRangeX, or DIY MULTI-Modul
 1. [Installing Flash Multi](#installing-flash-multi)
    1. [Windows](#windows)
       1. [Additional Drivers](#additional-drivers)
+         1. [MULTI-Module Drivers](#multi-module-drivers)
+         1. [Jumper JP4IN1-SE Drivers](#jumper-jp4in1-se)
    1. [Linux and Mac](#linux-and-mac)
 1. [Using Flash Multi](#using-flash-multi)
    1. [Writing (Updating) Firmware](#writing-updating-firmware)
@@ -81,13 +83,16 @@ Flash Multi requires .Net Framework 4.5 or newer.  You probably already have a c
 ### Additional Drivers
 **Depending on your MULTI-Module and version of Windows you may need to install additional drivers manually.**
 
-#### Maple USB
-The Maple USB driver, which is used by many MULTI-Modules, including original Jumper JP4IN1 modules, iRangeX IRX4 and IRX4+ modules, and all Banggood STM32 modules, can be installed using the driver installer which is included with Flash Multi.
+#### MULTI-Module Drivers
+The MULTI-Module USB drivers, which are used by many MULTI-Modules, including original Jumper JP4IN1 modules, iRangeX IRX4 and IRX4+ modules, and all Banggood STM32 modules, can be installed directly from Flash Multi.
 
-**Note:** Make sure your MULTI-Module is not plugged in when you run the Maple USB driver installer.  This is to avoid potential problems with the driver installation.
+**Note:** For the best results, plug the MULTI-Module in before installing the drivers.
 
-1. Locate the folder where you unzipped Flash Multi
-1. Run `\drivers\install_drivers.bat` to install the Maple USB device drivers
+1. Start Flash Multi
+1. Click **Advanced -> Actions -> Install USB Drivers**
+1. Follow the prompts to install the drivers
+
+Once the driver installation is complete, disconnect and reconnect the MULTI-Module.
 
 #### Jumper JP4IN1-SE
 The driver for the Jumper JP4IN1 module, the Silicon Labs CP210x driver, is **not** included with Flash Multi and can be downloaded from here:
