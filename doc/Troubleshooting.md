@@ -16,7 +16,20 @@ Found DFU: [1eaf:0003] devnum=0, cfg=1, intf=0, alt=2, name="UNDEFINED"
 Claiming USB DFU Interface...
 Cannot claim interface
 ```
-### Solution
+### Solution 1
+Use the latest version of Flash Multi to update the DFU drivers.
+
+1. Download and install Flash Multi 0.4.0 or newer
+1. Extract the files and fun `flash-multi.exe`
+1. Plug your MULTI-Module into the computer
+1. Ensure that the correct COM port is selected
+1. Click Advanced -> Actions -> Upgrade USB Drivers
+1. Follow the on screen prompts to upgrade the drivers
+1. Disconnect and reconnect the MULTI-Module
+
+### Solution 2
+Use Zadig to replace the DFU drivers.
+
 1. Download and extract or install the latest version  of Zadig from https://zadig.akeo.ie/
 1. Put the MULTI-Module into DFU mode
    1. Open a **Command Prompt**
