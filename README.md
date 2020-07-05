@@ -23,6 +23,8 @@ Just three steps are required to update your Jumper, iRangeX, or DIY MULTI-Modul
 1. [Installing Flash Multi](#installing-flash-multi)
    1. [Windows](#windows)
       1. [Additional Drivers](#additional-drivers)
+         1. [MULTI-Module Drivers](#multi-module-drivers)
+         1. [Jumper JP4IN1-SE Drivers](#jumper-jp4in1-se)
    1. [Linux and Mac](#linux-and-mac)
 1. [Using Flash Multi](#using-flash-multi)
    1. [Writing (Updating) Firmware](#writing-updating-firmware)
@@ -32,6 +34,14 @@ Just three steps are required to update your Jumper, iRangeX, or DIY MULTI-Modul
       1. [Read Output](#read-output)
    1. [Saving Backups](#saving-backups)
    1. [Erasing the Module](#erasing-the-module)
+   1. [Advanced](#advanced)
+      1. [Actions](#advanced-actions)
+         1. [Install USB Drivers](#install-usb-drivers)
+         1. [Reset Module to DFU Mode](#reset-module-to-dfu-mode)
+         1. [Upgrade Module Bootloader](#upgrade-module-bootloader)
+      1. [Settings](#advanced-settings)
+         1. [Serial Baud Rate](#serial-baud-rate)
+         1. [Run Fimrware After Write](#run-firmware-after-write)
 1. [Cloning a MULTI-Module](#cloning-a-multi-module)
    1. [How to Clone a Module](#how-to-clone-a-module)
       1. [EEPROM Backup and Restore](#eeprom-backup-and-restore)
@@ -73,13 +83,16 @@ Flash Multi requires .Net Framework 4.5 or newer.  You probably already have a c
 ### Additional Drivers
 **Depending on your MULTI-Module and version of Windows you may need to install additional drivers manually.**
 
-#### Maple USB
-The Maple USB driver, which is used by many MULTI-Modules, including original Jumper JP4IN1 modules, iRangeX IRX4 and IRX4+ modules, and all Banggood STM32 modules, can be installed using the driver installer which is included with Flash Multi.
+#### MULTI-Module Drivers
+The MULTI-Module USB drivers, which are used by many MULTI-Modules, including original Jumper JP4IN1 modules, iRangeX IRX4 and IRX4+ modules, and all Banggood STM32 modules, can be installed directly from Flash Multi.
 
-**Note:** Make sure your MULTI-Module is not plugged in when you run the Maple USB driver installer.  This is to avoid potential problems with the driver installation.
+**Note:** For the best results, plug the MULTI-Module in before installing the drivers.
 
-1. Locate the folder where you unzipped Flash Multi
-1. Run `\drivers\install_drivers.bat` to install the Maple USB device drivers
+1. Start Flash Multi
+1. Click **Advanced -> Actions -> Install USB Drivers**
+1. Follow the prompts to install the drivers
+
+Once the driver installation is complete, disconnect and reconnect the MULTI-Module.
 
 #### Jumper JP4IN1-SE
 The driver for the Jumper JP4IN1 module, the Silicon Labs CP210x driver, is **not** included with Flash Multi and can be downloaded from here:
@@ -202,6 +215,42 @@ Erasing the EEPROM data is necessary to restore a module which has had a backup 
    1. Confirm that you really want to erase the module
 
 Once again, **THIS OPERATION CANNOT BE UNDONE**.
+
+## Advanced
+The **Advanced** menu contains extra features and settings.
+
+### Advanced Actions
+The **Advanced -> Actions** menu can be used to access several extra actions.
+
+#### Install USB Drivers
+Clicking **Advanced -> Actions -> Install USB Drivers** will install or upgrade the MULTI-Module USB drivers.
+
+Drivers can be installed with or without a MULTI-Module plugged into the computer.
+
+**Note:** For best results, do the driver installation with the MULTI-Module plugged in.  If the module is plugged in, it will be reset to DFU mode during the driver installation.  This is to ensure that the DFU-mode drivers are installed or upgraded properly - if an older driver is present it cannot be updated if the module is not connected.  Once the driver installation is complete, you can unplug the module and plug it back in to reset it, but this is not necessary.
+
+#### Reset Module to DFU Mode
+Clicking **Advanced -> Actions -> Reset Module to DFU Mode** will reset the attached MULTI-Module into DFU mode.
+
+This is not normally necessary to do manually, but it may be needed for troubleshooting driver problems.  This menu item is only enabled when a MULTI-Module in USB Serial mode is attached, and the COM port corresponding to the module is selected.
+
+#### Upgrade Module Bootloader
+Clicking **Advanced -> Actions -> Upgrade Module Bootloader** will update the MULTI-Module's bootloader.
+
+Updating the bootloader is necessary for some MULTI-Modules which are known to ship with broken or out-of-date bootloaders installed.  Clicking **Upgrade Module Bootloader** will replace the MULTI firmware with an application which will update the bootloader.  Once the process completes the module must be unplugged, plugged back in, and new firmware written to it.
+
+**Important:** Read the on-screen instructions and pay attention to the module's red LED during the bootloader upgrade process.  It is important not to unplug the module until the red LED has been off for more than 5 seconds.
+
+This menu item is only enabled when a MULTI-Module in USB Serial mode or DFU Bootloader mode is attached, and the COM port (or DFU Device) corresponding to the module is selected.
+
+### Advanced Settings
+#### Serial Baud Rate
+Sets the baud rate which is used to read and write MULTI-Modules using an internal or external USB-to-Serial adapter.  Value can be 57,600 or 115,200 (default).  
+
+Try the lower rate if you have problems reading or writing a device.
+
+#### Run Firmware After Write
+Enable or disable running the MULTI firmware after it has been written to the module.  Default is enabled (run the firmware after write).
 
 # Cloning a MULTI-Module
 Cloning a MULTI-Module means using the Global ID of one module on another.  This may be useful if you have multiple radios or multiple MULTI-Modules and you want all your modules to control all your models without re-binding them.
