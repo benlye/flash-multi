@@ -316,7 +316,7 @@ namespace Flash_Multi
                 return;
             }
 
-            flashMulti.AppendLog($" {Strings.done}");
+            flashMulti.AppendLog($" {Strings.done}\r\n");
 
             // Write the bootloader if required
             if (writeBootloader)
@@ -340,7 +340,7 @@ namespace Flash_Multi
                     return;
                 }
 
-                flashMulti.AppendLog($" {Strings.done}");
+                flashMulti.AppendLog($" {Strings.done}\r\n");
             }
 
             // Increment the step counter and write to the log
@@ -374,7 +374,7 @@ namespace Flash_Multi
             }
 
             // Write a success message to the log
-            flashMulti.AppendLog($" {Strings.done}");
+            flashMulti.AppendLog($" {Strings.done}\r\n");
             flashMulti.AppendLog($"\r\n{Strings.succeededWritingFirmware}");
 
             // Show a success message box
