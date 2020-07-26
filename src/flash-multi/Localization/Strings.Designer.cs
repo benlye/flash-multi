@@ -426,7 +426,11 @@ namespace Flash_Multi {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BootReloader written successfully..
+        ///   Looks up a localized string similar to BootReloader written successfully.
+        ///
+        ///DO NOT UNPLUG THE MULTI-MODULE UNTIL THE RED LED GOES OUT AND REMAINS OFF FOR 5 SECONDS!
+        ///
+        ///You will need to write new firmware to the MULTI-Module..
         /// </summary>
         internal static string succeededWritingBootReloader {
             get {

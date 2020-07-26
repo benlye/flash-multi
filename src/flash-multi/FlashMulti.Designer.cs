@@ -84,6 +84,7 @@ namespace Flash_Multi
             this.toolStripMenuItemBaudRate57600 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemBaudRate115200 = new System.Windows.Forms.ToolStripMenuItem();
             this.runAfterUploadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.enableDeviceDetectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.documentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -319,7 +320,8 @@ namespace Flash_Multi
             // 
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.baudRateToolStripMenuItem,
-            this.runAfterUploadToolStripMenuItem});
+            this.runAfterUploadToolStripMenuItem,
+            this.enableDeviceDetectionToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             resources.ApplyResources(this.settingsToolStripMenuItem, "settingsToolStripMenuItem");
             // 
@@ -348,6 +350,13 @@ namespace Flash_Multi
             this.runAfterUploadToolStripMenuItem.CheckOnClick = true;
             this.runAfterUploadToolStripMenuItem.Name = "runAfterUploadToolStripMenuItem";
             resources.ApplyResources(this.runAfterUploadToolStripMenuItem, "runAfterUploadToolStripMenuItem");
+            // 
+            // enableDeviceDetectionToolStripMenuItem
+            // 
+            this.enableDeviceDetectionToolStripMenuItem.CheckOnClick = true;
+            this.enableDeviceDetectionToolStripMenuItem.Name = "enableDeviceDetectionToolStripMenuItem";
+            resources.ApplyResources(this.enableDeviceDetectionToolStripMenuItem, "enableDeviceDetectionToolStripMenuItem");
+            this.enableDeviceDetectionToolStripMenuItem.Click += new System.EventHandler(this.EnableDeviceDetectionToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -448,6 +457,7 @@ namespace Flash_Multi
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemBaudRate115200;
         private System.Windows.Forms.ToolStripMenuItem runAfterUploadToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem installUSBDriversToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem enableDeviceDetectionToolStripMenuItem;
     }
 }
 

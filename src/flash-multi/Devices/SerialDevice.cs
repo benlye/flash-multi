@@ -214,6 +214,7 @@ namespace Flash_Multi
         /// <param name="comPort">The COM port where the serial device can be found.</param>
         /// <param name="writeBootloader">Indicates whether or not the bootloader should be written.</param>
         /// <param name="writeEeprom">Indicates whether or not the EEPROM is being written, therefore should be erased before the write.</param>
+        /// <param name="runAfterUpload">Indicates whether or not the firmware should run after it is uploaded.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public static async Task WriteFlash(FlashMulti flashMulti, string fileName, string comPort, bool writeBootloader, bool writeEeprom, bool runAfterUpload)
         {
@@ -377,11 +378,11 @@ namespace Flash_Multi
             flashMulti.AppendLog($" {Strings.done}\r\n");
             flashMulti.AppendLog($"\r\n{Strings.succeededWritingFirmware}");
 
-            // Show a success message box
-            MessageBox.Show(Strings.succeededWritingFirmware, Strings.succeededWritingFirmware, MessageBoxButtons.OK, MessageBoxIcon.Information);
-
             // Re-enable the form controls
             flashMulti.EnableControls(true);
+
+            // Show a success message box
+            MessageBox.Show(Strings.succeededWritingFirmware, Strings.succeededWritingFirmware, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

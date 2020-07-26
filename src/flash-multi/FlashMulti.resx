@@ -769,7 +769,7 @@
     <value>&amp;Upgrade Module Bootloader</value>
   </data>
   <data name="actionsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>116, 22</value>
+    <value>180, 22</value>
   </data>
   <data name="actionsToolStripMenuItem.Text" xml:space="preserve">
     <value>A&amp;ctions</value>
@@ -798,8 +798,14 @@
   <data name="runAfterUploadToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Run Firmware After Write</value>
   </data>
+  <data name="enableDeviceDetectionToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>207, 22</value>
+  </data>
+  <data name="enableDeviceDetectionToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Enable Device Detection</value>
+  </data>
   <data name="settingsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>116, 22</value>
+    <value>180, 22</value>
   </data>
   <data name="settingsToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Settings</value>
@@ -1524,6 +1530,12 @@
     <value>runAfterUploadToolStripMenuItem</value>
   </data>
   <data name="&gt;&gt;runAfterUploadToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;enableDeviceDetectionToolStripMenuItem.Name" xml:space="preserve">
+    <value>enableDeviceDetectionToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;enableDeviceDetectionToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;helpToolStripMenuItem.Name" xml:space="preserve">

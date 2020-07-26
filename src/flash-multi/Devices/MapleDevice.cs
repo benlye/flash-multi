@@ -83,6 +83,16 @@ namespace Flash_Multi
         public string Mode { get; private set; }
 
         /// <summary>
+        /// Async method to find a Maple device in either USB or DFU mode.
+        /// </summary>
+        /// <returns>Returns a <see cref="MapleDevice"/>.</returns>
+        public static async Task<MapleDevice> FindMapleAsync()
+        {
+            MapleDevice mapleDevice = await Task.Run(() => FindMaple());
+            return mapleDevice;
+        }
+
+        /// <summary>
         /// Finds a Maple device in either USB or DFU mode.
         /// </summary>
         /// <returns>Returns a <see cref="MapleDevice"/>.</returns>
@@ -523,8 +533,11 @@ namespace Flash_Multi
                 serialMonitor.SerialConnect(comPort);
             }
 
-            MessageBox.Show(Strings.succeededWritingFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // Re-enable the form controls
             flashMulti.EnableControls(true);
+
+            // Show a success message box
+            MessageBox.Show(Strings.succeededWritingFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /// <summary>
@@ -683,9 +696,6 @@ namespace Flash_Multi
                     }
                 }
             }
-
-            // Re-enable the form controls
-            flashMulti.EnableControls(true);
 
             return true;
         }

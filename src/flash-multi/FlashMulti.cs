@@ -30,6 +30,7 @@ namespace Flash_Multi
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Forms;
+    using Flash_Multi.Properties;
 
     /// <summary>
     /// The FlashMulti Form class.
@@ -86,6 +87,8 @@ namespace Flash_Multi
         /// </summary>
         private bool controlsDisabled = false;
 
+        private bool enableDeviceDetection = true;
+
         /// <summary>
         /// Buffer for verbose output logging.
         /// </summary>
@@ -141,6 +144,10 @@ namespace Flash_Multi
 
             // Set 'Run after upload' from the settings
             this.runAfterUploadToolStripMenuItem.Checked = Properties.Settings.Default.RunAfterUpload;
+
+            // Set 'Enable device detection' from the settings
+            this.enableDeviceDetection = Properties.Settings.Default.EnableDeviceDetection;
+            this.enableDeviceDetectionToolStripMenuItem.Checked = this.enableDeviceDetection;
 
             // Hide the verbose output panel and set the height of the other panel
             int initialHeight = 215;
@@ -455,7 +462,7 @@ namespace Flash_Multi
         /// Enable or disable the controls.
         /// </summary>
         /// <param name="arg">True to enable, False to disable.</param>
-        public void EnableControls(bool arg)
+        public async void EnableControls(bool arg)
         {
             // Enable the buttons
             if (arg)
@@ -473,10 +480,12 @@ namespace Flash_Multi
             if (arg)
             {
                 // Populate the COM ports
-                _ = this.PopulateComPortsAsync();
+                await this.PopulateComPortsAsync();
             }
 
             // Toggle the controls
+            Debug.WriteLine("Toggling controls");
+            this.buttonRefresh.Enabled = arg;
             this.buttonUpload.Enabled = arg;
             this.buttonBrowse.Enabled = arg;
             this.buttonRefresh.Enabled = arg;
@@ -496,15 +505,24 @@ namespace Flash_Multi
             if (arg)
             {
                 // Check if the Upload button can be enabled
-                this.CheckControls();
+                this.CheckControlsAsync();
             }
         }
 
         /// <summary>
-        /// Checks if the Upload button should be enabled or not.
+        /// Async method to checks which controls should be enabled or disabled and sets their states accordingly.
         /// Called by changes to the file name or COM port selector.
         /// </summary>
-        public void CheckControls()
+        public async void CheckControlsAsync()
+        {
+            await Task.Run(() => this.CheckControls());
+        }
+
+        /// <summary>
+        /// Checks which controls should be enabled or disabled and sets their states accordingly.
+        /// Called by changes to the file name or COM port selector.
+        /// </summary>
+        public async void CheckControls()
         {
             if (this.InvokeRequired)
             {
@@ -518,7 +536,12 @@ namespace Flash_Multi
                 return;
             }
 
-            if (this.textFileName.Text != string.Empty && this.comPortSelector.SelectedItem != null)
+            Debug.WriteLine("Checking controls");
+
+            // Get the selected COM port
+            var selectedPort = this.GetSelectedPort();
+
+            if (this.textFileName.Text != string.Empty && this.GetSelectedPort() != null)
             {
                 this.buttonUpload.Enabled = true;
             }
@@ -527,7 +550,7 @@ namespace Flash_Multi
                 this.buttonUpload.Enabled = false;
             }
 
-            if (this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() != "USBasp" && this.comPortSelector.SelectedValue.ToString() != "DFU Device")
+            if (selectedPort != null && selectedPort.ToString() != "USBasp" && selectedPort.ToString() != "DFU Device")
             {
                 this.buttonSerialMonitor.Enabled = true;
             }
@@ -537,7 +560,7 @@ namespace Flash_Multi
                 this.buttonRead.Enabled = false;
             }
 
-            if (this.comPortSelector.SelectedItem != null)
+            if (this.GetSelectedPort() != null)
             {
                 this.buttonRead.Enabled = true;
                 this.buttonErase.Enabled = true;
@@ -558,26 +581,35 @@ namespace Flash_Multi
             }
 
             // Check for a Maple device
-            MapleDevice mapleCheck = MapleDevice.FindMaple();
-
-            // If a Maple Serial device is present and the selected port is the Maple COM port, enable the Reset to DFU Mode menu item
-            if (mapleCheck.DeviceFound && mapleCheck.UsbMode == true && this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() == MapleDevice.GetMapleComPort())
+            MapleDevice mapleCheck = await Task.Run(() => MapleDevice.FindMaple());
+            if (mapleCheck.DeviceFound)
             {
-                this.resetToDFUModeToolStripMenuItem.Enabled = true;
+                string mapleComPort = await Task.Run(() => MapleDevice.GetMapleComPort());
+
+                // If a Maple Serial device is present and the selected port is the Maple COM port, enable the Reset to DFU Mode menu item
+                if (mapleCheck.DeviceFound && mapleCheck.UsbMode == true && selectedPort != null && selectedPort.ToString() == mapleComPort)
+                {
+                    this.resetToDFUModeToolStripMenuItem.Enabled = true;
+                }
+                else
+                {
+                    this.resetToDFUModeToolStripMenuItem.Enabled = false;
+                }
+
+                // If a Maple DFU is present and the selected port is the Maple COM port or DFU device, enable the upload bootloader menu item
+                if ((mapleCheck.DeviceFound && mapleCheck.UsbMode == true && selectedPort != null && selectedPort.ToString() == mapleComPort)
+                    || (mapleCheck.DeviceFound && mapleCheck.DfuMode == true && selectedPort != null && selectedPort.ToString() == "DFU Device"))
+                {
+                    this.upgradeBootloaderToolStripMenuItem.Enabled = true;
+                }
+                else
+                {
+                    this.upgradeBootloaderToolStripMenuItem.Enabled = false;
+                }
             }
             else
             {
                 this.resetToDFUModeToolStripMenuItem.Enabled = false;
-            }
-
-            // If a Maple DFU is present and the selected port is the Maple COM port or DFU device, enable the upload bootloader menu item
-            if ((mapleCheck.DeviceFound && mapleCheck.UsbMode == true && this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() == MapleDevice.GetMapleComPort())
-                || (mapleCheck.DeviceFound && mapleCheck.DfuMode == true && this.comPortSelector.SelectedItem != null && this.comPortSelector.SelectedValue.ToString() == "DFU Device"))
-            {
-                this.upgradeBootloaderToolStripMenuItem.Enabled = true;
-            }
-            else
-            {
                 this.upgradeBootloaderToolStripMenuItem.Enabled = false;
             }
         }
@@ -607,18 +639,30 @@ namespace Flash_Multi
             base.WndProc(ref m);
             if (m.Msg == UsbNotification.WmDevicechange)
             {
-                switch ((int)m.WParam)
+                // Don't do anything if the controls are disabled
+                if (this.enableDeviceDetection)
                 {
-                    case UsbNotification.DbtDeviceremovecomplete:
-                        // Update the COM port list
-                        Debug.WriteLine($"Flash multi saw device removal");
-                        _ = this.PopulateComPortsAsync();
-                        break;
-                    case UsbNotification.DbtDevicearrival:
-                        // Update the COM port list
-                        Debug.WriteLine($"Flash multi saw device arrival");
-                        _ = this.PopulateComPortsAsync();
-                        break;
+                    switch ((int)m.WParam)
+                    {
+                        case UsbNotification.DbtDeviceremovecomplete:
+                            // Update the COM port list
+                            Debug.WriteLine($"USB device removed");
+                            this.enableDeviceDetection = false;
+
+                            // Wait 2s before populating the COM port selector
+                            this.DelayedExecute(() => this.TimerCallback(), 2000);
+
+                            break;
+                        case UsbNotification.DbtDevicearrival:
+                            // Update the COM port list
+                            Debug.WriteLine($"USB device attached");
+                            this.enableDeviceDetection = false;
+
+                            // Wait 2s before populating the COM port selector
+                            this.DelayedExecute(() => this.TimerCallback(), 2000);
+
+                            break;
+                    }
                 }
             }
         }
@@ -675,6 +719,31 @@ namespace Flash_Multi
         }
 
         /// <summary>
+        /// Method to execute an action after a delay.
+        /// </summary>
+        /// <param name="action">The action to execute.</param>
+        /// <param name="timeoutInMilliseconds">The delay in ms before the action is executed.</param>
+        private async void DelayedExecute(Action action, int timeoutInMilliseconds)
+        {
+            await Task.Delay(timeoutInMilliseconds);
+            action();
+        }
+
+        /// <summary>
+        /// Populates the COM ports after a USB device was added or removed.
+        /// </summary>
+        private async void TimerCallback()
+        {
+            Debug.WriteLine("Device detection timer elapsed");
+
+            // Revert the device detection setting
+            this.enableDeviceDetection = Settings.Default.EnableDeviceDetection;
+
+            // Populate the COM port selector
+            await this.PopulateComPortsAsync();
+        }
+
+        /// <summary>
         /// Handles the user clicking the Read button.
         /// </summary>
         private async void ButtonRead_Click(object sender, EventArgs e)
@@ -706,8 +775,12 @@ namespace Flash_Multi
         /// </summary>
         private void ComPortSelector_SelectionChanged(object sender, EventArgs e)
         {
-            // Check if the Upload button should be enabled yet
-            this.CheckControls();
+            Debug.WriteLine("COM port selector changed");
+            if (this.buttonRefresh.Enabled)
+            {
+                // Check if the Upload button should be enabled yet
+                this.CheckControlsAsync();
+            }
         }
 
         /// <summary>
@@ -716,7 +789,7 @@ namespace Flash_Multi
         private void TextFileName_OnChange(object sender, EventArgs e)
         {
             // Check if the Upload button should be enabled yet
-            this.CheckControls();
+            this.CheckControlsAsync();
         }
 
         /// <summary>
@@ -778,7 +851,9 @@ namespace Flash_Multi
         private async void ButtonRefresh_Click(object sender, EventArgs e)
         {
             Debug.WriteLine("ButtonRefresh clicked");
+            this.buttonRefresh.Enabled = false;
             await this.PopulateComPortsAsync();
+            this.buttonRefresh.Enabled = true;
             Debug.WriteLine("ButtonRefresh handled");
         }
 
@@ -811,7 +886,7 @@ namespace Flash_Multi
             }
             else
             {
-                SerialMonitor serialMonitor = new SerialMonitor(this.comPortSelector.SelectedValue.ToString());
+                SerialMonitor serialMonitor = new SerialMonitor(this.GetSelectedPort().ToString());
                 serialMonitor.Show();
             }
         }
@@ -905,6 +980,16 @@ namespace Flash_Multi
         }
 
         /// <summary>
+        /// Handles the user toggling the Device Detection menu setting.
+        /// </summary>
+        private void EnableDeviceDetectionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.enableDeviceDetection = this.enableDeviceDetectionToolStripMenuItem.Checked;
+            Properties.Settings.Default.EnableDeviceDetection = this.enableDeviceDetectionToolStripMenuItem.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+        /// <summary>
         /// Handles the user clicking the Check for Update menu item.
         /// </summary>
         private void CheckForUpdateToolStripMenuItem_Click(object sender, EventArgs e)
@@ -965,7 +1050,7 @@ namespace Flash_Multi
             UsbAspDevice usbaspResult = UsbAspDevice.FindUsbAsp();
 
             // Get the selected COM port
-            string comPort = this.comPortSelector.SelectedValue.ToString();
+            string comPort = this.GetSelectedPort().ToString();
 
             // Generate a temp file to read the firmware into
             string tempFirmwareFileName = Path.GetTempFileName();
@@ -1100,7 +1185,7 @@ namespace Flash_Multi
             }
 
             // Re-enable the controls
-            this.CheckControls();
+            this.CheckControlsAsync();
 
             // Populate the COM ports in case they changed
             await this.PopulateComPortsAsync();
@@ -1153,7 +1238,7 @@ namespace Flash_Multi
             UsbAspDevice usbaspResult = UsbAspDevice.FindUsbAsp();
 
             // Get the selected COM port
-            string comPort = this.comPortSelector.SelectedValue.ToString();
+            string comPort = this.GetSelectedPort().ToString();
 
             // Do the selected flash using the appropriate method
             bool eraseSucceeded;
@@ -1172,7 +1257,7 @@ namespace Flash_Multi
             }
 
             // Re-enable the controls
-            this.CheckControls();
+            this.CheckControlsAsync();
 
             // Populate the COM ports in case they changed
             await this.PopulateComPortsAsync();
@@ -1272,7 +1357,7 @@ namespace Flash_Multi
             }
 
             // Get the selected COM port
-            string comPort = this.comPortSelector.SelectedValue.ToString();
+            string comPort = this.GetSelectedPort().ToString();
 
             // Clear the backup file name - the backup will be invalid after an upload
             this.firmwareBackupFileName = string.Empty;
@@ -1411,7 +1496,7 @@ namespace Flash_Multi
             }
 
             // Check if the Upload button should be enabled yet
-            this.CheckControls();
+            this.CheckControlsAsync();
         }
 
         /// <summary>
@@ -1447,8 +1532,8 @@ namespace Flash_Multi
                 await MapleDevice.ResetToDfuMode(this, mapleComPort);
             }
 
-            // Refresh the COM ports
-            this.PopulateComPorts();
+            // Re-enable the controls
+            this.EnableControls(true);
         }
 
         /// <summary>
@@ -1541,7 +1626,7 @@ namespace Flash_Multi
             this.eepromBackupFileName = string.Empty;
 
             // Get the port
-            string comPort = this.comPortSelector.SelectedValue.ToString();
+            string comPort = this.GetSelectedPort().ToString();
 
             bool upgradeSucceeded;
 
@@ -1612,11 +1697,17 @@ namespace Flash_Multi
         /// </summary>
         private void PopulateComPorts()
         {
+            Debug.WriteLine("Populate COM ports started");
+            DateTime start = DateTime.Now;
+
             // Don't refresh if the control is not enabled
             if (!this.comPortSelector.Enabled)
             {
                 return;
             }
+
+            // Stop firing the the COM port selector change handler
+            this.comPortSelector.SelectedIndexChanged -= new System.EventHandler(this.ComPortSelector_SelectionChanged);
 
             // Get the current list from the combobox so we can auto-select the new device
             var oldPortList = this.comPortSelector.Items;
@@ -1626,14 +1717,13 @@ namespace Flash_Multi
             object portToSelect = selectedValue;
 
             // Enumerate the COM ports and bind the COM port selector
+            Debug.WriteLine($"{DateTime.Now - start} Enumerating COM ports.");
             _ = new List<ComPort>();
             List<ComPort> comPorts = ComPort.EnumeratePortList();
 
             // Check if we have a Maple device
+            Debug.WriteLine($"{DateTime.Now - start} Checking for a Maple device.");
             _ = MapleDevice.FindMaple();
-
-            // Populate the COM port selector
-            this.PopulatePortSelector(comPorts);
 
             // If we had an old list, compare it to the new one and pick the first item which is new
             if (oldPortList.Count > 0)
@@ -1657,6 +1747,10 @@ namespace Flash_Multi
                 }
             }
 
+            // Populate the COM port selector
+            Debug.WriteLine($"{DateTime.Now - start} Populating port selector.");
+            this.PopulatePortSelector(comPorts);
+
             // Re-select the previously selected item
             this.SelectPort(portToSelect);
 
@@ -1664,7 +1758,10 @@ namespace Flash_Multi
             // this.comPortSelector.DropDownWidth = comPorts.Select(c => c.DisplayName).ToList().Max(x => TextRenderer.MeasureText(x, this.comPortSelector.Font).Width);
 
             // Make sure the Update button is disabled if there is no port selected
-            this.CheckControls();
+            this.CheckControlsAsync();
+
+            // Resume firing the the COM port selector change handler
+            this.comPortSelector.SelectedIndexChanged += new System.EventHandler(this.ComPortSelector_SelectionChanged);
         }
 
         /// <summary>
