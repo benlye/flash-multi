@@ -256,7 +256,11 @@ Click OK to proceed.</value>
     <value>Writing BootReloader to MULTI-Module ...</value>
   </data>
   <data name="succeededWritingBootReloader" xml:space="preserve">
-    <value>BootReloader written successfully.</value>
+    <value>BootReloader written successfully.
+
+DO NOT UNPLUG THE MULTI-MODULE UNTIL THE RED LED GOES OUT AND REMAINS OFF FOR 5 SECONDS!
+
+You will need to write new firmware to the MULTI-Module.</value>
   </data>
   <data name="bootloaderUpgradeFailed" xml:space="preserve">
     <value>Failed to write the bootloader upgrade app!</value>
