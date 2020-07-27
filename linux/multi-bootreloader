@@ -1,0 +1,228 @@
+#!/bin/bash
+shopt -s extglob
+
+# *********************************************************************
+# Copyright (C) 2019 Ben Lye
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# *********************************************************************
+
+# Define the script version
+VERSION=0.1.0
+
+# Write the script header
+printf "multi-bootreloader $VERSION\n\nThis program is Free Software and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
+
+# Prepare simple help text to display when needed
+USAGE="Usage: multi-bootreloader [options] -p [serial device]\n\nOptions:\n  -h  Print this message and exit\n  -s  Don't prompt for confirmation\n\n"
+
+# Get the command line options
+while getopts ":f:p:hv" opt; do
+  case $opt in
+    f) FWFILE="$OPTARG"
+    ;;
+    p) PORT="$OPTARG"
+    ;;
+    h) printf "$USAGE"; exit 1
+    ;;
+    v) VERBOSE="True"
+    ;;
+    \?) printf "Invalid argument -$OPTARG\n\n"; >&2
+    ;;
+    :) printf "Missing value for argument -$OPTARG\n\n"; >&2
+    ;;
+  esac
+done
+
+# FWFILE is BootReloader.bin
+FWFILE=./tools/BootReloader.bin
+
+# Die if the firmware file doesn't exist
+if [ ! -f "$FWFILE" ]; then
+    printf "ERROR: $FWFILE does not exist!\n\n";
+    exit 2;
+fi
+
+# Die if the firmware file isn't readable
+if [ ! -r "$FWFILE" ]; then
+    printf "ERROR: $FWFILE cannot be read!\n\n";
+    exit 2;
+fi
+
+function confirm() {
+  while true; do
+    read -p "$1 [Y]es or [N]o: "
+    case $(echo $REPLY | tr '[A-Z]' '[a-z]') in
+        y|yes) echo "yes"; return ;;
+        n|no)  echo "no" ; return ;;
+    esac
+  done
+}
+
+function list_usb()
+{
+while IFS=: read key value; do
+  key="${key##+( )}"
+  value="${value##+( )}"
+  case "$key" in
+    "Product ID")
+        p="${value% *}"
+        ;;
+    "Vendor ID")
+        v="${value%% *}"
+        ;;
+    "Manufacturer")
+        m="${value}"
+        ;;
+    "Location ID")
+        l="${value}"
+        printf "%s:%s %s (%s)\n" "$v" "$p" "$l" "$m"
+        ;;
+  esac
+done < <( system_profiler SPUSBDataType )
+}
+
+# Check to see if a native STM32 USB device (Maple device)
+uname -a | grep "Darwin" 2>&1 1>/dev/null
+if [ $? -eq 0 ]; then
+  MAPLE_USB_DEVICES=$(echo "$(list_usb)" | grep "1eaf" | awk '{ print $1}')
+else
+  MAPLE_USB_DEVICES=$(lsusb | grep "1eaf")
+fi
+
+# Configure command output for verbosity level
+if [[ $VERBOSE == "True" ]]; then
+  OUTPUT='/dev/stdout'
+else
+  OUTPUT='/dev/null'
+fi
+
+# Determine the mode of and attached STM32 device - DFU, Native (USB serial), or Unknown (not found)
+case $MAPLE_USB_DEVICES in 
+   *?(0x)1eaf:?(0x)0003*)
+      MAPLE_DEVICE=DFU
+   ;;
+   *?(0x)1eaf:?(0x)0004*)
+      MAPLE_DEVICE=Native
+   ;;
+   *)
+      MAPLE_DEVICE=Unknown
+   ;;
+esac
+
+# Die if there isn't a Maple device attached
+if [[ $MAPLE_DEVICE == "Unknown" ]]
+then
+  # No Maple device - run the serial flash
+  printf "ERROR: No compatible MULTI-Module detected.\n\n"
+  exit 2
+fi
+
+# Check if port exists for Maple USB serial - there is no port needed for DFU 
+if [ $MAPLE_DEVICE == "Native" ] ; then
+  # Die if a serial port wasn't specified
+  if [ "x" == "x$PORT" ]; then
+    printf "ERROR: No port specified and no programmable device found!\n\n";
+    printf "$USAGE"
+    exit 1
+  fi
+
+  # Die if the serial port doesn't exist
+  if [ ! -c "$PORT" ]; then
+      printf "ERROR: $PORT does not exist!\n\n";
+      exit 3;
+  fi
+fi
+
+# Get the directory where the script is running.
+# DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+DIR=$(dirname "$0")
+
+# Determine the binaries to use based on the platform architecture
+uname -a | grep "Darwin" 2>&1 1>/dev/null
+if [ $? -eq 0 ]; then
+  TOOLS_DIR="$DIR/tools/macos"
+  GREP_ARGS=""
+  STAT_ARGS="-f %z"
+else
+  uname -m | grep "x86_64" 2>&1 1>/dev/null
+  if [ $? -eq 0 ]; then
+    TOOLS_DIR="$DIR/tools/64bit"
+  else
+    TOOLS_DIR="$DIR/tools/32bit"
+  fi
+
+  GREP_ARGS="-Pa"
+  STAT_ARGS="--printf=%s"
+fi
+
+RESET_UTIL="$TOOLS_DIR/maple-reset"
+DFU_UTIL="$TOOLS_DIR/dfu-util"
+
+if [ ! -x $RESET_UTIL ]; then
+  printf "ERROR: Required tool $RESET_UTIL does not exist or is not executable!\n\n"; exit 3;
+fi
+
+if [ ! -x $DFU_UTIL ]; then
+  printf "ERROR: Required tool $DFU_UTIL does not exist or is not executable!\n\n"; exit 3;
+fi
+
+# Show the instructions
+printf "The MULTI-Module firmware will be replaced by an application which will upgrade the module's bootloader.";
+printf "\nOnce begun, DO NOT interrupt the process, otherwise the bootloader will be corrupted and the module will not function.";
+printf "\nIf this happens a USB-to-serial (FTDI) adapter can be used to re-program the module.";
+printf "\n\nThe upgrade takes 4-5 seconds and will be complete once the LED goes off and remains off for at least 5 seconds.\n\n";
+
+# Ask the user to confirm
+if [[ "no" == $(confirm "Proceed with writing the BootReloader app?") ]]
+then
+    printf "\nBootReloader aborted.\n\n"
+    exit 0
+fi
+echo
+
+# Write the BootReloader app to the module
+printf "Attempting USB upload using dfu-util\n\n"
+
+STEP=1;
+NUM_STEPS=1;
+
+if [[ $MAPLE_DEVICE == "Native" ]] ; then
+  NUM_STEPS=2;
+  
+  printf "[$STEP/$NUM_STEPS] Resetting to DFU mode...\n"
+  if [[ $VERBOSE == "True" ]]; then printf "$RESET_UTIL $PORT\n"; fi;
+  "${RESET_UTIL}" $PORT 1>$OUTPUT 2>$OUTPUT;
+  [ $? -ne 0 ] && printf "ERROR: Failed to reset device!\n\n" && exit 4;
+  
+  # Give the board time to reset to DFU mode
+  sleep 1
+  
+  STEP=$((STEP+1))
+fi
+
+printf "[$STEP/$NUM_STEPS] Writing BootReloader app...\n"
+if [[ $VERBOSE == "True" ]]; then printf "${DFU_UTIL} -d 1eaf:0003 -a 2 -D \"$FWFILE\" -R\n"; fi
+"${DFU_UTIL}" -d 1eaf:0003 -a 2 -D "$FWFILE" -R 1>$OUTPUT 2>$OUTPUT;
+[ $? -ne 0 ] && printf "\nERROR: Failed to write BootReloader!\n\n" && exit 5;
+
+# printf "\n\n";
+printf "\n###################################################";
+printf "\n#     MULTI-Module bootloader upgrade started     #";
+printf "\n###################################################";
+printf "\n\nIMPORTANT: DO NOT UNPLUG THE MULTI-MODULE UNTIL THE LED GOES OFF!";
+printf "\n\nYou may unplug the module once the LED goes off and remains off for at least 5 seconds.";
+printf "\n\nYou now need to:";
+printf "\n\t1. Unplug then reconnect the MULTI-Module (after the LED goes off)";
+printf "\n\t2. Write new firmware to the MULTI-Module\n\n";
