@@ -19,7 +19,7 @@ shopt -s extglob
 # *********************************************************************
 
 # Define the script version
-VERSION=0.2.4
+VERSION=0.4.3
 
 # Write the script header
 printf "flash-multi $VERSION\n\nThis program is Free Software and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
@@ -283,15 +283,15 @@ if [ $? -eq 0 ]; then
   MAPLE_USB_DEVICES=$(echo "$(list_usb)" | grep "1eaf" | awk '{ print $1}')
   USBASP_DEVICE=$(echo "$(list_usb)" | grep "0x16c0:0x05dc" | awk '{ print $1}')
 else
-  MAPLE_USB_DEVICES=$(lsusb | grep "1eaf" | awk '{ print $NF}')
-  USBASP_DEVICE=$(lsusb | grep "16c0:05dc" | awk '{ print $NF}')
+  MAPLE_USB_DEVICES=$(lsusb | grep "1eaf")
+  USBASP_DEVICE=$(lsusb | grep "16c0:05dc")
 fi
 
 case $MAPLE_USB_DEVICES in 
-   ?(0x)1eaf:?(0x)0003)
+   *?(0x)1eaf:?(0x)0003*)
       MAPLE_DEVICE=DFU
    ;;
-   ?(0x)1eaf:?(0x)0004)
+   *?(0x)1eaf:?(0x)0004*)
       MAPLE_DEVICE=Native
    ;;
    *)
@@ -467,8 +467,8 @@ else
     NUM_STEPS=2;
     
     printf "[$STEP/$NUM_STEPS] Resetting to DFU mode...\n"
-    printf "$RESET_UTIL $PORT\n"
-    "${RESET_UTIL}" $PORT
+    printf "$RESET_UTIL $PORT\n";
+    "${RESET_UTIL}" $PORT;
     [ $? -ne 0 ] && printf "ERROR: Failed to reset device!\n\n" && exit 4;
     
     # Give the board a chance to reset to DFU mode
@@ -478,8 +478,8 @@ else
   fi
   
   printf "[$STEP/$NUM_STEPS] Writing firmware...\n"
-  printf "${DFU_UTIL} -d 1eaf:0003 -a 2 -D \"$FWFILE\" -R\n"
-  "${DFU_UTIL}" -d 1eaf:0003 -a 2 -D "$FWFILE" -R
+  printf "${DFU_UTIL} -d 1eaf:0003 -a 2 -D \"$FWFILE\" -R\n";
+  "${DFU_UTIL}" -d 1eaf:0003 -a 2 -D "$FWFILE" -R;
   [ $? -ne 0 ] && printf "\nERROR: Failed to write firmware!\n\n" && exit 5;
   printf "\n";
 fi
