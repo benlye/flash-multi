@@ -7,13 +7,13 @@ Like the Flash Multi Window application, the Linux and Mac script will automatic
 1. Download and extract the latest Linux release, for example:
 
    ```
-   wget https://github.com/benlye/flash-multi/releases/download/0.2.2/flash-multi-0.2.2.tar.gz
-   tar -xvzf flash-multi-0.2.2.tar.gz
+   wget https://github.com/benlye/flash-multi/releases/download/0.4.3/flash-multi-0.4.3.tar.gz
+   tar -xvzf flash-multi-0.4.3.tar.gz
    ```
    
 1. Change to the flash-multi directory, for example:
 
-   `cd flash-multi-0.2.2`
+   `cd flash-multi-0.4.3`
    
 1. Configure serial device permissions by running `tools/install.sh` as root to update the udev rules and add the current user to the dialout group, e.g.:
    
@@ -55,8 +55,8 @@ macOS requires the libusb library to be installed. The easiest way to install th
 For firmware compiled from recent source code the ouput will look similar to what is shown below, firmware from older source will not display information about the firmware configuration:
 
 ```
-ben@ben-ubuntu:~/flash-multi-0.2.2$ ./flash-multi -f /tmp/multi-stm-opentx-aetr-inv-v1.2.1.85.bin -p /dev/ttyUSB0
-flash-multi 0.2.2
+ben@ben-ubuntu:~/flash-multi-0.4.3$ ./flash-multi -f /tmp/multi-stm-opentx-aetr-inv-v1.2.1.85.bin -p /dev/ttyUSB0
+flash-multi 0.4.3
 
 This program is Free Sofware and has NO WARRANTY.
 https://github.com/benlye/flash-multi/
