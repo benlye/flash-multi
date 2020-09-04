@@ -48,10 +48,10 @@ namespace Flash_Multi
 
         /// <summary>
         /// Parses the binary file looking for a string which indicates that the compiled firmware images contains USB support.
-        /// The binary firmware file will contain the strings 'Maple' and 'LeafLabs' if it was compiled with support for the USB / Flash from TX bootloader.
+        /// The binary firmware file will contain the strings 'Maple' and 'LeafLabs' if it was compiled with USB serial support.
         /// </summary>
         /// <param name="filename">The path to the firmware file.</param>
-        /// <returns>A boolean value indicatating whether or not the firmware supports USB.</returns>
+        /// <returns>A boolean value indicatating whether or not the firmware supports USB serial.</returns>
         internal static bool CheckForUsbSupport(string filename)
         {
             bool usbSupportEnabled = false;
@@ -59,7 +59,7 @@ namespace Flash_Multi
             // Get the file size
             long length = new System.IO.FileInfo(filename).Length;
 
-            // File is too small to contain a USB support
+            // File is too small to contain USB support
             if (length < 8192)
             {
                 return usbSupportEnabled;
@@ -174,22 +174,51 @@ namespace Flash_Multi
             // Get the file size
             long length = new System.IO.FileInfo(filename).Length;
 
-            // If the file is very large we don't want to check for USB support so throw a generic error
-            if (length > 256000)
+            // Absolute max size is 128KB
+            int maxFileSize = 128 * 1024;
+
+            // If the file is larger than the max flash space we don't need any more checks
+            if (length > maxFileSize)
             {
                 MessageBox.Show("Selected firmware file is too large.", "Firmware File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
-            // If the file is smaller we can check if it has USB support and throw a more specific error
-            int maxFileSize = CheckForUsbSupport(filename) ? 120832 : 129024;
-
-            // Check if the file contains EEPROM data
-            byte[] eePromData = Stm32EepromUtils.GetEepromDataFromBackup(filename);
-            if (eePromData != null && Stm32EepromUtils.FindValidPage(eePromData) >= 0)
+            // If the file is smaller we can check if it has bootloader support and do a more exact check
+            FirmwareFile fileDetails = GetFirmwareSignature(filename);
+            if (fileDetails == null)
             {
-                maxFileSize += 2048;
+                // Warn that we can't accurately check the file size
+                string sizeMessage = $"Firmware file does not have a signature - unable to validate the size accurately.";
+                DialogResult sizeWarning = MessageBox.Show(sizeMessage, "Firmware File Size", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                if (sizeWarning != DialogResult.OK)
+                {
+                    return false;
+                }
+            } else
+            {
+                switch (fileDetails.ModuleType)
+                {
+                    case "AVR":
+                        maxFileSize = fileDetails.BootloaderSupport ? 32232 : 32744;
+                        break;
+                    case "STM32":
+                        maxFileSize = fileDetails.BootloaderSupport ? 120832 : 129024;
+                        break;
+                }
             }
+
+            // Check if the file contains EEPROM data if it is for an STM32
+            if (fileDetails.ModuleType == "STM32")
+            {
+                byte[] eePromData = Stm32EepromUtils.GetEepromDataFromBackup(filename);
+                if (eePromData != null && Stm32EepromUtils.FindValidPage(eePromData) >= 0)
+                {
+                    maxFileSize += 2048;
+                }
+            }
+
+            Debug.WriteLine($"Selected file is {length / 1024:n0} KB, maximum size is {maxFileSize / 1024:n0} KB.");
 
             if (length > maxFileSize)
             {
@@ -299,7 +328,7 @@ namespace Flash_Multi
                     int.TryParse(versionString.Substring(6, 2), out int versionPatch);
                     string parsedVersion = versionMajor + "." + versionMinor + "." + versionRevision + "." + versionPatch;
 
-                    // Create the firmware file signatre and return it
+                    // Create the firmware file signature and return it
                     FirmwareFile file = new FirmwareFile
                     {
                         Signature = signature,
@@ -559,6 +588,11 @@ namespace Flash_Multi
             /// Gets or sets a value indicating whether the firmware was compiled with INVERT_TELEMETRY defined.
             /// </summary>
             public bool InvertTelemetry { get; set; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether the firmware was compiled with USB Serial support.
+            /// </summary>
+            public bool UsbSerial { get; set; }
 
             /// <summary>
             /// Gets or sets a value indicating whether the firmware was compiled with DEBUG_SERIAL defined.

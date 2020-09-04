@@ -106,5 +106,41 @@ namespace Flash_Multi.Properties {
                 this["EnableDeviceDetection"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ErrorIfNoUSB {
+            get {
+                return ((bool)(this["ErrorIfNoUSB"]));
+            }
+            set {
+                this["ErrorIfNoUSB"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool WarnIfNoUSB {
+            get {
+                return ((bool)(this["WarnIfNoUSB"]));
+            }
+            set {
+                this["WarnIfNoUSB"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisableFlashVerification {
+            get {
+                return ((bool)(this["DisableFlashVerification"]));
+            }
+            set {
+                this["DisableFlashVerification"] = value;
+            }
+        }
     }
 }

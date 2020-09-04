@@ -264,6 +264,15 @@ namespace Flash_Multi {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Module flash verification failed.  This MCU on this module does not support 128KB of flash..
+        /// </summary>
+        internal static string failedToVerifyMcuFlash {
+            get {
+                return ResourceManager.GetString("failedToVerifyMcuFlash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to write the bootloader..
         /// </summary>
         internal static string failedToWriteBootloader {
@@ -341,6 +350,15 @@ namespace Flash_Multi {
         internal static string modeWriting {
             get {
                 return ResourceManager.GetString("modeWriting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checking flash size ....
+        /// </summary>
+        internal static string progressCheckingFlashSize {
+            get {
+                return ResourceManager.GetString("progressCheckingFlashSize", resourceCulture);
             }
         }
         

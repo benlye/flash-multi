@@ -787,22 +787,46 @@
     <value>115200</value>
   </data>
   <data name="baudRateToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>207, 22</value>
+    <value>223, 22</value>
   </data>
   <data name="baudRateToolStripMenuItem.Text" xml:space="preserve">
     <value>Serial &amp;Baud Rate</value>
   </data>
-  <data name="runAfterUploadToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>207, 22</value>
+  <data name="stickyDfuUsbModeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>199, 22</value>
   </data>
-  <data name="runAfterUploadToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Run Firmware After Write</value>
+  <data name="stickyDfuUsbModeToolStripMenuItem.Text" xml:space="preserve">
+    <value>Sticky &amp;DFU Mode (New)</value>
+  </data>
+  <data name="comPortUsbModeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>199, 22</value>
+  </data>
+  <data name="comPortUsbModeToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;COM Port (Legacy)</value>
+  </data>
+  <data name="bootloaderTypeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>223, 22</value>
+  </data>
+  <data name="bootloaderTypeToolStripMenuItem.Text" xml:space="preserve">
+    <value>Bootloader / USB Port</value>
+  </data>
+  <data name="disableCompatibilityCheckToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>223, 22</value>
+  </data>
+  <data name="disableCompatibilityCheckToolStripMenuItem.Text" xml:space="preserve">
+    <value>Disable Compatibility Check</value>
   </data>
   <data name="enableDeviceDetectionToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>207, 22</value>
+    <value>223, 22</value>
   </data>
   <data name="enableDeviceDetectionToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Enable Device Detection</value>
+  </data>
+  <data name="runAfterUploadToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>223, 22</value>
+  </data>
+  <data name="runAfterUploadToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Run Firmware After Write</value>
   </data>
   <data name="settingsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>180, 22</value>
@@ -1526,16 +1550,40 @@
   <data name="&gt;&gt;toolStripMenuItemBaudRate115200.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;runAfterUploadToolStripMenuItem.Name" xml:space="preserve">
-    <value>runAfterUploadToolStripMenuItem</value>
+  <data name="&gt;&gt;bootloaderTypeToolStripMenuItem.Name" xml:space="preserve">
+    <value>bootloaderTypeToolStripMenuItem</value>
   </data>
-  <data name="&gt;&gt;runAfterUploadToolStripMenuItem.Type" xml:space="preserve">
+  <data name="&gt;&gt;bootloaderTypeToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;stickyDfuUsbModeToolStripMenuItem.Name" xml:space="preserve">
+    <value>stickyDfuUsbModeToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;stickyDfuUsbModeToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;comPortUsbModeToolStripMenuItem.Name" xml:space="preserve">
+    <value>comPortUsbModeToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;comPortUsbModeToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;disableCompatibilityCheckToolStripMenuItem.Name" xml:space="preserve">
+    <value>disableCompatibilityCheckToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;disableCompatibilityCheckToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;enableDeviceDetectionToolStripMenuItem.Name" xml:space="preserve">
     <value>enableDeviceDetectionToolStripMenuItem</value>
   </data>
   <data name="&gt;&gt;enableDeviceDetectionToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;runAfterUploadToolStripMenuItem.Name" xml:space="preserve">
+    <value>runAfterUploadToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;runAfterUploadToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;helpToolStripMenuItem.Name" xml:space="preserve">

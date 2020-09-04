@@ -149,6 +149,13 @@ namespace Flash_Multi
             this.enableDeviceDetection = Properties.Settings.Default.EnableDeviceDetection;
             this.enableDeviceDetectionToolStripMenuItem.Checked = this.enableDeviceDetection;
 
+            // Set 'Enable Flash Verification' from the settings
+            this.disableCompatibilityCheckToolStripMenuItem.Checked = Settings.Default.DisableFlashVerification;
+
+            // Set the 'Bootloader / USB Port' mode from the settings
+            this.comPortUsbModeToolStripMenuItem.Checked = Settings.Default.ErrorIfNoUSB;
+            this.stickyDfuUsbModeToolStripMenuItem.Checked = !Settings.Default.ErrorIfNoUSB;
+
             // Hide the verbose output panel and set the height of the other panel
             int initialHeight = 215;
             this.splitContainer1.Panel2Collapsed = true;
@@ -989,6 +996,37 @@ namespace Flash_Multi
             Properties.Settings.Default.Save();
         }
 
+        private void DisableCompatibilityCheckToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Settings.Default.DisableFlashVerification = this.disableCompatibilityCheckToolStripMenuItem.Checked;
+            Settings.Default.Save();
+        }
+
+        /// <summary>
+        /// Handles setting the Bootloader / USB Port mode to 'legacy'.
+        /// </summary>
+        private void ComPortUsbModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.stickyDfuUsbModeToolStripMenuItem.Checked = false;
+            this.comPortUsbModeToolStripMenuItem.Checked = true;
+            Settings.Default.ErrorIfNoUSB = true;
+            Settings.Default.WarnIfNoUSB = true;
+            Settings.Default.RunAfterUpload = true;
+            Settings.Default.Save();
+        }
+
+        /// <summary>
+        /// Handles setting the Bootloader / USB Port mode to 'new'.
+        /// </summary>
+        private void StickyDfuUsbModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.stickyDfuUsbModeToolStripMenuItem.Checked = true;
+            this.comPortUsbModeToolStripMenuItem.Checked = false;
+            Settings.Default.ErrorIfNoUSB = false;
+            Settings.Default.RunAfterUpload = false;
+            Settings.Default.Save();
+        }
+
         /// <summary>
         /// Handles the user clicking the Check for Update menu item.
         /// </summary>
@@ -1347,13 +1385,49 @@ namespace Flash_Multi
             // Get the signature from the firmware file
             FileUtils.FirmwareFile fileSignature = FileUtils.GetFirmwareSignature(this.textFileName.Text);
 
-            // Error if flashing non-USB firmware via native USB port
-            if (mapleResult.DeviceFound && !firmwareSupportsUsb)
+            // Stop if this is a firmware file without a signature - we can't be sure that it will match the module
+            if (this.textFileName.Text.EndsWith(".bin") && fileSignature == null)
             {
-                string msgBoxMessage = "The selected firmware file was compiled without USB support.\r\n\r\nFlashing this firmware would prevent the MULTI-Module from functioning correctly.\r\n\r\nPlease select a different firmware file.";
+                string msgBoxMessage = "Unable to validate the selected firmware file. The firmware signature is missing.";
                 MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.EnableControls(true);
                 return;
+            }
+
+            // Error if flashing firmware without bootloader support firmware via native USB port
+            if (mapleResult.DeviceFound && !fileSignature.BootloaderSupport)
+            {
+                string msgBoxMessage = "The selected firmware file was compiled without bootloader support\r\n\r\nThis firmware cannot be written to the connected MULTI-Module.";
+                MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.EnableControls(true);
+                return;
+            }
+
+            // Error or warn if flashing non-USB firmware via native USB port and we're not configured for hte new bootloader
+            if (mapleResult.DeviceFound && !firmwareSupportsUsb)
+            {
+                if (Settings.Default.ErrorIfNoUSB)
+                {
+                    string msgBoxMessage = "The selected firmware file was compiled without USB serial support and the 'Bootloader / USB Port' setting is set to 'COM Port (Legacy)'.\r\n\r\nThe MULTI-Module bootloader must be updated and the 'Bootloader / USB Port' setting set to 'Sticky DFU Mode (New)' in order to write this firmware.\r\n\r\nSee [link] for more information.";
+                    MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.EnableControls(true);
+                    return;
+                }
+                else
+                {
+                    if (Settings.Default.WarnIfNoUSB)
+                    {
+                        // Warn that bootloader update is required if the firmware file does not have USB support
+                        string msgBoxMessage = "The selected firmware file was compiled without USB serial support. The MULTI-Module bootloader should be updated before writing this firmware.\r\n\r\nSee [link] for more information.\r\n\r\nClick OK to write the firmware.";
+                        DialogResult warnResult = MessageBox.Show(msgBoxMessage, "Bootloader Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+
+                        if (warnResult != DialogResult.OK)
+                        {
+                            this.EnableControls(true);
+                            return;
+                        }
+                    }
+                }
             }
 
             // Get the selected COM port
@@ -1401,7 +1475,7 @@ namespace Flash_Multi
             }
             else
             {
-                await SerialDevice.WriteFlash(this, this.textFileName.Text, comPort, firmwareSupportsUsb, firmwareContainsEeprom, this.runAfterUploadToolStripMenuItem.Checked);
+                await SerialDevice.WriteFlash(this, this.textFileName.Text, comPort, fileSignature.BootloaderSupport, firmwareContainsEeprom, this.runAfterUploadToolStripMenuItem.Checked, this.disableCompatibilityCheckToolStripMenuItem.Checked);
             }
 
             // Populate the COM ports in case they changed
@@ -1440,6 +1514,9 @@ namespace Flash_Multi
                     uint globalId = 0;
                     if (openFileDialog.FileName.EndsWith(".bin"))
                     {
+                        // Check for USB Serial support
+                        bool usbSerialSupport = FileUtils.CheckForUsbSupport(this.textFileName.Text);
+
                         // Get the signature from the firmware file
                         FileUtils.FirmwareFile fileDetails = FileUtils.GetFirmwareSignature(this.textFileName.Text);
 
@@ -1453,6 +1530,7 @@ namespace Flash_Multi
                             this.AppendLog($"Invert Telemetry Enabled: {fileDetails.InvertTelemetry}\r\n");
                             this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader}\r\n");
                             this.AppendLog($"Bootloader Enabled:       {fileDetails.BootloaderSupport}\r\n");
+                            this.AppendLog($"USB Serial Support:       {usbSerialSupport}\r\n");
                             this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}");
                         }
                         else
@@ -1823,5 +1901,7 @@ namespace Flash_Multi
                 this.comPortSelector.ValueMember = "Name";
             }
         }
+
+
     }
 }

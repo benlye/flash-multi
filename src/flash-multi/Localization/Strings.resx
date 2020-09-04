@@ -285,4 +285,10 @@ If you are upgrading ore replacing existing drivers, ensure that the MULTI-Modul
   <data name="modeDfuSwitch" xml:space="preserve">
     <value />
   </data>
+  <data name="progressCheckingFlashSize" xml:space="preserve">
+    <value>Checking flash size ...</value>
+  </data>
+  <data name="failedToVerifyMcuFlash" xml:space="preserve">
+    <value>Module flash verification failed.  This MCU on this module does not support 128KB of flash.</value>
+  </data>
 </root>
