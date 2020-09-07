@@ -1,5 +1,5 @@
 ﻿// -------------------------------------------------------------------------------
-// <copyright file="UsbSupportWarning.cs" company="Ben Lye">
+// <copyright file="UsbSupportWarningDialog.cs" company="Ben Lye">
 // Copyright 2020 Ben Lye
 //
 // This file is part of Flash Multi.
@@ -53,7 +53,8 @@ namespace Flash_Multi
         private void ButtonOK_Click(object sender, EventArgs e)
         {
             // Disable the warning if the box was checked
-            if (this.disableUsbWarning.Checked == true) {
+            if (this.disableUsbWarning.Checked == true)
+            {
                 Properties.Settings.Default.WarnIfNoUSB = false;
             }
 
