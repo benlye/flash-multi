@@ -1432,8 +1432,12 @@ namespace Flash_Multi
                     if (Settings.Default.WarnIfNoUSB)
                     {
                         // Warn that bootloader update is required if the firmware file does not have USB support
-                        string msgBoxMessage = "The selected firmware file was compiled without USB serial support. The MULTI-Module bootloader should be updated before writing this firmware.\r\n\r\nSee [link] for more information.\r\n\r\nClick OK to write the firmware.";
-                        DialogResult warnResult = MessageBox.Show(msgBoxMessage, "Bootloader Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                        //string msgBoxMessage = "The selected firmware file was compiled without USB serial support. The MULTI-Module bootloader should be updated before writing this firmware.\r\n\r\nSee [link] for more information.\r\n\r\nClick OK to write the firmware.";
+                        //DialogResult warnResult = MessageBox.Show(msgBoxMessage, "Bootloader Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+
+                        // Show the recovery mode dialog
+                        UsbSupportWarning usbSupportWarning = new UsbSupportWarning();
+                        var warnResult = usbSupportWarning.ShowDialog();
 
                         if (warnResult != DialogResult.OK)
                         {

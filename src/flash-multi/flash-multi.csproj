@@ -51,6 +51,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dialogs\UsbSupportWarning.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\UsbSupportWarning.Designer.cs">
+      <DependentUpon>UsbSupportWarning.cs</DependentUpon>
+    </Compile>
     <Compile Include="Eeprom\AtmegaEepromUtils.cs" />
     <Compile Include="ComPort.cs" />
     <Compile Include="Dialogs\DfuRecoveryDialog.cs">
@@ -92,6 +98,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\SerialMonitor.fr.resx">
       <DependentUpon>SerialMonitor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\UsbSupportWarning.resx">
+      <DependentUpon>UsbSupportWarning.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FlashMulti.fr.resx">
       <DependentUpon>FlashMulti.cs</DependentUpon>
