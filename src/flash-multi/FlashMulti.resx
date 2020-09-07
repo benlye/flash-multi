@@ -775,16 +775,22 @@
     <value>A&amp;ctions</value>
   </data>
   <data name="toolStripMenuItemBaudRate57600.Size" type="System.Drawing.Size, System.Drawing">
-    <value>110, 22</value>
+    <value>180, 22</value>
   </data>
   <data name="toolStripMenuItemBaudRate57600.Text" xml:space="preserve">
     <value>57600</value>
   </data>
   <data name="toolStripMenuItemBaudRate115200.Size" type="System.Drawing.Size, System.Drawing">
-    <value>110, 22</value>
+    <value>180, 22</value>
   </data>
   <data name="toolStripMenuItemBaudRate115200.Text" xml:space="preserve">
     <value>115200</value>
+  </data>
+  <data name="toolStripMenuItemBaudRate500000.Size" type="System.Drawing.Size, System.Drawing">
+    <value>180, 22</value>
+  </data>
+  <data name="toolStripMenuItemBaudRate500000.Text" xml:space="preserve">
+    <value>500000</value>
   </data>
   <data name="baudRateToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>223, 22</value>
@@ -1608,6 +1614,12 @@
     <value>downloadFirmwareToolStripMenuItem</value>
   </data>
   <data name="&gt;&gt;downloadFirmwareToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItemBaudRate500000.Name" xml:space="preserve">
+    <value>toolStripMenuItemBaudRate500000</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItemBaudRate500000.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

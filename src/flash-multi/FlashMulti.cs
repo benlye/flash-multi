@@ -960,10 +960,11 @@ namespace Flash_Multi
         /// </summary>
         private void ToolStripMenuItemBaudRate57600_Click(object sender, EventArgs e)
         {
-            Properties.Settings.Default.SerialBaudRate = 57600;
-            Properties.Settings.Default.Save();
+            Settings.Default.SerialBaudRate = 57600;
+            Settings.Default.Save();
             this.toolStripMenuItemBaudRate57600.Checked = true;
             this.toolStripMenuItemBaudRate115200.Checked = false;
+            this.toolStripMenuItemBaudRate500000.Checked = false;
         }
 
         /// <summary>
@@ -971,10 +972,23 @@ namespace Flash_Multi
         /// </summary>
         private void ToolStripMenuItemBaudRate115200_Click(object sender, EventArgs e)
         {
-            Properties.Settings.Default.SerialBaudRate = 115200;
-            Properties.Settings.Default.Save();
+            Settings.Default.SerialBaudRate = 115200;
+            Settings.Default.Save();
             this.toolStripMenuItemBaudRate57600.Checked = false;
             this.toolStripMenuItemBaudRate115200.Checked = true;
+            this.toolStripMenuItemBaudRate500000.Checked = false;
+        }
+
+        /// <summary>
+        /// Handles the user setting the serial baud rate to 500000.
+        /// </summary>
+        private void ToolStripMenuItemBaudRate500000_Click(object sender, EventArgs e)
+        {
+            Settings.Default.SerialBaudRate = 500000;
+            Settings.Default.Save();
+            this.toolStripMenuItemBaudRate57600.Checked = false;
+            this.toolStripMenuItemBaudRate115200.Checked = false;
+            this.toolStripMenuItemBaudRate500000.Checked = true;
         }
 
         /// <summary>
@@ -1901,7 +1915,5 @@ namespace Flash_Multi
                 this.comPortSelector.ValueMember = "Name";
             }
         }
-
-
     }
 }

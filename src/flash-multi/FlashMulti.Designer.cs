@@ -93,6 +93,7 @@ namespace Flash_Multi
             this.checkForUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.documentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadFirmwareToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemBaudRate500000 = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -335,7 +336,8 @@ namespace Flash_Multi
             // 
             this.baudRateToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItemBaudRate57600,
-            this.toolStripMenuItemBaudRate115200});
+            this.toolStripMenuItemBaudRate115200,
+            this.toolStripMenuItemBaudRate500000});
             this.baudRateToolStripMenuItem.Name = "baudRateToolStripMenuItem";
             resources.ApplyResources(this.baudRateToolStripMenuItem, "baudRateToolStripMenuItem");
             // 
@@ -418,6 +420,12 @@ namespace Flash_Multi
             resources.ApplyResources(this.downloadFirmwareToolStripMenuItem, "downloadFirmwareToolStripMenuItem");
             this.downloadFirmwareToolStripMenuItem.Click += new System.EventHandler(this.DownloadFirmwareToolStripMenuItem_Click);
             // 
+            // toolStripMenuItemBaudRate500000
+            // 
+            this.toolStripMenuItemBaudRate500000.Name = "toolStripMenuItemBaudRate500000";
+            resources.ApplyResources(this.toolStripMenuItemBaudRate500000, "toolStripMenuItemBaudRate500000");
+            this.toolStripMenuItemBaudRate500000.Click += new System.EventHandler(this.ToolStripMenuItemBaudRate500000_Click);
+            // 
             // FlashMulti
             // 
             resources.ApplyResources(this, "$this");
@@ -495,6 +503,7 @@ namespace Flash_Multi
         private System.Windows.Forms.ToolStripMenuItem stickyDfuUsbModeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem comPortUsbModeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem disableCompatibilityCheckToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemBaudRate500000;
     }
 }
 
