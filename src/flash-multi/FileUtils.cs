@@ -465,7 +465,7 @@ namespace Flash_Multi
                     b.Write(firmwareData);
                 }
 
-                flashMulti.AppendLog($"\r\n\r\nMULTI-Module firmware saved succesfully");
+                flashMulti.AppendLog($"\r\n\r\nMULTI-Module firmware saved successfully");
                 flashMulti.AppendVerbose($"Firmware saved to '{saveFileDialog.FileName}'");
             }
 
@@ -507,7 +507,7 @@ namespace Flash_Multi
                         b.Write(firmwareData);
                     }
 
-                    flashMulti.AppendLog($"\r\nMULTI-Module EEPROM saved succesfully");
+                    flashMulti.AppendLog($"\r\nMULTI-Module EEPROM saved successfully");
                     flashMulti.AppendVerbose($"EEPROM saved to '{eepromFileName}'");
                 }
             }
