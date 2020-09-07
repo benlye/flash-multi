@@ -1154,6 +1154,9 @@ namespace Flash_Multi
                     // Get the signature from the firmware file
                     FileUtils.FirmwareFile fileDetails = FileUtils.GetFirmwareSignature(tempFirmwareFileName);
 
+                    // Check for USB Serial support
+                    bool usbSerialSupport = FileUtils.CheckForUsbSupport(tempFirmwareFileName);
+
                     // If we got details from the signature write them to the log window
                     if (fileDetails != null)
                     {
@@ -1163,6 +1166,7 @@ namespace Flash_Multi
                         this.AppendLog($"Invert Telemetry Enabled: {fileDetails.InvertTelemetry}\r\n");
                         this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader}\r\n");
                         this.AppendLog($"Bootloader Enabled:       {fileDetails.BootloaderSupport}\r\n");
+                        this.AppendLog($"USB Serial Support:       {usbSerialSupport}\r\n");
                         this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}\r\n");
                     }
                     else
@@ -1422,7 +1426,7 @@ namespace Flash_Multi
             {
                 if (Settings.Default.ErrorIfNoUSB)
                 {
-                    string msgBoxMessage = "The selected firmware file was compiled without USB serial support and the 'Bootloader / USB Port' setting is set to 'COM Port (Legacy)'.\r\n\r\nThe MULTI-Module bootloader must be updated and the 'Bootloader / USB Port' setting set to 'Sticky DFU Mode (New)' in order to write this firmware.\r\n\r\nSee [link] for more information.";
+                    string msgBoxMessage = "The selected firmware file was compiled without USB serial support and the 'USB Port Mode' setting is set to 'COM Port (Legacy)'.\r\n\r\nThe MULTI-Module bootloader must be updated and the 'USB Port Mode' setting set to 'Sticky DFU Mode (New)' in order to write this firmware.\r\n\r\nSee [link] for more information.";
                     MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     this.EnableControls(true);
                     return;
@@ -1432,11 +1436,7 @@ namespace Flash_Multi
                     if (Settings.Default.WarnIfNoUSB)
                     {
                         // Warn that bootloader update is required if the firmware file does not have USB support
-                        //string msgBoxMessage = "The selected firmware file was compiled without USB serial support. The MULTI-Module bootloader should be updated before writing this firmware.\r\n\r\nSee [link] for more information.\r\n\r\nClick OK to write the firmware.";
-                        //DialogResult warnResult = MessageBox.Show(msgBoxMessage, "Bootloader Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-
-                        // Show the recovery mode dialog
-                        UsbSupportWarning usbSupportWarning = new UsbSupportWarning();
+                        UsbSupportWarningDialog usbSupportWarning = new UsbSupportWarningDialog();
                         var warnResult = usbSupportWarning.ShowDialog();
 
                         if (warnResult != DialogResult.OK)

@@ -75,10 +75,6 @@ namespace Flash_Multi
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.advancedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.actionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.installUSBDriversToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.resetToDFUModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.upgradeBootloaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.baudRateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemBaudRate57600 = new System.Windows.Forms.ToolStripMenuItem();
@@ -90,6 +86,10 @@ namespace Flash_Multi
             this.disableCompatibilityCheckToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.enableDeviceDetectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runAfterUploadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.actionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.installUSBDriversToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resetToDFUModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.upgradeBootloaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.documentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -294,33 +294,6 @@ namespace Flash_Multi
             this.advancedToolStripMenuItem.Name = "advancedToolStripMenuItem";
             resources.ApplyResources(this.advancedToolStripMenuItem, "advancedToolStripMenuItem");
             // 
-            // actionsToolStripMenuItem
-            // 
-            this.actionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.installUSBDriversToolStripMenuItem,
-            this.resetToDFUModeToolStripMenuItem,
-            this.upgradeBootloaderToolStripMenuItem});
-            this.actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
-            resources.ApplyResources(this.actionsToolStripMenuItem, "actionsToolStripMenuItem");
-            // 
-            // installUSBDriversToolStripMenuItem
-            // 
-            this.installUSBDriversToolStripMenuItem.Name = "installUSBDriversToolStripMenuItem";
-            resources.ApplyResources(this.installUSBDriversToolStripMenuItem, "installUSBDriversToolStripMenuItem");
-            this.installUSBDriversToolStripMenuItem.Click += new System.EventHandler(this.InstallUSBDriversToolStripMenuItem_Click);
-            // 
-            // resetToDFUModeToolStripMenuItem
-            // 
-            this.resetToDFUModeToolStripMenuItem.Name = "resetToDFUModeToolStripMenuItem";
-            resources.ApplyResources(this.resetToDFUModeToolStripMenuItem, "resetToDFUModeToolStripMenuItem");
-            this.resetToDFUModeToolStripMenuItem.Click += new System.EventHandler(this.ResetToDFUModeToolStripMenuItem_Click);
-            // 
-            // upgradeBootloaderToolStripMenuItem
-            // 
-            this.upgradeBootloaderToolStripMenuItem.Name = "upgradeBootloaderToolStripMenuItem";
-            resources.ApplyResources(this.upgradeBootloaderToolStripMenuItem, "upgradeBootloaderToolStripMenuItem");
-            this.upgradeBootloaderToolStripMenuItem.Click += new System.EventHandler(this.UpgradeBootloaderToolStripMenuItem_Click);
-            // 
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -398,6 +371,33 @@ namespace Flash_Multi
             this.runAfterUploadToolStripMenuItem.CheckOnClick = true;
             this.runAfterUploadToolStripMenuItem.Name = "runAfterUploadToolStripMenuItem";
             resources.ApplyResources(this.runAfterUploadToolStripMenuItem, "runAfterUploadToolStripMenuItem");
+            // 
+            // actionsToolStripMenuItem
+            // 
+            this.actionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.installUSBDriversToolStripMenuItem,
+            this.resetToDFUModeToolStripMenuItem,
+            this.upgradeBootloaderToolStripMenuItem});
+            this.actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
+            resources.ApplyResources(this.actionsToolStripMenuItem, "actionsToolStripMenuItem");
+            // 
+            // installUSBDriversToolStripMenuItem
+            // 
+            this.installUSBDriversToolStripMenuItem.Name = "installUSBDriversToolStripMenuItem";
+            resources.ApplyResources(this.installUSBDriversToolStripMenuItem, "installUSBDriversToolStripMenuItem");
+            this.installUSBDriversToolStripMenuItem.Click += new System.EventHandler(this.InstallUSBDriversToolStripMenuItem_Click);
+            // 
+            // resetToDFUModeToolStripMenuItem
+            // 
+            this.resetToDFUModeToolStripMenuItem.Name = "resetToDFUModeToolStripMenuItem";
+            resources.ApplyResources(this.resetToDFUModeToolStripMenuItem, "resetToDFUModeToolStripMenuItem");
+            this.resetToDFUModeToolStripMenuItem.Click += new System.EventHandler(this.ResetToDFUModeToolStripMenuItem_Click);
+            // 
+            // upgradeBootloaderToolStripMenuItem
+            // 
+            this.upgradeBootloaderToolStripMenuItem.Name = "upgradeBootloaderToolStripMenuItem";
+            resources.ApplyResources(this.upgradeBootloaderToolStripMenuItem, "upgradeBootloaderToolStripMenuItem");
+            this.upgradeBootloaderToolStripMenuItem.Click += new System.EventHandler(this.UpgradeBootloaderToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
