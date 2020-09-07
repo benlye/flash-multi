@@ -508,7 +508,7 @@ namespace Flash_Multi
                     }
 
                     flashMulti.AppendLog($"\r\nMULTI-Module EEPROM saved successfully");
-                    flashMulti.AppendVerbose($"EEPROM saved to '{eepromFileName}'");
+                    flashMulti.AppendVerbose($"EEPROM saved to '{saveFileDialog.FileName}'");
                 }
             }
         }
