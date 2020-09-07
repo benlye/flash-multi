@@ -65,11 +65,18 @@ namespace Flash_Multi
                 return usbSupportEnabled;
             }
 
+            // Parse the file and find the first instance of the signature
             byte[] byteBuffer = File.ReadAllBytes(filename);
             string byteBufferAsString = System.Text.Encoding.ASCII.GetString(byteBuffer);
-            int offset = byteBufferAsString.IndexOf("M\0a\0p\0l\0e\0\u0012\u0003L\0e\0a\0f\0L\0a\0b\0s\0\u0012\u0001");
 
-            if (offset > 0)
+            // Find the signature
+            int signatureOffset = byteBufferAsString.IndexOf("multi-");
+
+            // Look for the USB string
+            int usbOffset = byteBufferAsString.IndexOf("M\0a\0p\0l\0e\0\u0012\u0003L\0e\0a\0f\0L\0a\0b\0s\0\u0012\u0001");
+
+            // If we found the usb offset before the signature, or we found the USB offset without a signature, USB is enabled
+            if ((usbOffset > 0 && signatureOffset > 0 && usbOffset < signatureOffset) || (usbOffset > 0 && signatureOffset == 0))
             {
                 usbSupportEnabled = true;
             }
@@ -249,32 +256,14 @@ namespace Flash_Multi
                 return null;
             }
 
-            // Read the last 24 bytes of the binary file so we can see if it contains a signature string
-            using (var reader = new StreamReader(filename))
+            // Parse the file and find the first instance of the signature
+            byte[] byteBuffer = File.ReadAllBytes(filename);
+            string byteBufferAsString = System.Text.Encoding.ASCII.GetString(byteBuffer);
+            int offset = byteBufferAsString.IndexOf("multi-");
+
+            if (offset > 0)
             {
-                if (reader.BaseStream.Length > 24)
-                {
-                    reader.BaseStream.Seek(-24, SeekOrigin.End);
-                }
-
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    signature = line;
-                }
-            }
-
-            // Parse the entire file if we didn't find the signature in the last 24 bytes
-            if (signature != string.Empty && signature.Substring(0, 6) != "multi-")
-            {
-                byte[] byteBuffer = File.ReadAllBytes(filename);
-                string byteBufferAsString = System.Text.Encoding.ASCII.GetString(byteBuffer);
-                int offset = byteBufferAsString.IndexOf("multi-");
-
-                if (offset > 0)
-                {
-                    signature = byteBufferAsString.Substring(offset, 24);
-                }
+                signature = byteBufferAsString.Substring(offset, 24);
             }
 
             Debug.WriteLine(signature);
@@ -477,7 +466,7 @@ namespace Flash_Multi
                 }
 
                 flashMulti.AppendLog($"\r\n\r\nMULTI-Module firmware saved succesfully");
-                flashMulti.AppendVerbose($"Firmware saved to '{flashFileName}'");
+                flashMulti.AppendVerbose($"Firmware saved to '{saveFileDialog.FileName}'");
             }
 
             // Save the Atmega328p EEPROM to a separate file
