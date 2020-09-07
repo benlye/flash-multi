@@ -61,7 +61,7 @@ namespace Flash_Multi {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Bootloader upgrade app written successfully.
+        ///   Looks up a localized string similar to Bootloader upgrade app written successfully.  
         ///
         ///The app will now update the bootloader on the MULTI-Module.
         ///
@@ -85,9 +85,7 @@ namespace Flash_Multi {
         /// <summary>
         ///   Looks up a localized string similar to Upgrading the bootloader will erase the MULTI-Module firmware.  New firmware will need to be written to the module before it is usable.
         ///
-        ///The red LED on the MULTI-Module will indicate the progress of the bootloader upgrade.
-        ///
-        ///Once the bootloader upgrade is started the module must not be unplugged until the red LED remains off for 5s.
+        ///The red LED on the MULTI-Module will indicate the progress of the bootloader upgrade.  Once the bootloader upgrade is started the module must not be unplugged until the red LED remains off for 5s.
         ///
         ///Once the LED has been off for 5s, unplug the module, plug it back in, then write new firmware to it.
         ///

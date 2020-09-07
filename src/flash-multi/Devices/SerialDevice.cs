@@ -218,13 +218,21 @@ namespace Flash_Multi
         /// <param name="writeEeprom">Indicates whether or not the EEPROM is being written, therefore should be erased before the write.</param>
         /// <param name="runAfterUpload">Indicates whether or not the firmware should run after it is uploaded.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public static async Task WriteFlash(FlashMulti flashMulti, string fileName, string comPort, bool writeBootloader, bool writeEeprom, bool runAfterUpload, bool disableFlashVerification)
+        public static async Task WriteFlash(FlashMulti flashMulti, string fileName, string comPort, bool writeBootloader, bool writeEeprom, bool runAfterUpload)
         {
             // Path to the flashing tool, stm32flash.exe
             string command = ".\\tools\\stm32flash.exe";
 
             // Path to the bootloader file
-            string bootLoaderPath = ".\\bootloaders\\StmMulti4in1.bin";
+            string bootLoaderPath;
+            if (Properties.Settings.Default.ErrorIfNoUSB)
+            {
+                bootLoaderPath = ".\\bootloaders\\StmMulti4in1_Legacy.bin";
+            }
+            else
+            {
+                bootLoaderPath = ".\\bootloaders\\StmMulti4in1_StickyDfu.bin";
+            }
 
             // Baud rate for serial flash commands
             int serialBaud = Properties.Settings.Default.SerialBaudRate;
@@ -301,7 +309,7 @@ namespace Flash_Multi
                 return;
             }
 
-            if (!disableFlashVerification)
+            if (!Properties.Settings.Default.DisableFlashVerification)
             {
                 flashStep++;
 

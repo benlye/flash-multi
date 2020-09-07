@@ -83,6 +83,7 @@ namespace Flash_Multi
             this.baudRateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemBaudRate57600 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemBaudRate115200 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemBaudRate500000 = new System.Windows.Forms.ToolStripMenuItem();
             this.bootloaderTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stickyDfuUsbModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.comPortUsbModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -93,7 +94,6 @@ namespace Flash_Multi
             this.checkForUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.documentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadFirmwareToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItemBaudRate500000 = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -289,8 +289,8 @@ namespace Flash_Multi
             // advancedToolStripMenuItem
             // 
             this.advancedToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.actionsToolStripMenuItem,
-            this.settingsToolStripMenuItem});
+            this.settingsToolStripMenuItem,
+            this.actionsToolStripMenuItem});
             this.advancedToolStripMenuItem.Name = "advancedToolStripMenuItem";
             resources.ApplyResources(this.advancedToolStripMenuItem, "advancedToolStripMenuItem");
             // 
@@ -352,6 +352,12 @@ namespace Flash_Multi
             this.toolStripMenuItemBaudRate115200.Name = "toolStripMenuItemBaudRate115200";
             resources.ApplyResources(this.toolStripMenuItemBaudRate115200, "toolStripMenuItemBaudRate115200");
             this.toolStripMenuItemBaudRate115200.Click += new System.EventHandler(this.ToolStripMenuItemBaudRate115200_Click);
+            // 
+            // toolStripMenuItemBaudRate500000
+            // 
+            this.toolStripMenuItemBaudRate500000.Name = "toolStripMenuItemBaudRate500000";
+            resources.ApplyResources(this.toolStripMenuItemBaudRate500000, "toolStripMenuItemBaudRate500000");
+            this.toolStripMenuItemBaudRate500000.Click += new System.EventHandler(this.ToolStripMenuItemBaudRate500000_Click);
             // 
             // bootloaderTypeToolStripMenuItem
             // 
@@ -419,12 +425,6 @@ namespace Flash_Multi
             this.downloadFirmwareToolStripMenuItem.Name = "downloadFirmwareToolStripMenuItem";
             resources.ApplyResources(this.downloadFirmwareToolStripMenuItem, "downloadFirmwareToolStripMenuItem");
             this.downloadFirmwareToolStripMenuItem.Click += new System.EventHandler(this.DownloadFirmwareToolStripMenuItem_Click);
-            // 
-            // toolStripMenuItemBaudRate500000
-            // 
-            this.toolStripMenuItemBaudRate500000.Name = "toolStripMenuItemBaudRate500000";
-            resources.ApplyResources(this.toolStripMenuItemBaudRate500000, "toolStripMenuItemBaudRate500000");
-            this.toolStripMenuItemBaudRate500000.Click += new System.EventHandler(this.ToolStripMenuItemBaudRate500000_Click);
             // 
             // FlashMulti
             // 

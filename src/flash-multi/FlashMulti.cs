@@ -1489,7 +1489,7 @@ namespace Flash_Multi
             }
             else
             {
-                await SerialDevice.WriteFlash(this, this.textFileName.Text, comPort, fileSignature.BootloaderSupport, firmwareContainsEeprom, this.runAfterUploadToolStripMenuItem.Checked, this.disableCompatibilityCheckToolStripMenuItem.Checked);
+                await SerialDevice.WriteFlash(this, this.textFileName.Text, comPort, fileSignature.BootloaderSupport, firmwareContainsEeprom, this.runAfterUploadToolStripMenuItem.Checked);
             }
 
             // Populate the COM ports in case they changed
