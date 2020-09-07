@@ -23,27 +23,41 @@ namespace Flash_Multi
     using System;
     using System.Windows.Forms;
 
-    public partial class UsbSupportWarning : Form
+    /// <summary>
+    /// Class for the USB Support warning dialog.
+    /// </summary>
+    public partial class UsbSupportWarningDialog : Form
     {
-        public UsbSupportWarning()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UsbSupportWarningDialog"/> class.
+        /// </summary>
+        public UsbSupportWarningDialog()
         {
             this.InitializeComponent();
         }
 
-        private void buttonCancel_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Handles the Cancel button being clicked.
+        /// </summary>
+        private void ButtonCancel_Click(object sender, EventArgs e)
         {
+            // Return Cancel
             this.DialogResult = DialogResult.Cancel;
             this.Close();
             return;
         }
 
-        private void buttonOK_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Handles the OK button being clicked.
+        /// </summary>
+        private void ButtonOK_Click(object sender, EventArgs e)
         {
-            // Disable the warning
+            // Disable the warning if the box was checked
             if (this.disableUsbWarning.Checked == true) {
                 Properties.Settings.Default.WarnIfNoUSB = false;
             }
 
+            // Return OK
             this.DialogResult = DialogResult.OK;
             this.Close();
             return;
