@@ -195,7 +195,8 @@ namespace Flash_Multi
                 {
                     return false;
                 }
-            } else
+            }
+            else
             {
                 switch (fileDetails.ModuleType)
                 {
