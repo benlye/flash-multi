@@ -35,6 +35,7 @@
             this.warningIcon = new System.Windows.Forms.PictureBox();
             this.buttonOK = new System.Windows.Forms.Button();
             this.disableUsbWarning = new System.Windows.Forms.CheckBox();
+            this.MoreInfoLinkLabel = new System.Windows.Forms.LinkLabel();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.warningIcon)).BeginInit();
             this.SuspendLayout();
@@ -54,6 +55,7 @@
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.panel2.Controls.Add(this.MoreInfoLinkLabel);
             this.panel2.Controls.Add(this.dialogText);
             this.panel2.Controls.Add(this.warningIcon);
             this.panel2.Location = new System.Drawing.Point(0, 0);
@@ -68,7 +70,9 @@
             this.dialogText.Name = "dialogText";
             this.dialogText.Size = new System.Drawing.Size(306, 101);
             this.dialogText.TabIndex = 0;
-            this.dialogText.Text = resources.GetString("dialogText.Text");
+            this.dialogText.Text = "The selected firmware file was compiled without USB serial support.  The MULTI-Mo" +
+    "dule bootloader should be updated before writing this firmware.\r\n\r\n\r\n\r\nClick OK " +
+    "to write the firmware.";
             // 
             // warningIcon
             // 
@@ -102,7 +106,20 @@
             this.disableUsbWarning.Text = "Do not show this message again";
             this.disableUsbWarning.UseVisualStyleBackColor = true;
             // 
-            // UsbSupportWarning
+            // MoreInfoLinkLabel
+            // 
+            this.MoreInfoLinkLabel.AutoSize = true;
+            this.MoreInfoLinkLabel.LinkArea = new System.Windows.Forms.LinkArea(6, 4);
+            this.MoreInfoLinkLabel.Location = new System.Drawing.Point(54, 65);
+            this.MoreInfoLinkLabel.Name = "MoreInfoLinkLabel";
+            this.MoreInfoLinkLabel.Size = new System.Drawing.Size(162, 17);
+            this.MoreInfoLinkLabel.TabIndex = 3;
+            this.MoreInfoLinkLabel.TabStop = true;
+            this.MoreInfoLinkLabel.Text = "Click here for more information.";
+            this.MoreInfoLinkLabel.UseCompatibleTextRendering = true;
+            this.MoreInfoLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.MoreInfoLinkLabel_LinkClicked);
+            // 
+            // UsbSupportWarningDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -115,11 +132,12 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "UsbSupportWarning";
+            this.Name = "UsbSupportWarningDialog";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "USB Support Warning";
             this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.warningIcon)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -134,5 +152,6 @@
         private System.Windows.Forms.PictureBox warningIcon;
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.CheckBox disableUsbWarning;
+        private System.Windows.Forms.LinkLabel MoreInfoLinkLabel;
     }
 }

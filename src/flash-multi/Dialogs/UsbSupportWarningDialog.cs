@@ -21,6 +21,7 @@
 namespace Flash_Multi
 {
     using System;
+    using System.Diagnostics;
     using System.Windows.Forms;
 
     /// <summary>
@@ -62,6 +63,27 @@ namespace Flash_Multi
             this.DialogResult = DialogResult.OK;
             this.Close();
             return;
+        }
+
+        /// <summary>
+        /// Opens a URL in the default browser.
+        /// </summary>
+        /// <param name="url">The URL to open.</param>
+        private void OpenLink(string url)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(url);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
+        private void MoreInfoLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            this.OpenLink("https://github.com/benlye/flash-multi/blob/master/doc/New_Bootloader.md");
         }
     }
 }
