@@ -28,7 +28,7 @@ printf "multi-bootreloader $VERSION\n\nThis program is Free Software and has NO 
 USAGE="Usage: multi-bootreloader [options] -p [serial device]\n\nOptions:\n  -h  Print this message and exit\n  -l  Install legacy bootloader\n\n"
 
 # Get the command line options
-while getopts ":f:p:h:l" opt; do
+while getopts ":f:p:hl" opt; do
   case $opt in
     f) FWFILE="$OPTARG"
     ;;

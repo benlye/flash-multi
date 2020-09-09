@@ -28,7 +28,7 @@ printf "flash-multi $VERSION\n\nThis program is Free Software and has NO WARRANT
 USAGE="Usage: flash-multi [options] -f [firmware file] -p [serial device]\n\nOptions:\n  -h  Print this message and exit\n  -l  Install legacy bootloader\n  -r  Read and display the firmware file information and exit\n  -s  Don't prompt for confirmation\n\n"
 
 # Get the command line options
-while getopts ":f:p:hrs" opt; do
+while getopts ":f:p:hrsl" opt; do
   case $opt in
     f) FWFILE="$OPTARG"
     ;;
