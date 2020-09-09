@@ -462,8 +462,8 @@ else
   
   # Warn if the firmware file doesn't contain USB code
   if [ "$HAS_USB_SUPPORT" == false ]; then
-    printf "WARNING: Specified firmware file was not compiled with USB support.\n\n";
-    printf "Please confirm that the MULTI-module bootloader has been updated to support this firmware.\n\n"; 
+    printf "WARNING: Specified firmware file was not compiled with USB support.\n";
+    printf "You must update the MULTI-module bootloader to the latest version BEFORE writing this firmware.\n"; 
     printf "See https://github.com/benlye/flash-multi/blob/master/doc/New_Bootloader.md for more information\n\n";
 
     if [[ "no" == $(confirm "Proceed with firmware update?") ]]; then
