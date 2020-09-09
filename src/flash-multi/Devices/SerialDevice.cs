@@ -224,15 +224,7 @@ namespace Flash_Multi
             string command = ".\\tools\\stm32flash.exe";
 
             // Path to the bootloader file
-            string bootLoaderPath;
-            if (Properties.Settings.Default.ErrorIfNoUSB)
-            {
-                bootLoaderPath = ".\\bootloaders\\StmMulti4in1_Legacy.bin";
-            }
-            else
-            {
-                bootLoaderPath = ".\\bootloaders\\StmMulti4in1_StickyDfu.bin";
-            }
+            string bootLoaderPath = ".\\bootloaders\\StmMulti4in1_StickyDfu.bin";
 
             // Baud rate for serial flash commands
             int serialBaud = Properties.Settings.Default.SerialBaudRate;
