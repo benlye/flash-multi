@@ -265,10 +265,8 @@ function get_signature()
 
   # Determine if the specified firmware file contains support for the STM32 USB port
   if grep -q $GREP_ARGS 'M\x00a\x00p\x00l\x00e\x00\x12\x03L\x00e\x00a\x00f\x00L\x00a\x00b\x00s' "$FWFILE"; then
-    HAS_USB_SUPPORT=true;
     FW_USBSERIAL_SUPPORT="True"
   else
-    HAS_USB_SUPPORT=false;
     FW_USBSERIAL_SUPPORT="False"
   fi
 
@@ -405,8 +403,8 @@ else
   BOOTLOADERFILE="$DIR/bootloader/StmMulti4in1_StickyDfu.bin"
 fi
 
-# Determine if the specified firmware file contains support for the STM32 USB port
-if [ "$HAS_USB_SUPPORT" == true ]; then
+# Set the parameters according to bootloader support
+if [ $FW_BOOTLOADER_SUPPORT == "True" ]; then
   MAX_FILE_SIZE=120832
   FLASH_START=8
   EXEC_ADDR=0x8002000
@@ -434,7 +432,7 @@ then
   fi
   
   STEP=1
-  [ "$HAS_USB_SUPPORT" == true ] && NUM_STEPS=3 || NUM_STEPS=2;
+  [ $FW_BOOTLOADER_SUPPORT == "True" ] && NUM_STEPS=3 || NUM_STEPS=2;
   
   printf "[$STEP/$NUM_STEPS] Erasing flash...\n"
   printf "$STM32_FLASH -o -S 0x8000000:129024 -b 115200 \"$PORT\"\n"
@@ -442,7 +440,7 @@ then
   [ $? -ne 0 ] && printf "ERROR: Failed to erase flash!\n\n" && exit 3;
   STEP=$((STEP+1))
   
-  if [ "$HAS_USB_SUPPORT" == true ] ; then
+  if [ $FW_BOOTLOADER_SUPPORT == "True" ] ; then
     printf "[$STEP/$NUM_STEPS] Writing bootloader...\n"
     printf "$STM32_FLASH -v -e 0 -g 0x8000000 -b 115200 -w \"$BOOTLOADERFILE\" \"$PORT\"\n"
     "${STM32_FLASH}" -v -e 0 -g 0x8000000 -b 115200 -w "$BOOTLOADERFILE" "$PORT"
@@ -468,7 +466,7 @@ else
   fi
   
   # Warn if the firmware file doesn't contain USB code
-  if [ "$HAS_USB_SUPPORT" == false ]; then
+  if [ $FW_USBSERIAL_SUPPORT == "False" ]; then
     printf "WARNING: Specified firmware file was not compiled with USB support.\n";
     printf "         You MUST update the MULTI-module bootloader to the latest version BEFORE writing this firmware.\n\n"; 
     printf "         See https://github.com/benlye/flash-multi/blob/master/doc/New_Bootloader.md for more information.\n\n";
