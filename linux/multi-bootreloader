@@ -19,20 +19,22 @@ shopt -s extglob
 # *********************************************************************
 
 # Define the script version
-VERSION=0.1.0
+VERSION=0.2.0
 
 # Write the script header
 printf "multi-bootreloader $VERSION\n\nThis program is Free Software and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
 
 # Prepare simple help text to display when needed
-USAGE="Usage: multi-bootreloader [options] -p [serial device]\n\nOptions:\n  -h  Print this message and exit\n  -s  Don't prompt for confirmation\n\n"
+USAGE="Usage: multi-bootreloader [options] -p [serial device]\n\nOptions:\n  -h  Print this message and exit\n  -l  Install legacy bootloader\n\n"
 
 # Get the command line options
-while getopts ":f:p:h" opt; do
+while getopts ":f:p:h:l" opt; do
   case $opt in
     f) FWFILE="$OPTARG"
     ;;
     p) PORT="$OPTARG"
+    ;;
+    l) LEGACY="True"
     ;;
     h) printf "$USAGE"; exit 1
     ;;
@@ -43,8 +45,12 @@ while getopts ":f:p:h" opt; do
   esac
 done
 
-# FWFILE is BootReloader.bin
-FWFILE=./tools/BootReloader.bin
+# Pick the bootreloader file
+if [[ $LEGACY == "True" ]]; then
+  FWFILE=./tools/BootReloader_Legacy.bin
+else
+  FWFILE=./tools/BootReloader_StickyDfu.bin
+fi
 
 # Die if the firmware file doesn't exist
 if [ ! -f "$FWFILE" ]; then

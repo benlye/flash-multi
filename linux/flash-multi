@@ -19,13 +19,13 @@ shopt -s extglob
 # *********************************************************************
 
 # Define the script version
-VERSION=0.4.3
+VERSION=0.5.0
 
 # Write the script header
 printf "flash-multi $VERSION\n\nThis program is Free Software and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
 
 # Prepare simple help text to display when needed
-USAGE="Usage: flash-multi [options] -f [firmware file] -p [serial device]\n\nOptions:\n  -h  Print this message and exit\n  -r  Read and display the firmware file information and exit\n  -s  Don't prompt for confirmation\n\n"
+USAGE="Usage: flash-multi [options] -f [firmware file] -p [serial device]\n\nOptions:\n  -h  Print this message and exit\n  -l  Install legacy bootloader\n  -r  Read and display the firmware file information and exit\n  -s  Don't prompt for confirmation\n\n"
 
 # Get the command line options
 while getopts ":f:p:hrs" opt; do
@@ -37,6 +37,8 @@ while getopts ":f:p:hrs" opt; do
     h) printf "$USAGE"; exit 1
     ;;
     r) SHOWINFO="True"
+    ;;
+    l) LEGACY="True"
     ;;
     s) SILENT="True"
     ;;
@@ -388,7 +390,11 @@ fi
 
 # STM32 Module Flashing
 # Set the path to the bootloader file
-BOOTLOADERFILE="$DIR/bootloader/StmMulti4in1.bin"
+if [[ $LEGACY == "True" ]]; then
+  BOOTLOADERFILE="$DIR/bootloader/StmMulti4in1_Legacy.bin"
+else
+  BOOTLOADERFILE="$DIR/bootloader/StmMulti4in1_StickyDfu.bin"
+fi
 
 # Determine if the specified firmware file contains support for the STM32 USB port
 if grep -q $GREP_ARGS 'M\x00a\x00p\x00l\x00e\x00\x12\x03L\x00e\x00a\x00f\x00L\x00a\x00b\x00s' "$FWFILE"; then
