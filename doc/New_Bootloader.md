@@ -85,3 +85,6 @@ You have the old bootloader.  Use Flash Multi to flash the module bootloader, as
 
 ### Why doesn't this apply to JP4IN1-SE or Radioboss modules?
 They use a different USB interface which does not use DFU mode to flash firmware.  They will work happily with the old or new bootloaders and do not require updating this way.
+
+### Why doesn't this apply to radios with internal modules?
+Because internal modules don't have USB ports they do not require any update to work properly with the new firmware which does not have USB support.
