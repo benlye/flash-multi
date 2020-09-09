@@ -25,10 +25,10 @@ VERSION=0.5.0
 printf "flash-multi $VERSION\n\nThis program is Free Software and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
 
 # Prepare simple help text to display when needed
-USAGE="Usage: flash-multi [options] -f [firmware file] -p [serial device]\n\nOptions:\n  -h  Print this message and exit\n  -l  Install legacy bootloader\n  -r  Read and display the firmware file information and exit\n  -s  Don't prompt for confirmation\n\n"
+USAGE="Usage: flash-multi [options] -f [firmware file] -p [serial device]\n\nOptions:\n  -h  Print this message and exit\n  -l  Install legacy bootloader\n  -r  Read and display the firmware file information and exit\n  -s  Don't prompt for confirmation\n  -b  Baud rate (57600, 115200, 500000)\n\n"
 
 # Get the command line options
-while getopts ":f:p:hrsl" opt; do
+while getopts ":f:p:b:hrsl" opt; do
   case $opt in
     f) FWFILE="$OPTARG"
     ;;
@@ -41,6 +41,8 @@ while getopts ":f:p:hrsl" opt; do
     l) LEGACY="True"
     ;;
     s) SILENT="True"
+    ;;
+    b) BAUDRATE="$OPTARG"
     ;;
     \?) printf "Invalid argument -$OPTARG\n\n"; >&2
     ;;
@@ -65,6 +67,17 @@ fi
 if [ ! -r "$FWFILE" ]; then
     printf "ERROR: $FWFILE cannot be read!\n\n";
     exit 2;
+fi
+
+# Die if the baud rate isn't valid
+if [ "x" != "x$BAUDRATE" ] && [ $BAUDRATE != "57600" ] && [ $BAUDRATE != "115200" ] && [ $BAUDRATE != "500000" ] ; then
+    printf "ERROR: $BAUDRATE is not a valid baud rate!\n\n";
+    exit 2;
+fi
+
+# Set the baud rate for stm32flash
+if [ "x" == "x$BAUDRATE" ]; then
+  BAUDRATE=115200
 fi
 
 function confirm() {
@@ -435,22 +448,22 @@ then
   [ $FW_BOOTLOADER_SUPPORT == "True" ] && NUM_STEPS=3 || NUM_STEPS=2;
   
   printf "[$STEP/$NUM_STEPS] Erasing flash...\n"
-  printf "$STM32_FLASH -o -S 0x8000000:129024 -b 115200 \"$PORT\"\n"
-  "${STM32_FLASH}" -o -S 0x8000000:129024 -b 115200 "$PORT"
+  printf "$STM32_FLASH -o -S 0x8000000:129024 -b $BAUDRATE \"$PORT\"\n"
+  "${STM32_FLASH}" -o -S 0x8000000:129024 -b $BAUDRATE "$PORT"
   [ $? -ne 0 ] && printf "ERROR: Failed to erase flash!\n\n" && exit 3;
   STEP=$((STEP+1))
   
   if [ $FW_BOOTLOADER_SUPPORT == "True" ] ; then
     printf "[$STEP/$NUM_STEPS] Writing bootloader...\n"
-    printf "$STM32_FLASH -v -e 0 -g 0x8000000 -b 115200 -w \"$BOOTLOADERFILE\" \"$PORT\"\n"
-    "${STM32_FLASH}" -v -e 0 -g 0x8000000 -b 115200 -w "$BOOTLOADERFILE" "$PORT"
+    printf "$STM32_FLASH -v -e 0 -g 0x8000000 -b $BAUDRATE -w \"$BOOTLOADERFILE\" \"$PORT\"\n"
+    "${STM32_FLASH}" -v -e 0 -g 0x8000000 -b $BAUDRATE -w "$BOOTLOADERFILE" "$PORT"
     [ $? -ne 0 ] && printf "ERROR: Failed to write bootloader!\n\n" && exit 3;
     STEP=$((STEP+1))
   fi
   
   printf "[$STEP/$NUM_STEPS] Writing firmware...\n"
-  printf "$STM32_FLASH -v -s $FLASH_START -e 0 -g $EXEC_ADDR -b 115200 -w \"$FWFILE\" \"$PORT\"\n"
-  "${STM32_FLASH}" -v -s $FLASH_START -e 0 -g $EXEC_ADDR -b 115200 -w "$FWFILE" "$PORT"
+  printf "$STM32_FLASH -v -s $FLASH_START -e 0 -g $EXEC_ADDR -b $BAUDRATE -w \"$FWFILE\" \"$PORT\"\n"
+  "${STM32_FLASH}" -v -s $FLASH_START -e 0 -g $EXEC_ADDR -b $BAUDRATE -w "$FWFILE" "$PORT"
   [ $? -ne 0 ] && printf "ERROR: Failed to write firmware!\n\n" && exit 3;
     
 else
