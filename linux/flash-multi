@@ -460,10 +460,16 @@ else
     printf "ERROR: Required tool $DFU_UTIL does not exist or is not executable!\n\n"; exit 3;
   fi
   
-  # Die if the firmware file doesn't contain USB code
+  # Warn if the firmware file doesn't contain USB code
   if [ "$HAS_USB_SUPPORT" == false ]; then
-    printf "ERROR: Specified firmware file was not compiled with USB support.\nFlashing this file would make the MULTI-Module unusable.\n\n"; 
-    exit 9;
+    printf "WARNING: Specified firmware file was not compiled with USB support.\n\n";
+    printf "Please confirm that the MULTI-module bootloader has been updated to support this firmware.\n\n"; 
+    printf "See https://github.com/benlye/flash-multi/blob/master/doc/New_Bootloader.md for more information\n\n";
+
+    if [[ "no" == $(confirm "Proceed with firmware update?") ]]; then
+        printf "\nFirmware update aborted.\n\n"
+        exit 9;
+    fi
   fi
   
   STEP=1;
