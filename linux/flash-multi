@@ -263,6 +263,15 @@ function get_signature()
     return;
   fi
 
+  # Determine if the specified firmware file contains support for the STM32 USB port
+  if grep -q $GREP_ARGS 'M\x00a\x00p\x00l\x00e\x00\x12\x03L\x00e\x00a\x00f\x00L\x00a\x00b\x00s' "$FWFILE"; then
+    HAS_USB_SUPPORT=true;
+    FW_USBSERIAL_SUPPORT="True"
+  else
+    HAS_USB_SUPPORT=false;
+    FW_USBSERIAL_SUPPORT="False"
+  fi
+
   # Show the firmware information
   printf "Multi Firmware Version:    $SIG_VERSION_STRING ($SIG_BOARD_TYPE_NAME)\n";
   printf "Expected Channel Order:    $FW_CHANNEL_ORDER\n";
@@ -270,6 +279,7 @@ function get_signature()
   printf "Invert Telemetry Enabled:  $FW_INVERT_TELEMETRY_ENABLED\n";
   printf "Flash From Radio Enabled:  $FW_CHECK_FOR_BOOTLOADER_ENABLED\n";
   printf "Bootloader Enabled:        $FW_BOOTLOADER_SUPPORT\n";
+  printf "USB Serial Support:        $FW_USBSERIAL_SUPPORT\n";
   printf "Serial Debug Enabled:      $FW_DEBUG_SERIAL_ENABLED\n\n";
 }
 
@@ -387,7 +397,6 @@ if [[ $SIG_BOARD_TYPE_NAME == "AVR" ]]; then
   exit 0
 fi
 
-
 # STM32 Module Flashing
 # Set the path to the bootloader file
 if [[ $LEGACY == "True" ]]; then
@@ -397,13 +406,11 @@ else
 fi
 
 # Determine if the specified firmware file contains support for the STM32 USB port
-if grep -q $GREP_ARGS 'M\x00a\x00p\x00l\x00e\x00\x12\x03L\x00e\x00a\x00f\x00L\x00a\x00b\x00s' "$FWFILE"; then
-  HAS_USB_SUPPORT=true;
+if [ "$HAS_USB_SUPPORT" == true ]; then
   MAX_FILE_SIZE=120832
   FLASH_START=8
   EXEC_ADDR=0x8002000
 else
-  HAS_USB_SUPPORT=false;
   MAX_FILE_SIZE=129024
   FLASH_START=0
   EXEC_ADDR=0x8000000
@@ -463,8 +470,8 @@ else
   # Warn if the firmware file doesn't contain USB code
   if [ "$HAS_USB_SUPPORT" == false ]; then
     printf "WARNING: Specified firmware file was not compiled with USB support.\n";
-    printf "You must update the MULTI-module bootloader to the latest version BEFORE writing this firmware.\n"; 
-    printf "See https://github.com/benlye/flash-multi/blob/master/doc/New_Bootloader.md for more information\n\n";
+    printf "         You MUST update the MULTI-module bootloader to the latest version BEFORE writing this firmware.\n\n"; 
+    printf "         See https://github.com/benlye/flash-multi/blob/master/doc/New_Bootloader.md for more information.\n\n";
 
     if [[ "no" == $(confirm "Proceed with firmware update?") ]]; then
         printf "\nFirmware update aborted.\n\n"
