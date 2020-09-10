@@ -23,6 +23,7 @@ namespace Flash_Multi
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -473,6 +474,74 @@ namespace Flash_Multi
                 }
             }
 
+            if (!Properties.Settings.Default.DisableFlashVerification)
+            {
+                // Check that the STM32 MCU supports 128KB
+                flashMulti.AppendLog($"{Strings.progressCheckingFlashSize}");
+
+                // Create a temporary file name to read into
+                string tempFileName = Path.GetTempFileName();
+
+                // Read the flash memory into a temp file
+                command = ".\\tools\\dfu-util-multi.exe";
+                commandArgs = string.Format("-a 2 -d 1EAF:0003 -U \"{0}\" -v", tempFileName, comPort);
+                await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+
+                // If we failed we need to try DFU Recovery Mode
+                if (returnCode != 0)
+                {
+                    // First attempt failed so we need to try bootloader recovery
+                    flashMulti.AppendLog($" {Strings.failed}\r\n");
+
+                    flashMulti.AppendLog($"{Strings.dfuAttemptingRecovery}\r\n");
+
+                    // Show the recovery mode dialog
+                    DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
+                    var recoveryResult = recoveryDialog.ShowDialog();
+
+                    // If we made it into recovery mode, flash the module
+                    if (recoveryResult == DialogResult.OK)
+                    {
+                        // Run the recovery flash command
+                        flashMulti.AppendLog(Strings.progressCheckingFlashSize);
+                        await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+                        if (returnCode != 0)
+                        {
+                            flashMulti.AppendLog($" {Strings.failed}!\r\n");
+                            MessageBox.Show(Strings.failedToWriteFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            flashMulti.EnableControls(true);
+                            return;
+                        }
+                    }
+                    else if (recoveryResult == DialogResult.Cancel)
+                    {
+                        flashMulti.AppendLog(Strings.dfuRecoveryCancelled);
+                        flashMulti.EnableControls(true);
+                        return;
+                    }
+                    else
+                    {
+                        flashMulti.AppendLog(Strings.dfuRecoveryFailed);
+                        flashMulti.EnableControls(true);
+                        return;
+                    }
+                }
+
+                flashMulti.AppendLog($" {Strings.done}\r\n");
+
+                // Get the file size
+                long length = new FileInfo(tempFileName).Length;
+
+                // Compare the size of the data we read to the size we expect
+                if (length < 122880)
+                {
+                    // Throw a message and stop
+                    flashMulti.EnableControls(true);
+                    MessageBox.Show(Strings.failedToVerifyMcuFlash, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
             // First attempt to flash the firmware
             flashMulti.AppendLog(Strings.progressWritingFirmware);
             command = ".\\tools\\dfu-util-multi.exe";
@@ -607,19 +676,60 @@ namespace Flash_Multi
             }
 
             // The bootreloader.bin file
-            string fileName = ".\\tools\\bootreloader.bin";
+            string fileName;
+            if (Properties.Settings.Default.ErrorIfNoUSB)
+            {
+                fileName = ".\\tools\\bootreloader_legacy.bin";
+            }
+            else
+            {
+                fileName = ".\\tools\\bootreloader_stickydfu.bin";
+            }
 
             // Erase the the flash
             flashMulti.AppendLog(Strings.progressWritingBootReloader);
             command = ".\\tools\\dfu-util-multi.exe";
             commandArgs = string.Format("-a 2 -d 1EAF:0003 -D \"{0}\" -v -R", fileName, comPort);
+
             await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+
             if (returnCode != 0)
             {
+                // First attempt failed so we need to try bootloader recovery
                 flashMulti.AppendLog($" {Strings.failed}\r\n");
-                MessageBox.Show(Strings.failedToWriteBootReloader, Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                flashMulti.EnableControls(true);
-                return false;
+
+                flashMulti.AppendLog($"{Strings.dfuAttemptingRecovery}\r\n");
+
+                // Show the recovery mode dialog
+                DfuRecoveryDialog recoveryDialog = new DfuRecoveryDialog(flashMulti);
+                var recoveryResult = recoveryDialog.ShowDialog();
+
+                // If we made it into recovery mode, flash the module
+                if (recoveryResult == DialogResult.OK)
+                {
+                    // Run the recovery flash command
+                    flashMulti.AppendLog(Strings.progressWritingBootReloader);
+                    await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+                    if (returnCode != 0)
+                    {
+                        flashMulti.AppendLog($" {Strings.failed}!\r\n");
+                        MessageBox.Show(Strings.failedToWriteFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        flashMulti.EnableControls(true);
+                        return false;
+                    }
+                }
+                else if (recoveryResult == DialogResult.Cancel)
+                {
+                    flashMulti.AppendLog(Strings.dfuRecoveryCancelled);
+                    flashMulti.EnableControls(true);
+                    return false;
+                }
+                else
+                {
+                    flashMulti.AppendLog(Strings.dfuRecoveryFailed);
+                    flashMulti.EnableControls(true);
+                    return false;
+                }
             }
 
             // Write a success message to the log

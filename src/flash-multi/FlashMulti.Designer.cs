@@ -75,16 +75,21 @@ namespace Flash_Multi
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.advancedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.actionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.installUSBDriversToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.resetToDFUModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.upgradeBootloaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.baudRateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemBaudRate57600 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemBaudRate115200 = new System.Windows.Forms.ToolStripMenuItem();
-            this.runAfterUploadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemBaudRate500000 = new System.Windows.Forms.ToolStripMenuItem();
+            this.bootloaderTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stickyDfuUsbModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.comPortUsbModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.disableCompatibilityCheckToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.enableDeviceDetectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.runAfterUploadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.actionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.installUSBDriversToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resetToDFUModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.upgradeBootloaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.documentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -284,10 +289,88 @@ namespace Flash_Multi
             // advancedToolStripMenuItem
             // 
             this.advancedToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.actionsToolStripMenuItem,
-            this.settingsToolStripMenuItem});
+            this.settingsToolStripMenuItem,
+            this.actionsToolStripMenuItem});
             this.advancedToolStripMenuItem.Name = "advancedToolStripMenuItem";
             resources.ApplyResources(this.advancedToolStripMenuItem, "advancedToolStripMenuItem");
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.baudRateToolStripMenuItem,
+            this.bootloaderTypeToolStripMenuItem,
+            this.disableCompatibilityCheckToolStripMenuItem,
+            this.enableDeviceDetectionToolStripMenuItem,
+            this.runAfterUploadToolStripMenuItem});
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            resources.ApplyResources(this.settingsToolStripMenuItem, "settingsToolStripMenuItem");
+            // 
+            // baudRateToolStripMenuItem
+            // 
+            this.baudRateToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItemBaudRate57600,
+            this.toolStripMenuItemBaudRate115200,
+            this.toolStripMenuItemBaudRate500000});
+            this.baudRateToolStripMenuItem.Name = "baudRateToolStripMenuItem";
+            resources.ApplyResources(this.baudRateToolStripMenuItem, "baudRateToolStripMenuItem");
+            // 
+            // toolStripMenuItemBaudRate57600
+            // 
+            this.toolStripMenuItemBaudRate57600.Name = "toolStripMenuItemBaudRate57600";
+            resources.ApplyResources(this.toolStripMenuItemBaudRate57600, "toolStripMenuItemBaudRate57600");
+            this.toolStripMenuItemBaudRate57600.Click += new System.EventHandler(this.ToolStripMenuItemBaudRate57600_Click);
+            // 
+            // toolStripMenuItemBaudRate115200
+            // 
+            this.toolStripMenuItemBaudRate115200.Name = "toolStripMenuItemBaudRate115200";
+            resources.ApplyResources(this.toolStripMenuItemBaudRate115200, "toolStripMenuItemBaudRate115200");
+            this.toolStripMenuItemBaudRate115200.Click += new System.EventHandler(this.ToolStripMenuItemBaudRate115200_Click);
+            // 
+            // toolStripMenuItemBaudRate500000
+            // 
+            this.toolStripMenuItemBaudRate500000.Name = "toolStripMenuItemBaudRate500000";
+            resources.ApplyResources(this.toolStripMenuItemBaudRate500000, "toolStripMenuItemBaudRate500000");
+            this.toolStripMenuItemBaudRate500000.Click += new System.EventHandler(this.ToolStripMenuItemBaudRate500000_Click);
+            // 
+            // bootloaderTypeToolStripMenuItem
+            // 
+            this.bootloaderTypeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.stickyDfuUsbModeToolStripMenuItem,
+            this.comPortUsbModeToolStripMenuItem});
+            this.bootloaderTypeToolStripMenuItem.Name = "bootloaderTypeToolStripMenuItem";
+            resources.ApplyResources(this.bootloaderTypeToolStripMenuItem, "bootloaderTypeToolStripMenuItem");
+            // 
+            // stickyDfuUsbModeToolStripMenuItem
+            // 
+            this.stickyDfuUsbModeToolStripMenuItem.Name = "stickyDfuUsbModeToolStripMenuItem";
+            resources.ApplyResources(this.stickyDfuUsbModeToolStripMenuItem, "stickyDfuUsbModeToolStripMenuItem");
+            this.stickyDfuUsbModeToolStripMenuItem.Click += new System.EventHandler(this.StickyDfuUsbModeToolStripMenuItem_Click);
+            // 
+            // comPortUsbModeToolStripMenuItem
+            // 
+            this.comPortUsbModeToolStripMenuItem.Name = "comPortUsbModeToolStripMenuItem";
+            resources.ApplyResources(this.comPortUsbModeToolStripMenuItem, "comPortUsbModeToolStripMenuItem");
+            this.comPortUsbModeToolStripMenuItem.Click += new System.EventHandler(this.ComPortUsbModeToolStripMenuItem_Click);
+            // 
+            // disableCompatibilityCheckToolStripMenuItem
+            // 
+            this.disableCompatibilityCheckToolStripMenuItem.CheckOnClick = true;
+            this.disableCompatibilityCheckToolStripMenuItem.Name = "disableCompatibilityCheckToolStripMenuItem";
+            resources.ApplyResources(this.disableCompatibilityCheckToolStripMenuItem, "disableCompatibilityCheckToolStripMenuItem");
+            this.disableCompatibilityCheckToolStripMenuItem.Click += new System.EventHandler(this.DisableCompatibilityCheckToolStripMenuItem_Click);
+            // 
+            // enableDeviceDetectionToolStripMenuItem
+            // 
+            this.enableDeviceDetectionToolStripMenuItem.CheckOnClick = true;
+            this.enableDeviceDetectionToolStripMenuItem.Name = "enableDeviceDetectionToolStripMenuItem";
+            resources.ApplyResources(this.enableDeviceDetectionToolStripMenuItem, "enableDeviceDetectionToolStripMenuItem");
+            this.enableDeviceDetectionToolStripMenuItem.Click += new System.EventHandler(this.EnableDeviceDetectionToolStripMenuItem_Click);
+            // 
+            // runAfterUploadToolStripMenuItem
+            // 
+            this.runAfterUploadToolStripMenuItem.CheckOnClick = true;
+            this.runAfterUploadToolStripMenuItem.Name = "runAfterUploadToolStripMenuItem";
+            resources.ApplyResources(this.runAfterUploadToolStripMenuItem, "runAfterUploadToolStripMenuItem");
             // 
             // actionsToolStripMenuItem
             // 
@@ -315,48 +398,6 @@ namespace Flash_Multi
             this.upgradeBootloaderToolStripMenuItem.Name = "upgradeBootloaderToolStripMenuItem";
             resources.ApplyResources(this.upgradeBootloaderToolStripMenuItem, "upgradeBootloaderToolStripMenuItem");
             this.upgradeBootloaderToolStripMenuItem.Click += new System.EventHandler(this.UpgradeBootloaderToolStripMenuItem_Click);
-            // 
-            // settingsToolStripMenuItem
-            // 
-            this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.baudRateToolStripMenuItem,
-            this.runAfterUploadToolStripMenuItem,
-            this.enableDeviceDetectionToolStripMenuItem});
-            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            resources.ApplyResources(this.settingsToolStripMenuItem, "settingsToolStripMenuItem");
-            // 
-            // baudRateToolStripMenuItem
-            // 
-            this.baudRateToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItemBaudRate57600,
-            this.toolStripMenuItemBaudRate115200});
-            this.baudRateToolStripMenuItem.Name = "baudRateToolStripMenuItem";
-            resources.ApplyResources(this.baudRateToolStripMenuItem, "baudRateToolStripMenuItem");
-            // 
-            // toolStripMenuItemBaudRate57600
-            // 
-            this.toolStripMenuItemBaudRate57600.Name = "toolStripMenuItemBaudRate57600";
-            resources.ApplyResources(this.toolStripMenuItemBaudRate57600, "toolStripMenuItemBaudRate57600");
-            this.toolStripMenuItemBaudRate57600.Click += new System.EventHandler(this.ToolStripMenuItemBaudRate57600_Click);
-            // 
-            // toolStripMenuItemBaudRate115200
-            // 
-            this.toolStripMenuItemBaudRate115200.Name = "toolStripMenuItemBaudRate115200";
-            resources.ApplyResources(this.toolStripMenuItemBaudRate115200, "toolStripMenuItemBaudRate115200");
-            this.toolStripMenuItemBaudRate115200.Click += new System.EventHandler(this.ToolStripMenuItemBaudRate115200_Click);
-            // 
-            // runAfterUploadToolStripMenuItem
-            // 
-            this.runAfterUploadToolStripMenuItem.CheckOnClick = true;
-            this.runAfterUploadToolStripMenuItem.Name = "runAfterUploadToolStripMenuItem";
-            resources.ApplyResources(this.runAfterUploadToolStripMenuItem, "runAfterUploadToolStripMenuItem");
-            // 
-            // enableDeviceDetectionToolStripMenuItem
-            // 
-            this.enableDeviceDetectionToolStripMenuItem.CheckOnClick = true;
-            this.enableDeviceDetectionToolStripMenuItem.Name = "enableDeviceDetectionToolStripMenuItem";
-            resources.ApplyResources(this.enableDeviceDetectionToolStripMenuItem, "enableDeviceDetectionToolStripMenuItem");
-            this.enableDeviceDetectionToolStripMenuItem.Click += new System.EventHandler(this.EnableDeviceDetectionToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -458,6 +499,11 @@ namespace Flash_Multi
         private System.Windows.Forms.ToolStripMenuItem runAfterUploadToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem installUSBDriversToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem enableDeviceDetectionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem bootloaderTypeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem stickyDfuUsbModeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem comPortUsbModeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem disableCompatibilityCheckToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemBaudRate500000;
     }
 }
 

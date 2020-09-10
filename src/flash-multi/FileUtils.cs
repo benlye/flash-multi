@@ -48,10 +48,10 @@ namespace Flash_Multi
 
         /// <summary>
         /// Parses the binary file looking for a string which indicates that the compiled firmware images contains USB support.
-        /// The binary firmware file will contain the strings 'Maple' and 'LeafLabs' if it was compiled with support for the USB / Flash from TX bootloader.
+        /// The binary firmware file will contain the strings 'Maple' and 'LeafLabs' if it was compiled with USB serial support.
         /// </summary>
         /// <param name="filename">The path to the firmware file.</param>
-        /// <returns>A boolean value indicatating whether or not the firmware supports USB.</returns>
+        /// <returns>A boolean value indicatating whether or not the firmware supports USB serial.</returns>
         internal static bool CheckForUsbSupport(string filename)
         {
             bool usbSupportEnabled = false;
@@ -59,17 +59,24 @@ namespace Flash_Multi
             // Get the file size
             long length = new System.IO.FileInfo(filename).Length;
 
-            // File is too small to contain a USB support
+            // File is too small to contain USB support
             if (length < 8192)
             {
                 return usbSupportEnabled;
             }
 
+            // Parse the file and find the first instance of the signature
             byte[] byteBuffer = File.ReadAllBytes(filename);
             string byteBufferAsString = System.Text.Encoding.ASCII.GetString(byteBuffer);
-            int offset = byteBufferAsString.IndexOf("M\0a\0p\0l\0e\0\u0012\u0003L\0e\0a\0f\0L\0a\0b\0s\0\u0012\u0001");
 
-            if (offset > 0)
+            // Find the signature
+            int signatureOffset = byteBufferAsString.IndexOf("multi-");
+
+            // Look for the USB string
+            int usbOffset = byteBufferAsString.IndexOf("M\0a\0p\0l\0e\0\u0012\u0003L\0e\0a\0f\0L\0a\0b\0s\0\u0012\u0001");
+
+            // If we found the usb offset before the signature, or we found the USB offset without a signature, USB is enabled
+            if ((usbOffset > 0 && signatureOffset > 0 && usbOffset < signatureOffset) || (usbOffset > 0 && signatureOffset == 0))
             {
                 usbSupportEnabled = true;
             }
@@ -174,22 +181,52 @@ namespace Flash_Multi
             // Get the file size
             long length = new System.IO.FileInfo(filename).Length;
 
-            // If the file is very large we don't want to check for USB support so throw a generic error
-            if (length > 256000)
+            // Absolute max size is 128KB
+            int maxFileSize = 128 * 1024;
+
+            // If the file is larger than the max flash space we don't need any more checks
+            if (length > maxFileSize)
             {
                 MessageBox.Show("Selected firmware file is too large.", "Firmware File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
-            // If the file is smaller we can check if it has USB support and throw a more specific error
-            int maxFileSize = CheckForUsbSupport(filename) ? 120832 : 129024;
-
-            // Check if the file contains EEPROM data
-            byte[] eePromData = Stm32EepromUtils.GetEepromDataFromBackup(filename);
-            if (eePromData != null && Stm32EepromUtils.FindValidPage(eePromData) >= 0)
+            // If the file is smaller we can check if it has bootloader support and do a more exact check
+            FirmwareFile fileDetails = GetFirmwareSignature(filename);
+            if (fileDetails == null)
             {
-                maxFileSize += 2048;
+                // Warn that we can't accurately check the file size
+                string sizeMessage = $"Firmware file does not have a signature - unable to validate the size accurately.";
+                DialogResult sizeWarning = MessageBox.Show(sizeMessage, "Firmware File Size", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                if (sizeWarning != DialogResult.OK)
+                {
+                    return false;
+                }
             }
+            else
+            {
+                switch (fileDetails.ModuleType)
+                {
+                    case "AVR":
+                        maxFileSize = fileDetails.BootloaderSupport ? 32232 : 32744;
+                        break;
+                    case "STM32":
+                        maxFileSize = fileDetails.BootloaderSupport ? 120832 : 129024;
+                        break;
+                }
+            }
+
+            // Check if the file contains EEPROM data if it is for an STM32
+            if (fileDetails.ModuleType == "STM32")
+            {
+                byte[] eePromData = Stm32EepromUtils.GetEepromDataFromBackup(filename);
+                if (eePromData != null && Stm32EepromUtils.FindValidPage(eePromData) >= 0)
+                {
+                    maxFileSize += 2048;
+                }
+            }
+
+            Debug.WriteLine($"Selected file is {length / 1024:n0} KB, maximum size is {maxFileSize / 1024:n0} KB.");
 
             if (length > maxFileSize)
             {
@@ -219,32 +256,14 @@ namespace Flash_Multi
                 return null;
             }
 
-            // Read the last 24 bytes of the binary file so we can see if it contains a signature string
-            using (var reader = new StreamReader(filename))
+            // Parse the file and find the first instance of the signature
+            byte[] byteBuffer = File.ReadAllBytes(filename);
+            string byteBufferAsString = System.Text.Encoding.ASCII.GetString(byteBuffer);
+            int offset = byteBufferAsString.IndexOf("multi-");
+
+            if (offset > 0)
             {
-                if (reader.BaseStream.Length > 24)
-                {
-                    reader.BaseStream.Seek(-24, SeekOrigin.End);
-                }
-
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    signature = line;
-                }
-            }
-
-            // Parse the entire file if we didn't find the signature in the last 24 bytes
-            if (signature != string.Empty && signature.Substring(0, 6) != "multi-")
-            {
-                byte[] byteBuffer = File.ReadAllBytes(filename);
-                string byteBufferAsString = System.Text.Encoding.ASCII.GetString(byteBuffer);
-                int offset = byteBufferAsString.IndexOf("multi-");
-
-                if (offset > 0)
-                {
-                    signature = byteBufferAsString.Substring(offset, 24);
-                }
+                signature = byteBufferAsString.Substring(offset, 24);
             }
 
             Debug.WriteLine(signature);
@@ -299,7 +318,7 @@ namespace Flash_Multi
                     int.TryParse(versionString.Substring(6, 2), out int versionPatch);
                     string parsedVersion = versionMajor + "." + versionMinor + "." + versionRevision + "." + versionPatch;
 
-                    // Create the firmware file signatre and return it
+                    // Create the firmware file signature and return it
                     FirmwareFile file = new FirmwareFile
                     {
                         Signature = signature,
@@ -446,8 +465,8 @@ namespace Flash_Multi
                     b.Write(firmwareData);
                 }
 
-                flashMulti.AppendLog($"\r\n\r\nMULTI-Module firmware saved succesfully");
-                flashMulti.AppendVerbose($"Firmware saved to '{flashFileName}'");
+                flashMulti.AppendLog($"\r\n\r\nMULTI-Module firmware saved successfully");
+                flashMulti.AppendVerbose($"Firmware saved to '{saveFileDialog.FileName}'");
             }
 
             // Save the Atmega328p EEPROM to a separate file
@@ -488,8 +507,8 @@ namespace Flash_Multi
                         b.Write(firmwareData);
                     }
 
-                    flashMulti.AppendLog($"\r\nMULTI-Module EEPROM saved succesfully");
-                    flashMulti.AppendVerbose($"EEPROM saved to '{eepromFileName}'");
+                    flashMulti.AppendLog($"\r\nMULTI-Module EEPROM saved successfully");
+                    flashMulti.AppendVerbose($"EEPROM saved to '{saveFileDialog.FileName}'");
                 }
             }
         }
@@ -559,6 +578,11 @@ namespace Flash_Multi
             /// Gets or sets a value indicating whether the firmware was compiled with INVERT_TELEMETRY defined.
             /// </summary>
             public bool InvertTelemetry { get; set; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether the firmware was compiled with USB Serial support.
+            /// </summary>
+            public bool UsbSerial { get; set; }
 
             /// <summary>
             /// Gets or sets a value indicating whether the firmware was compiled with DEBUG_SERIAL defined.

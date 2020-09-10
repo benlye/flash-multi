@@ -20,7 +20,9 @@
 
 namespace Flash_Multi
 {
+    using System.Collections;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -222,7 +224,7 @@ namespace Flash_Multi
             string command = ".\\tools\\stm32flash.exe";
 
             // Path to the bootloader file
-            string bootLoaderPath = ".\\bootloaders\\StmMulti4in1.bin";
+            string bootLoaderPath = ".\\bootloaders\\StmMulti4in1_StickyDfu.bin";
 
             // Baud rate for serial flash commands
             int serialBaud = Properties.Settings.Default.SerialBaudRate;
@@ -234,7 +236,7 @@ namespace Flash_Multi
             int returnCode = -1;
 
             // First step in flash process
-            int flashStep = 1;
+            int flashStep = 0;
 
             // Total number of steps in flash process
             int flashSteps = 2;
@@ -257,7 +259,7 @@ namespace Flash_Multi
             if (writeBootloader)
             {
                 // Increase the total number of steps
-                flashSteps = 3;
+                flashSteps++;
 
                 // The bootloader occupies the first 8 pages (0-7), so start writing after it
                 flashStart = 8;
@@ -299,7 +301,54 @@ namespace Flash_Multi
                 return;
             }
 
-            // Erase the flash
+            if (!Properties.Settings.Default.DisableFlashVerification)
+            {
+                flashStep++;
+
+                // Increase the total number of steps
+                flashSteps++;
+
+                // Check that the STM32 MCU supports 128KB
+                flashMulti.AppendLog($"[{flashStep}/{flashSteps}] {Strings.progressCheckingFlashSize}");
+
+                // Create a temporary file name to read into
+                string tempFileName = Path.GetTempFileName();
+
+                // Set the stm32flash.exe command line arguments for reading the 32B of flash above 64KB
+                commandArgs = $"-r {tempFileName} -S 0x8010000:32 -b {serialBaud} {comPort}";
+
+                // Run the read command asynchronously and wait for it to finish
+                await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
+
+                // Show an error message if the read command failed for any reason
+                if (returnCode != 0)
+                {
+                    flashMulti.EnableControls(true);
+                    flashMulti.AppendLog($" {Strings.failed}");
+                    MessageBox.Show(Strings.failedToReadModule, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                flashMulti.AppendLog($" {Strings.done}\r\n");
+
+                // Read the data we read from the module
+                byte[] byteBuffer = File.ReadAllBytes(tempFileName);
+
+                // 32 Bytes of bad data to compare to
+                byte[] badData = { 7, 73, 8, 128, 7, 73, 8, 128, 7, 73, 8, 128, 7, 73, 8, 128, 7, 73, 8, 128, 7, 73, 8, 128, 7, 73, 8, 128, 7, 73, 8, 128 };
+
+                // Compare the data we read to the known 'bad' data
+                if (StructuralComparisons.StructuralEqualityComparer.Equals(byteBuffer, badData))
+                {
+                    // Throw a message and stop
+                    flashMulti.EnableControls(true);
+                    MessageBox.Show(Strings.failedToVerifyMcuFlash, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
+            // Increment the step counter and write to the log
+            flashStep++;
             flashMulti.AppendLog($"[{flashStep}/{flashSteps}] {Strings.progressErasingFlash}");
 
             // Set the stm32flash.exe command line arguments for erasing

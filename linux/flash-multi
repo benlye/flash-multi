@@ -19,16 +19,16 @@ shopt -s extglob
 # *********************************************************************
 
 # Define the script version
-VERSION=0.4.3
+VERSION=0.5.0
 
 # Write the script header
 printf "flash-multi $VERSION\n\nThis program is Free Software and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
 
 # Prepare simple help text to display when needed
-USAGE="Usage: flash-multi [options] -f [firmware file] -p [serial device]\n\nOptions:\n  -h  Print this message and exit\n  -r  Read and display the firmware file information and exit\n  -s  Don't prompt for confirmation\n\n"
+USAGE="Usage: flash-multi [options] -f [firmware file] -p [serial device]\n\nOptions:\n  -h  Print this message and exit\n  -l  Install legacy bootloader\n  -r  Read and display the firmware file information and exit\n  -s  Don't prompt for confirmation\n  -b  Baud rate (57600, 115200, 500000)\n\n"
 
 # Get the command line options
-while getopts ":f:p:hrs" opt; do
+while getopts ":f:p:b:hrsl" opt; do
   case $opt in
     f) FWFILE="$OPTARG"
     ;;
@@ -38,7 +38,11 @@ while getopts ":f:p:hrs" opt; do
     ;;
     r) SHOWINFO="True"
     ;;
+    l) LEGACY="True"
+    ;;
     s) SILENT="True"
+    ;;
+    b) BAUDRATE="$OPTARG"
     ;;
     \?) printf "Invalid argument -$OPTARG\n\n"; >&2
     ;;
@@ -63,6 +67,17 @@ fi
 if [ ! -r "$FWFILE" ]; then
     printf "ERROR: $FWFILE cannot be read!\n\n";
     exit 2;
+fi
+
+# Die if the baud rate isn't valid
+if [ "x" != "x$BAUDRATE" ] && [ $BAUDRATE != "57600" ] && [ $BAUDRATE != "115200" ] && [ $BAUDRATE != "500000" ] ; then
+    printf "ERROR: $BAUDRATE is not a valid baud rate!\n\n";
+    exit 2;
+fi
+
+# Set the baud rate for stm32flash
+if [ "x" == "x$BAUDRATE" ]; then
+  BAUDRATE=115200
 fi
 
 function confirm() {
@@ -261,6 +276,13 @@ function get_signature()
     return;
   fi
 
+  # Determine if the specified firmware file contains support for the STM32 USB port
+  if grep -q $GREP_ARGS 'M\x00a\x00p\x00l\x00e\x00\x12\x03L\x00e\x00a\x00f\x00L\x00a\x00b\x00s' "$FWFILE"; then
+    FW_USBSERIAL_SUPPORT="True"
+  else
+    FW_USBSERIAL_SUPPORT="False"
+  fi
+
   # Show the firmware information
   printf "Multi Firmware Version:    $SIG_VERSION_STRING ($SIG_BOARD_TYPE_NAME)\n";
   printf "Expected Channel Order:    $FW_CHANNEL_ORDER\n";
@@ -268,6 +290,7 @@ function get_signature()
   printf "Invert Telemetry Enabled:  $FW_INVERT_TELEMETRY_ENABLED\n";
   printf "Flash From Radio Enabled:  $FW_CHECK_FOR_BOOTLOADER_ENABLED\n";
   printf "Bootloader Enabled:        $FW_BOOTLOADER_SUPPORT\n";
+  printf "USB Serial Support:        $FW_USBSERIAL_SUPPORT\n";
   printf "Serial Debug Enabled:      $FW_DEBUG_SERIAL_ENABLED\n\n";
 }
 
@@ -385,19 +408,20 @@ if [[ $SIG_BOARD_TYPE_NAME == "AVR" ]]; then
   exit 0
 fi
 
-
 # STM32 Module Flashing
 # Set the path to the bootloader file
-BOOTLOADERFILE="$DIR/bootloader/StmMulti4in1.bin"
+if [[ $LEGACY == "True" ]]; then
+  BOOTLOADERFILE="$DIR/bootloader/StmMulti4in1_Legacy.bin"
+else
+  BOOTLOADERFILE="$DIR/bootloader/StmMulti4in1_StickyDfu.bin"
+fi
 
-# Determine if the specified firmware file contains support for the STM32 USB port
-if grep -q $GREP_ARGS 'M\x00a\x00p\x00l\x00e\x00\x12\x03L\x00e\x00a\x00f\x00L\x00a\x00b\x00s' "$FWFILE"; then
-  HAS_USB_SUPPORT=true;
+# Set the parameters according to bootloader support
+if [ $FW_BOOTLOADER_SUPPORT == "True" ]; then
   MAX_FILE_SIZE=120832
   FLASH_START=8
   EXEC_ADDR=0x8002000
 else
-  HAS_USB_SUPPORT=false;
   MAX_FILE_SIZE=129024
   FLASH_START=0
   EXEC_ADDR=0x8000000
@@ -421,25 +445,25 @@ then
   fi
   
   STEP=1
-  [ "$HAS_USB_SUPPORT" == true ] && NUM_STEPS=3 || NUM_STEPS=2;
+  [ $FW_BOOTLOADER_SUPPORT == "True" ] && NUM_STEPS=3 || NUM_STEPS=2;
   
   printf "[$STEP/$NUM_STEPS] Erasing flash...\n"
-  printf "$STM32_FLASH -o -S 0x8000000:129024 -b 115200 \"$PORT\"\n"
-  "${STM32_FLASH}" -o -S 0x8000000:129024 -b 115200 "$PORT"
+  printf "$STM32_FLASH -o -S 0x8000000:129024 -b $BAUDRATE \"$PORT\"\n"
+  "${STM32_FLASH}" -o -S 0x8000000:129024 -b $BAUDRATE "$PORT"
   [ $? -ne 0 ] && printf "ERROR: Failed to erase flash!\n\n" && exit 3;
   STEP=$((STEP+1))
   
-  if [ "$HAS_USB_SUPPORT" == true ] ; then
+  if [ $FW_BOOTLOADER_SUPPORT == "True" ] ; then
     printf "[$STEP/$NUM_STEPS] Writing bootloader...\n"
-    printf "$STM32_FLASH -v -e 0 -g 0x8000000 -b 115200 -w \"$BOOTLOADERFILE\" \"$PORT\"\n"
-    "${STM32_FLASH}" -v -e 0 -g 0x8000000 -b 115200 -w "$BOOTLOADERFILE" "$PORT"
+    printf "$STM32_FLASH -v -e 0 -g 0x8000000 -b $BAUDRATE -w \"$BOOTLOADERFILE\" \"$PORT\"\n"
+    "${STM32_FLASH}" -v -e 0 -g 0x8000000 -b $BAUDRATE -w "$BOOTLOADERFILE" "$PORT"
     [ $? -ne 0 ] && printf "ERROR: Failed to write bootloader!\n\n" && exit 3;
     STEP=$((STEP+1))
   fi
   
   printf "[$STEP/$NUM_STEPS] Writing firmware...\n"
-  printf "$STM32_FLASH -v -s $FLASH_START -e 0 -g $EXEC_ADDR -b 115200 -w \"$FWFILE\" \"$PORT\"\n"
-  "${STM32_FLASH}" -v -s $FLASH_START -e 0 -g $EXEC_ADDR -b 115200 -w "$FWFILE" "$PORT"
+  printf "$STM32_FLASH -v -s $FLASH_START -e 0 -g $EXEC_ADDR -b $BAUDRATE -w \"$FWFILE\" \"$PORT\"\n"
+  "${STM32_FLASH}" -v -s $FLASH_START -e 0 -g $EXEC_ADDR -b $BAUDRATE -w "$FWFILE" "$PORT"
   [ $? -ne 0 ] && printf "ERROR: Failed to write firmware!\n\n" && exit 3;
     
 else
@@ -454,10 +478,16 @@ else
     printf "ERROR: Required tool $DFU_UTIL does not exist or is not executable!\n\n"; exit 3;
   fi
   
-  # Die if the firmware file doesn't contain USB code
-  if [ "$HAS_USB_SUPPORT" == false ]; then
-    printf "ERROR: Specified firmware file was not compiled with USB support.\nFlashing this file would make the MULTI-Module unusable.\n\n"; 
-    exit 9;
+  # Warn if the firmware file doesn't contain USB code
+  if [ $FW_USBSERIAL_SUPPORT == "False" ]; then
+    printf "WARNING: Specified firmware file was not compiled with USB support.\n";
+    printf "         You MUST update the MULTI-module bootloader to the latest version BEFORE writing this firmware.\n\n"; 
+    printf "         See https://github.com/benlye/flash-multi/blob/master/doc/New_Bootloader.md for more information.\n\n";
+
+    if [[ "no" == $(confirm "Proceed with firmware update?") ]]; then
+        printf "\nFirmware update aborted.\n\n"
+        exit 9;
+    fi
   fi
   
   STEP=1;

@@ -750,30 +750,6 @@
   <data name="fileToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;File</value>
   </data>
-  <data name="installUSBDriversToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>224, 22</value>
-  </data>
-  <data name="installUSBDriversToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Install USB Device Drivers</value>
-  </data>
-  <data name="resetToDFUModeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>224, 22</value>
-  </data>
-  <data name="resetToDFUModeToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Reset Module to DFU Mode</value>
-  </data>
-  <data name="upgradeBootloaderToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>224, 22</value>
-  </data>
-  <data name="upgradeBootloaderToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Upgrade Module Bootloader</value>
-  </data>
-  <data name="actionsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
-  </data>
-  <data name="actionsToolStripMenuItem.Text" xml:space="preserve">
-    <value>A&amp;ctions</value>
-  </data>
   <data name="toolStripMenuItemBaudRate57600.Size" type="System.Drawing.Size, System.Drawing">
     <value>110, 22</value>
   </data>
@@ -786,17 +762,41 @@
   <data name="toolStripMenuItemBaudRate115200.Text" xml:space="preserve">
     <value>115200</value>
   </data>
+  <data name="toolStripMenuItemBaudRate500000.Size" type="System.Drawing.Size, System.Drawing">
+    <value>110, 22</value>
+  </data>
+  <data name="toolStripMenuItemBaudRate500000.Text" xml:space="preserve">
+    <value>500000</value>
+  </data>
   <data name="baudRateToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>207, 22</value>
   </data>
   <data name="baudRateToolStripMenuItem.Text" xml:space="preserve">
     <value>Serial &amp;Baud Rate</value>
   </data>
-  <data name="runAfterUploadToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+  <data name="stickyDfuUsbModeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>199, 22</value>
+  </data>
+  <data name="stickyDfuUsbModeToolStripMenuItem.Text" xml:space="preserve">
+    <value>Sticky &amp;DFU Mode (New)</value>
+  </data>
+  <data name="comPortUsbModeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>199, 22</value>
+  </data>
+  <data name="comPortUsbModeToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;COM Port (Legacy)</value>
+  </data>
+  <data name="bootloaderTypeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>207, 22</value>
   </data>
-  <data name="runAfterUploadToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Run Firmware After Write</value>
+  <data name="bootloaderTypeToolStripMenuItem.Text" xml:space="preserve">
+    <value>USB Port Mode</value>
+  </data>
+  <data name="disableCompatibilityCheckToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>207, 22</value>
+  </data>
+  <data name="disableCompatibilityCheckToolStripMenuItem.Text" xml:space="preserve">
+    <value>Disable Flash Size Check</value>
   </data>
   <data name="enableDeviceDetectionToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>207, 22</value>
@@ -804,11 +804,41 @@
   <data name="enableDeviceDetectionToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Enable Device Detection</value>
   </data>
+  <data name="runAfterUploadToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>207, 22</value>
+  </data>
+  <data name="runAfterUploadToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Run Firmware After Write</value>
+  </data>
   <data name="settingsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>180, 22</value>
   </data>
   <data name="settingsToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Settings</value>
+  </data>
+  <data name="installUSBDriversToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>219, 22</value>
+  </data>
+  <data name="installUSBDriversToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Install USB Device Drivers</value>
+  </data>
+  <data name="resetToDFUModeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>219, 22</value>
+  </data>
+  <data name="resetToDFUModeToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Reset Module to DFU Mode</value>
+  </data>
+  <data name="upgradeBootloaderToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>219, 22</value>
+  </data>
+  <data name="upgradeBootloaderToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Flash Module Bootloader</value>
+  </data>
+  <data name="actionsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>180, 22</value>
+  </data>
+  <data name="actionsToolStripMenuItem.Text" xml:space="preserve">
+    <value>A&amp;ctions</value>
   </data>
   <data name="advancedToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>72, 20</value>
@@ -1478,30 +1508,6 @@
   <data name="&gt;&gt;advancedToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;actionsToolStripMenuItem.Name" xml:space="preserve">
-    <value>actionsToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;actionsToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;installUSBDriversToolStripMenuItem.Name" xml:space="preserve">
-    <value>installUSBDriversToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;installUSBDriversToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;resetToDFUModeToolStripMenuItem.Name" xml:space="preserve">
-    <value>resetToDFUModeToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;resetToDFUModeToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;upgradeBootloaderToolStripMenuItem.Name" xml:space="preserve">
-    <value>upgradeBootloaderToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;upgradeBootloaderToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="&gt;&gt;settingsToolStripMenuItem.Name" xml:space="preserve">
     <value>settingsToolStripMenuItem</value>
   </data>
@@ -1526,16 +1532,70 @@
   <data name="&gt;&gt;toolStripMenuItemBaudRate115200.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;runAfterUploadToolStripMenuItem.Name" xml:space="preserve">
-    <value>runAfterUploadToolStripMenuItem</value>
+  <data name="&gt;&gt;toolStripMenuItemBaudRate500000.Name" xml:space="preserve">
+    <value>toolStripMenuItemBaudRate500000</value>
   </data>
-  <data name="&gt;&gt;runAfterUploadToolStripMenuItem.Type" xml:space="preserve">
+  <data name="&gt;&gt;toolStripMenuItemBaudRate500000.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;bootloaderTypeToolStripMenuItem.Name" xml:space="preserve">
+    <value>bootloaderTypeToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;bootloaderTypeToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;stickyDfuUsbModeToolStripMenuItem.Name" xml:space="preserve">
+    <value>stickyDfuUsbModeToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;stickyDfuUsbModeToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;comPortUsbModeToolStripMenuItem.Name" xml:space="preserve">
+    <value>comPortUsbModeToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;comPortUsbModeToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;disableCompatibilityCheckToolStripMenuItem.Name" xml:space="preserve">
+    <value>disableCompatibilityCheckToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;disableCompatibilityCheckToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;enableDeviceDetectionToolStripMenuItem.Name" xml:space="preserve">
     <value>enableDeviceDetectionToolStripMenuItem</value>
   </data>
   <data name="&gt;&gt;enableDeviceDetectionToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;runAfterUploadToolStripMenuItem.Name" xml:space="preserve">
+    <value>runAfterUploadToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;runAfterUploadToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;actionsToolStripMenuItem.Name" xml:space="preserve">
+    <value>actionsToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;actionsToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;installUSBDriversToolStripMenuItem.Name" xml:space="preserve">
+    <value>installUSBDriversToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;installUSBDriversToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;resetToDFUModeToolStripMenuItem.Name" xml:space="preserve">
+    <value>resetToDFUModeToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;resetToDFUModeToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;upgradeBootloaderToolStripMenuItem.Name" xml:space="preserve">
+    <value>upgradeBootloaderToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;upgradeBootloaderToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;helpToolStripMenuItem.Name" xml:space="preserve">

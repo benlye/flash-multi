@@ -51,6 +51,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dialogs\UsbSupportErrorDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\UsbSupportErrorDialog.Designer.cs">
+      <DependentUpon>UsbSupportErrorDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\UsbSupportWarningDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\UsbSupportWarningDialog.Designer.cs">
+      <DependentUpon>UsbSupportWarningDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Eeprom\AtmegaEepromUtils.cs" />
     <Compile Include="ComPort.cs" />
     <Compile Include="Dialogs\DfuRecoveryDialog.cs">
@@ -70,6 +82,11 @@
     <Compile Include="Devices\MapleDevice.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="RunCommand.cs" />
     <Compile Include="Devices\SerialDevice.cs" />
     <Compile Include="Dialogs\SerialMonitor.cs">
@@ -93,6 +110,12 @@
     <EmbeddedResource Include="Dialogs\SerialMonitor.fr.resx">
       <DependentUpon>SerialMonitor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\UsbSupportErrorDialog.resx">
+      <DependentUpon>UsbSupportErrorDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\UsbSupportWarningDialog.resx">
+      <DependentUpon>UsbSupportWarningDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FlashMulti.fr.resx">
       <DependentUpon>FlashMulti.cs</DependentUpon>
     </EmbeddedResource>
@@ -106,6 +129,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
       <CustomToolNamespace>Flash_Multi</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="packages.config" />
@@ -136,9 +163,7 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Actions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>XCOPY "$(SolutionDir)tools\*.*" "$(TargetDir)" /S /Y</PostBuildEvent>
