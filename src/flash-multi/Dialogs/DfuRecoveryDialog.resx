@@ -207,10 +207,10 @@ Flashing will continue automatically when the module is plugged back in.</value>
 </value>
   </data>
   <data name="warningIcon.Location" type="System.Drawing.Point, System.Drawing">
-    <value>19, 13</value>
+    <value>13, 13</value>
   </data>
   <data name="warningIcon.Size" type="System.Drawing.Size, System.Drawing">
-    <value>30, 34</value>
+    <value>34, 34</value>
   </data>
   <data name="warningIcon.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>

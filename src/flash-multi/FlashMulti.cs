@@ -1426,8 +1426,9 @@ namespace Flash_Multi
             {
                 if (Settings.Default.ErrorIfNoUSB)
                 {
-                    string msgBoxMessage = "The selected firmware file was compiled without USB serial support and the 'USB Port Mode' setting is set to 'COM Port (Legacy)'.\r\n\r\nThe MULTI-Module bootloader must be updated and the 'USB Port Mode' setting set to 'Sticky DFU Mode (New)' in order to write this firmware.\r\n\r\nSee [link] for more information.";
-                    MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // Error if the new bootloader hasn't been enabled
+                    UsbSupportErrorDialog usbSupportErrorDialog = new UsbSupportErrorDialog();
+                    usbSupportErrorDialog.ShowDialog();
                     this.EnableControls(true);
                     return;
                 }

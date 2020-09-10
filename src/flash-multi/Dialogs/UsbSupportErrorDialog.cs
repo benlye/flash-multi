@@ -1,5 +1,5 @@
 ﻿// -------------------------------------------------------------------------------
-// <copyright file="UsbSupportWarningDialog.cs" company="Ben Lye">
+// <copyright file="UsbSupportErrorDialog.cs" company="Ben Lye">
 // Copyright 2020 Ben Lye
 //
 // This file is part of Flash Multi.
@@ -27,12 +27,12 @@ namespace Flash_Multi
     /// <summary>
     /// Class for the USB Support warning dialog.
     /// </summary>
-    public partial class UsbSupportWarningDialog : Form
+    public partial class UsbSupportErrorDialog : Form
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="UsbSupportWarningDialog"/> class.
+        /// Initializes a new instance of the <see cref="UsbSupportErrorDialog"/> class.
         /// </summary>
-        public UsbSupportWarningDialog()
+        public UsbSupportErrorDialog()
         {
             this.InitializeComponent();
         }
@@ -42,7 +42,7 @@ namespace Flash_Multi
         /// </summary>
         protected override void OnShown(EventArgs e)
         {
-            this.warningIcon.Image = System.Drawing.SystemIcons.Warning.ToBitmap();
+            this.errorIcon.Image = System.Drawing.SystemIcons.Error.ToBitmap();
         }
 
         /// <summary>
@@ -61,12 +61,6 @@ namespace Flash_Multi
         /// </summary>
         private void ButtonOK_Click(object sender, EventArgs e)
         {
-            // Disable the warning if the box was checked
-            if (this.disableUsbWarning.Checked == true)
-            {
-                Properties.Settings.Default.WarnIfNoUSB = false;
-            }
-
             // Return OK
             this.DialogResult = DialogResult.OK;
             this.Close();
