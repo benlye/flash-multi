@@ -491,7 +491,9 @@ namespace Flash_Multi {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A newer version of Flash Multi is available.\n\nYou have Flash Multi.
+        ///   Looks up a localized string similar to A newer version of Flash Multi is available.
+        ///
+        ///You have Flash Multi.
         /// </summary>
         internal static string updatePromptPart1 {
             get {
@@ -509,7 +511,9 @@ namespace Flash_Multi {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to is available.\n\nSee the latest release on Github?.
+        ///   Looks up a localized string similar to is available.
+        ///
+        ///See the latest release on Github?.
         /// </summary>
         internal static string updatePromptPart3 {
             get {
