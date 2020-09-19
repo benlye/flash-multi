@@ -83,6 +83,13 @@ You have the old bootloader.  Use Flash Multi to flash the module bootloader, as
 ### I have to unplug and re-plug my module every time I flash it, how do I fix it?
 You have the old bootloader.  Use Flash Multi to flash the module bootloader, as explained above.  You will have to unplug and replug the module when instructed.
 
+## I'm trying to update but I get a message saying no DFU device was found, and unplugging and re-plugging the module does nothing, how do I fix it?
+You need to reinstall the MULTI-Module device drivers.
+* Reset the module by unplugging it and plugging it back in
+* Click **Advanced** -> **Actions** -> **Upgrade USB Drivers**
+
+See [this page](/doc/Troubleshooting.md#re-installing-the-maple-dfu-device-drivers) for more details.
+
 ### Why doesn't this apply to JP4IN1-SE or Radioboss modules?
 They use a different USB interface which does not use DFU mode to flash firmware.  They will work happily with the old or new bootloaders and do not require updating this way.
 
