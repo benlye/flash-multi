@@ -217,7 +217,11 @@ namespace Flash_Multi
             if (!ComPort.CheckPort(comPort))
             {
                 flashMulti.AppendLog($"{Strings.failedToOpenPort} {comPort}");
-                MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(flashMulti))
+                {
+                    MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 flashMulti.EnableControls(true);
                 return false;
             }
@@ -240,7 +244,11 @@ namespace Flash_Multi
                     if (MapleDevice.FindMaple().DfuMode == false)
                     {
                         flashMulti.AppendLog($"  {Strings.failed}\r\n");
-                        MessageBox.Show(Strings.failedtoEraseModule, Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        using (new CenterWinDialog(flashMulti))
+                        {
+                            MessageBox.Show(Strings.failedtoEraseModule, Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
                         flashMulti.EnableControls(true);
                         return false;
                     }
@@ -268,7 +276,11 @@ namespace Flash_Multi
             if (returnCode != 0)
             {
                 flashMulti.AppendLog($" {Strings.failed}\r\n");
-                MessageBox.Show(Strings.failedtoEraseModule, Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(flashMulti))
+                {
+                    MessageBox.Show(Strings.failedtoEraseModule, Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 flashMulti.EnableControls(true);
                 return false;
             }
@@ -323,7 +335,11 @@ namespace Flash_Multi
             if (!ComPort.CheckPort(comPort))
             {
                 flashMulti.AppendLog($"{Strings.failedToOpenPort} {comPort}");
-                MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(flashMulti))
+                {
+                    MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 flashMulti.EnableControls(true);
                 return false;
             }
@@ -346,7 +362,11 @@ namespace Flash_Multi
                     if (MapleDevice.FindMaple().DfuMode == false)
                     {
                         flashMulti.AppendLog($" {Strings.failed}\r\n");
-                        MessageBox.Show(Strings.failedToReadModule, Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        using (new CenterWinDialog(flashMulti))
+                        {
+                            MessageBox.Show(Strings.failedToReadModule, Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
                         flashMulti.EnableControls(true);
                         return false;
                     }
@@ -361,7 +381,11 @@ namespace Flash_Multi
             if (returnCode != 0)
             {
                 flashMulti.AppendLog($" {Strings.failed}\r\n");
-                MessageBox.Show(Strings.failedToReadModule, Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(flashMulti))
+                {
+                    MessageBox.Show(Strings.failedToReadModule, Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 flashMulti.EnableControls(true);
                 return false;
             }
@@ -423,7 +447,11 @@ namespace Flash_Multi
             if (!ComPort.CheckPort(comPort))
             {
                 flashMulti.AppendLog($"{Strings.failedToOpenPort} {comPort}");
-                MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(flashMulti))
+                {
+                    MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 flashMulti.EnableControls(true);
                 return;
             }
@@ -508,7 +536,11 @@ namespace Flash_Multi
                         if (returnCode != 0)
                         {
                             flashMulti.AppendLog($" {Strings.failed}!\r\n");
-                            MessageBox.Show(Strings.failedToWriteFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            using (new CenterWinDialog(flashMulti))
+                            {
+                                MessageBox.Show(Strings.failedToWriteFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+
                             flashMulti.EnableControls(true);
                             return;
                         }
@@ -537,7 +569,11 @@ namespace Flash_Multi
                 {
                     // Throw a message and stop
                     flashMulti.EnableControls(true);
-                    MessageBox.Show(Strings.failedToVerifyMcuFlash, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    using (new CenterWinDialog(flashMulti))
+                    {
+                        MessageBox.Show(Strings.failedToVerifyMcuFlash, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+
                     return;
                 }
             }
@@ -573,7 +609,11 @@ namespace Flash_Multi
                     if (returnCode != 0)
                     {
                         flashMulti.AppendLog($" {Strings.failed}!\r\n");
-                        MessageBox.Show(Strings.failedToWriteFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        using (new CenterWinDialog(flashMulti))
+                        {
+                            MessageBox.Show(Strings.failedToWriteFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
                         flashMulti.EnableControls(true);
                         return;
                     }
@@ -606,7 +646,10 @@ namespace Flash_Multi
             flashMulti.EnableControls(true);
 
             // Show a success message box
-            MessageBox.Show(Strings.succeededWritingFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            using (new CenterWinDialog(flashMulti))
+            {
+                MessageBox.Show(Strings.succeededWritingFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         /// <summary>
@@ -645,7 +688,11 @@ namespace Flash_Multi
             if (!ComPort.CheckPort(comPort))
             {
                 flashMulti.AppendLog($"{Strings.failedToOpenPort} {comPort}");
-                MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(flashMulti))
+                {
+                    MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 flashMulti.EnableControls(true);
                 return false;
             }
@@ -668,7 +715,11 @@ namespace Flash_Multi
                     if (MapleDevice.FindMaple().DfuMode == false)
                     {
                         flashMulti.AppendLog($"  {Strings.failed}\r\n");
-                        MessageBox.Show(Strings.failedToWriteBootReloader, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        using (new CenterWinDialog(flashMulti))
+                        {
+                            MessageBox.Show(Strings.failedToWriteBootReloader, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
                         flashMulti.EnableControls(true);
                         return false;
                     }
@@ -713,7 +764,11 @@ namespace Flash_Multi
                     if (returnCode != 0)
                     {
                         flashMulti.AppendLog($" {Strings.failed}!\r\n");
-                        MessageBox.Show(Strings.failedToWriteFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        using (new CenterWinDialog(flashMulti))
+                        {
+                            MessageBox.Show(Strings.failedToWriteFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
                         flashMulti.EnableControls(true);
                         return false;
                     }
@@ -777,7 +832,11 @@ namespace Flash_Multi
             if (!ComPort.CheckPort(comPort))
             {
                 flashMulti.AppendLog($"{Strings.failedToOpenPort} {comPort}");
-                MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(flashMulti))
+                {
+                    MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 flashMulti.EnableControls(true);
                 return false;
             }
@@ -800,7 +859,11 @@ namespace Flash_Multi
                     if (MapleDevice.FindMaple().DfuMode == false)
                     {
                         flashMulti.AppendLog($" {Strings.failed}\r\n");
-                        MessageBox.Show(Strings.failedToReadModule, Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        using (new CenterWinDialog(flashMulti))
+                        {
+                            MessageBox.Show(Strings.failedToReadModule, Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
                         flashMulti.EnableControls(true);
                         return false;
                     }

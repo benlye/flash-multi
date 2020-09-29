@@ -916,7 +916,10 @@ namespace Flash_Multi
             }
             else
             {
-                MessageBox.Show("No backup file. Read the MULTI-Module first.", "Save Backup", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(this))
+                {
+                    MessageBox.Show("No backup file. Read the MULTI-Module first.", "Save Backup", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -1257,7 +1260,12 @@ namespace Flash_Multi
             this.EnableControls(false);
 
             // Prompt for confirmation
-            DialogResult eraseConfirm = MessageBox.Show("Are you sure you want to erase the MULTI-Module?", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+            DialogResult eraseConfirm;
+            using (new CenterWinDialog(this))
+            {
+                eraseConfirm = MessageBox.Show("Are you sure you want to erase the MULTI-Module?", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+            }
+
             if (eraseConfirm != DialogResult.Yes)
             {
                 this.EnableControls(true);
@@ -1266,14 +1274,24 @@ namespace Flash_Multi
 
             // Ask if we should erase the EEPROM as well
             bool eraseEeprom = false;
-            DialogResult eraseEepromConfirm = MessageBox.Show("Also erase the EEPROM data?", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+            DialogResult eraseEepromConfirm;
+            using (new CenterWinDialog(this))
+            {
+                eraseEepromConfirm = MessageBox.Show("Also erase the EEPROM data?", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+            }
+
             if (eraseEepromConfirm == DialogResult.Yes)
             {
                 eraseEeprom = true;
             }
 
             // Prompt for second confirmation
-            DialogResult eraseReallyConfirm = MessageBox.Show("Are you really sure you want to erase the MULTI-Module?\r\nThis action cannot be undone.", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2);
+            DialogResult eraseReallyConfirm;
+            using (new CenterWinDialog(this))
+            {
+                eraseReallyConfirm = MessageBox.Show("Are you really sure you want to erase the MULTI-Module?\r\nThis action cannot be undone.", "Erase Module", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2);
+            }
+
             if (eraseReallyConfirm != DialogResult.Yes)
             {
                 this.EnableControls(true);
@@ -1344,7 +1362,11 @@ namespace Flash_Multi
             if (!(this.textFileName.Text.EndsWith(".bin") || this.textFileName.Text.EndsWith(".eep")))
             {
                 this.AppendLog(string.Format("Unknown file type '{0}'", this.textFileName.Text.Substring(this.textFileName.Text.Length - 4, 4)));
-                MessageBox.Show("Unknown file type '{0}'. File extension must be '.bin' or '.eep'.", "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(this))
+                {
+                    MessageBox.Show("Unknown file type '{0}'. File extension must be '.bin' or '.eep'.", "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 this.EnableControls(true);
                 return;
             }
@@ -1353,7 +1375,11 @@ namespace Flash_Multi
             if (!File.Exists(this.textFileName.Text))
             {
                 this.AppendLog(string.Format("File {0} does not exist", this.textFileName.Text));
-                MessageBox.Show("Firmware file does not exist.", "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(this))
+                {
+                    MessageBox.Show("Firmware file does not exist.", "Write Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 this.EnableControls(true);
                 return;
             }
@@ -1383,7 +1409,12 @@ namespace Flash_Multi
             // Warn if we're restoring EEPROM data
             if (firmwareContainsEeprom)
             {
-                DialogResult overwriteEeprom = MessageBox.Show("The selected file contains EEPROM data. Continuing will overwrite the existing EEPROM data in the flash memory.", "Overwrite EEPROM", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                DialogResult overwriteEeprom;
+                using (new CenterWinDialog(this))
+                {
+                    overwriteEeprom = MessageBox.Show("The selected file contains EEPROM data. Continuing will overwrite the existing EEPROM data in the flash memory.", "Overwrite EEPROM", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                }
+
                 if (overwriteEeprom == DialogResult.Cancel)
                 {
                     this.EnableControls(true);
@@ -1407,7 +1438,11 @@ namespace Flash_Multi
             if (this.textFileName.Text.EndsWith(".bin") && fileSignature == null)
             {
                 string msgBoxMessage = "Unable to validate the selected firmware file. The firmware signature is missing.";
-                MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(this))
+                {
+                    MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 this.EnableControls(true);
                 return;
             }
@@ -1416,7 +1451,11 @@ namespace Flash_Multi
             if (mapleResult.DeviceFound && !fileSignature.BootloaderSupport)
             {
                 string msgBoxMessage = "The selected firmware file was compiled without bootloader support\r\n\r\nThis firmware cannot be written to the connected MULTI-Module.";
-                MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(this))
+                {
+                    MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 this.EnableControls(true);
                 return;
             }
@@ -1467,7 +1506,11 @@ namespace Flash_Multi
                 if (this.textFileName.Text.EndsWith(".bin") && fileSignature == null)
                 {
                     string msgBoxMessage = "Unable to check the specified firmware file for compatibility with this upload method.";
-                    MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    using (new CenterWinDialog(this))
+                    {
+                        MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+
                     this.EnableControls(true);
                     return;
                 }
@@ -1476,7 +1519,11 @@ namespace Flash_Multi
                 if (this.textFileName.Text.EndsWith(".bin") && fileSignature.ModuleType != "AVR")
                 {
                     string msgBoxMessage = "The selected firmware file is not compatible with this upload method.";
-                    MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    using (new CenterWinDialog(this))
+                    {
+                        MessageBox.Show(msgBoxMessage, "Incompatible Firmware", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+
                     this.EnableControls(true);
                     return;
                 }
@@ -1602,7 +1649,11 @@ namespace Flash_Multi
         private async Task ResetToDfuMode()
         {
             // Prompt for confirmation
-            DialogResult confirm = MessageBox.Show(Strings.dfuResetPrompt, Strings.dialogTitleDfuReset, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            DialogResult confirm;
+            using (new CenterWinDialog(this))
+            {
+                confirm = MessageBox.Show(Strings.dfuResetPrompt, Strings.dialogTitleDfuReset, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            }
 
             // Abort if the user didn't click OK
             if (confirm != DialogResult.OK)
@@ -1639,7 +1690,11 @@ namespace Flash_Multi
         private async Task InstallUsbDrivers()
         {
             // Prompt for confirmation
-            DialogResult confirm = MessageBox.Show(Strings.driverInstallerPrompt, Strings.dialogTitleDriverInstaller, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            DialogResult confirm;
+            using (new CenterWinDialog(this))
+            {
+                confirm = MessageBox.Show(Strings.driverInstallerPrompt, Strings.dialogTitleDriverInstaller, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            }
 
             // Abort if the user didn't click OK
             if (confirm != DialogResult.OK)
@@ -1698,7 +1753,11 @@ namespace Flash_Multi
         private async Task UpgradeBootloader()
         {
             // Prompt for confirmation
-            DialogResult confirm = MessageBox.Show(Strings.bootloaderUpgradePrompt, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            DialogResult confirm;
+            using (new CenterWinDialog(this))
+            {
+                confirm = MessageBox.Show(Strings.bootloaderUpgradePrompt, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            }
 
             // Abort if the user didn't click OK
             if (confirm != DialogResult.OK)
@@ -1732,11 +1791,17 @@ namespace Flash_Multi
 
             if (upgradeSucceeded)
             {
-                MessageBox.Show(Strings.bootloaderUpgradeDone, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                using (new CenterWinDialog(this))
+                {
+                    MessageBox.Show(Strings.bootloaderUpgradeDone, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
             else
             {
-                MessageBox.Show(Strings.bootloaderUpgradeFailed, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                using (new CenterWinDialog(this))
+                {
+                    MessageBox.Show(Strings.bootloaderUpgradeFailed, Strings.dialogTitleBootloaderUpgrade, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
         }
 
