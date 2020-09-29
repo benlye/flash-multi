@@ -121,7 +121,11 @@ namespace Flash_Multi
             {
                 flashMulti.EnableControls(true);
                 flashMulti.AppendLog($"\r\n{Strings.failedtoEraseModule}");
-                MessageBox.Show(Strings.failedtoEraseModule, Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(flashMulti))
+                {
+                    MessageBox.Show(Strings.failedtoEraseModule, Strings.dialogTitleErase, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 return false;
             }
 
@@ -165,7 +169,11 @@ namespace Flash_Multi
             {
                 flashMulti.EnableControls(true);
                 flashMulti.AppendLog($"\r\n{Strings.failedToReadModule}");
-                MessageBox.Show(Strings.failedToReadModule, Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(flashMulti))
+                {
+                    MessageBox.Show(Strings.failedToReadModule, Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 return false;
             }
 
@@ -223,12 +231,20 @@ namespace Flash_Multi
             {
                 flashMulti.EnableControls(true);
                 flashMulti.AppendLog($"\r\n{Strings.failedToWriteFirmware}");
-                MessageBox.Show(Strings.failedToWriteFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(flashMulti))
+                {
+                    MessageBox.Show(Strings.failedToWriteFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 return;
             }
 
             flashMulti.AppendLog($"\r\n{Strings.succeededWritingFirmware}");
-            MessageBox.Show(Strings.succeededWritingFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            using (new CenterWinDialog(flashMulti))
+            {
+                MessageBox.Show(Strings.succeededWritingFirmware, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
             flashMulti.EnableControls(true);
         }
 
@@ -268,13 +284,21 @@ namespace Flash_Multi
             if (returnCode != 0)
             {
                 flashMulti.AppendLog($"\r\n{Strings.failedToWriteEeprom}");
-                MessageBox.Show(Strings.failedToWriteEeprom, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(flashMulti))
+                {
+                    MessageBox.Show(Strings.failedToWriteEeprom, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 flashMulti.EnableControls(true);
                 return;
             }
 
             flashMulti.AppendLog($"\r\n{Strings.succeededWritingEeprom}");
-            MessageBox.Show(Strings.succeededWritingEeprom, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            using (new CenterWinDialog(flashMulti))
+            {
+                MessageBox.Show(Strings.succeededWritingEeprom, Strings.dialogTitleWrite, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
             flashMulti.EnableControls(true);
         }
     }

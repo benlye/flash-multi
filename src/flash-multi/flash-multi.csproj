@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CenterWinDialog.cs" />
     <Compile Include="Dialogs\UsbSupportErrorDialog.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -95,7 +95,11 @@ namespace Flash_Multi
             catch (Exception ex)
             {
                 Debug.WriteLine($"Unable to open port:\n{ex.Message}");
-                MessageBox.Show(ex.Message, "Serial Monitor Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(this))
+                {
+                    MessageBox.Show(ex.Message, "Serial Monitor Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 return false;
             }
         }

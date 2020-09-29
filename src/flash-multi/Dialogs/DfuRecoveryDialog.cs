@@ -81,7 +81,11 @@ namespace Flash_Multi
                     {
                         // The module wasn't unplugged when the timer expired.
                         this.flashMulti.AppendLog(" timed out!\r\n");
-                        MessageBox.Show("DFU device was not unplugged in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        using (new CenterWinDialog(this.flashMulti))
+                        {
+                            MessageBox.Show("DFU device was not unplugged in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
                         this.DialogResult = DialogResult.Cancel;
                         this.Close();
                         return;
@@ -112,7 +116,11 @@ namespace Flash_Multi
             {
                 // The module wasn't plugged in when the timer expired
                 this.flashMulti.AppendLog(" timed out!\r\n");
-                MessageBox.Show("DFU device was not plugged in in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using (new CenterWinDialog(this))
+                {
+                    MessageBox.Show("DFU device was not plugged in in time.", "Firmware Update", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 this.DialogResult = DialogResult.Abort;
                 this.Close();
                 return;

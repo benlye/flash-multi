@@ -73,11 +73,16 @@ namespace Flash_Multi
                 {
                     // A newer version is available to show the user a prompt
                     Debug.WriteLine($"App version is older than latest version: {currentVersion} < {latestVersion}");
-                    DialogResult showUpdate = MessageBox.Show(
+
+                    DialogResult showUpdate;
+                    using (new CenterWinDialog(flashMulti))
+                    {
+                        showUpdate = MessageBox.Show(
                         $"{Strings.updatePromptPart1} v{currentVersion} {Strings.updatePromptPart2} v{latestVersion} {Strings.updatePromptPart3}",
                         Strings.dialogTitleUpdateCheck,
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Information);
+                    }
 
                     // Show the Github release page for the new version if the user clicked Yes
                     if (showUpdate == DialogResult.Yes)
@@ -89,7 +94,10 @@ namespace Flash_Multi
                 {
                     if (showNoUpdate)
                     {
-                        MessageBox.Show(Strings.updateNoUpdate, Strings.dialogTitleUpdateCheck, MessageBoxButtons.OK);
+                        using (new CenterWinDialog(flashMulti))
+                        {
+                            MessageBox.Show(Strings.updateNoUpdate, Strings.dialogTitleUpdateCheck, MessageBoxButtons.OK);
+                        }
                     }
                 }
             }
@@ -97,7 +105,10 @@ namespace Flash_Multi
             {
                 if (showNoUpdate)
                 {
-                    MessageBox.Show(Strings.updateCheckFailed, Strings.dialogTitleUpdateCheck, MessageBoxButtons.OK);
+                    using (new CenterWinDialog(flashMulti))
+                    {
+                        MessageBox.Show(Strings.updateCheckFailed, Strings.dialogTitleUpdateCheck, MessageBoxButtons.OK);
+                    }
                 }
             }
         }
