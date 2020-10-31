@@ -476,5 +476,106 @@ namespace Flash_Multi
                 MessageBox.Show(Strings.succeededWritingFirmware, Strings.succeededWritingFirmware, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
+
+        /// <summary>
+        /// Launches the firmware on a serial MULTI-Module.
+        /// </summary>
+        /// <param name="flashMulti">An instance of the <see cref="FlashMulti"/> class.</param>
+        /// <param name="comPort">The COM port where the serial device can be found.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public static async Task<bool> RunFirmware(FlashMulti flashMulti, string comPort)
+        {
+            // Path to the flashing tool, stm32flash.exe
+            string command = ".\\tools\\stm32flash.exe";
+
+            // Baud rate for serial flash commands
+            int serialBaud = Properties.Settings.Default.SerialBaudRate;
+
+            // Arguments for the command line - will vary at each step of the process
+            string commandArgs;
+
+            // Variable to keep the return code from executed commands
+            int returnCode1 = -1;
+            int returnCode2 = -1;
+
+            // Write to the log
+            flashMulti.AppendLog($"{Strings.modeReading} {Strings.viaSerial}\r\n");
+
+            // Stop the serial monitor if it's active
+            SerialMonitor serialMonitor = null;
+            bool reconnectSerialMonitor = false;
+            if (Application.OpenForms.OfType<SerialMonitor>().Any())
+            {
+                Debug.WriteLine("Serial monitor window is open");
+                serialMonitor = Application.OpenForms.OfType<SerialMonitor>().First();
+                if (serialMonitor != null && serialMonitor.SerialPort != null && serialMonitor.SerialPort.IsOpen)
+                {
+                    reconnectSerialMonitor = true;
+                    Debug.WriteLine($"Serial monitor is connected to {serialMonitor.SerialPort.PortName}");
+
+                    Debug.WriteLine($"Closing serial monitor connection to {serialMonitor.SerialPort.PortName}");
+                    serialMonitor.SerialDisconnect();
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Serial monitor is not open");
+            }
+
+            // Check if the port can be opened
+            if (!ComPort.CheckPort(comPort))
+            {
+                flashMulti.AppendLog($"{Strings.failedToOpenPort} {comPort}");
+                using (new CenterWinDialog(flashMulti))
+                {
+                    MessageBox.Show($"{Strings.failedToOpenPort} {comPort}", Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                flashMulti.EnableControls(true);
+                return false;
+            }
+
+            // Write to the log
+            flashMulti.AppendLog($"[1/1] {Strings.progressReadingFlash}");
+
+            // Prepare the command line arguments for writing the firmware
+            commandArgs = $"-b {serialBaud} -g 0x8002000 {comPort}";
+
+            // Run the write command asynchronously and wait for it to finish
+            await Task.Run(() => { returnCode1 = RunCommand.Run(flashMulti, command, commandArgs); });
+
+            // Prepare the command line arguments for writing the firmware
+            commandArgs = $"-b {serialBaud} -g 0x8000000 {comPort}";
+
+            // Run the write command asynchronously and wait for it to finish
+            await Task.Run(() => { returnCode2 = RunCommand.Run(flashMulti, command, commandArgs); });
+
+            // Show an error message if the command failed for any reason
+            if (returnCode1 != 0 && returnCode2 != 0)
+            {
+                flashMulti.AppendLog($" {Strings.failed}");
+                using (new CenterWinDialog(flashMulti))
+                {
+                    MessageBox.Show(Strings.failedToReadModule, Strings.dialogTitleRead, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                flashMulti.EnableControls(true);
+                return false;
+            }
+
+            // Reconnect the serial monitor if it was connected before
+            if (serialMonitor != null && serialMonitor.IsDisposed != true && reconnectSerialMonitor)
+            {
+                serialMonitor.SerialConnect(comPort);
+            }
+
+            // Write a success message to the log
+            flashMulti.AppendLog($" {Strings.done}\r\n\r\n");
+
+            // Re-enable the form controls
+            flashMulti.EnableControls(true);
+
+            return true;
+        }
     }
 }
