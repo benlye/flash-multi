@@ -560,10 +560,12 @@ namespace Flash_Multi
             if (selectedPort != null && selectedPort.ToString() != "USBasp" && selectedPort.ToString() != "DFU Device")
             {
                 this.buttonSerialMonitor.Enabled = true;
+                this.runFirmwareToolStripMenuItem.Enabled = true;
             }
             else
             {
                 this.buttonSerialMonitor.Enabled = false;
+                this.runFirmwareToolStripMenuItem.Enabled = false;
                 this.buttonRead.Enabled = false;
             }
 
@@ -597,6 +599,7 @@ namespace Flash_Multi
                 if (mapleCheck.DeviceFound && mapleCheck.UsbMode == true && selectedPort != null && selectedPort.ToString() == mapleComPort)
                 {
                     this.resetToDFUModeToolStripMenuItem.Enabled = true;
+                    this.runFirmwareToolStripMenuItem.Enabled = false;
                 }
                 else
                 {
@@ -1075,6 +1078,15 @@ namespace Flash_Multi
         {
             // Reset the module to DFU mode
             await this.ResetToDfuMode();
+        }
+
+        /// <summary>
+        /// Handles the user clicking the Run Firmare menu item.
+        /// </summary>
+        private async void RunFirmwareToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Run the module firmware
+            await this.RunMultiFirmware();
         }
 
         /// <summary>
@@ -1843,6 +1855,35 @@ namespace Flash_Multi
 
             // Return the exit code from the process
             return returnCode;
+        }
+
+        private async Task RunMultiFirmware()
+        {
+            // Disable the buttons until this flash attempt is complete
+            Debug.WriteLine("Disabling the controls...");
+            this.EnableControls(false);
+
+            // Clear the output box
+            Debug.WriteLine("Clearing the output textboxes...");
+            this.textActivity.Clear();
+            this.textVerbose.Clear();
+            this.progressBar1.Value = 0;
+            this.outputLineBuffer = string.Empty;
+
+            /*
+            // Determine if we should use Maple device
+            MapleDevice mapleResult = MapleDevice.FindMaple();
+
+            // Determine if we should use a USBasp device
+            UsbAspDevice usbaspResult = UsbAspDevice.FindUsbAsp();
+            */
+
+            // Get the selected COM port
+            string comPort = this.GetSelectedPort().ToString();
+
+            await SerialDevice.RunFirmware(this, comPort);
+
+            this.EnableControls(true);
         }
 
         /// <summary>

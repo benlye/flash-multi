@@ -90,6 +90,7 @@ namespace Flash_Multi
             this.installUSBDriversToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetToDFUModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.upgradeBootloaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.runFirmwareToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.documentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -377,7 +378,8 @@ namespace Flash_Multi
             this.actionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.installUSBDriversToolStripMenuItem,
             this.resetToDFUModeToolStripMenuItem,
-            this.upgradeBootloaderToolStripMenuItem});
+            this.upgradeBootloaderToolStripMenuItem,
+            this.runFirmwareToolStripMenuItem});
             this.actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
             resources.ApplyResources(this.actionsToolStripMenuItem, "actionsToolStripMenuItem");
             // 
@@ -398,6 +400,12 @@ namespace Flash_Multi
             this.upgradeBootloaderToolStripMenuItem.Name = "upgradeBootloaderToolStripMenuItem";
             resources.ApplyResources(this.upgradeBootloaderToolStripMenuItem, "upgradeBootloaderToolStripMenuItem");
             this.upgradeBootloaderToolStripMenuItem.Click += new System.EventHandler(this.UpgradeBootloaderToolStripMenuItem_Click);
+            // 
+            // runFirmwareToolStripMenuItem
+            // 
+            this.runFirmwareToolStripMenuItem.Name = "runFirmwareToolStripMenuItem";
+            resources.ApplyResources(this.runFirmwareToolStripMenuItem, "runFirmwareToolStripMenuItem");
+            this.runFirmwareToolStripMenuItem.Click += new System.EventHandler(this.RunFirmwareToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -504,6 +512,7 @@ namespace Flash_Multi
         private System.Windows.Forms.ToolStripMenuItem comPortUsbModeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem disableCompatibilityCheckToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemBaudRate500000;
+        private System.Windows.Forms.ToolStripMenuItem runFirmwareToolStripMenuItem;
     }
 }
 

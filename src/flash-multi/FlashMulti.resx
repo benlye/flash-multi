@@ -834,6 +834,15 @@
   <data name="upgradeBootloaderToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Flash Module Bootloader</value>
   </data>
+  <data name="runFirmwareToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>219, 22</value>
+  </data>
+  <data name="runFirmwareToolStripMenuItem.Text" xml:space="preserve">
+    <value>Ru&amp;n Firmware</value>
+  </data>
+  <data name="runFirmwareToolStripMenuItem.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
   <data name="actionsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>180, 22</value>
   </data>
@@ -1596,6 +1605,12 @@
     <value>upgradeBootloaderToolStripMenuItem</value>
   </data>
   <data name="&gt;&gt;upgradeBootloaderToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;runFirmwareToolStripMenuItem.Name" xml:space="preserve">
+    <value>runFirmwareToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;runFirmwareToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;helpToolStripMenuItem.Name" xml:space="preserve">
