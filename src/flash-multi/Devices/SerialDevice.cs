@@ -335,7 +335,7 @@ namespace Flash_Multi
                 string tempFileName = Path.GetTempFileName();
 
                 // Set the stm32flash.exe command line arguments for reading the 32B of flash above 64KB
-                commandArgs = $"-r {tempFileName} -S 0x8010000:32 -b {serialBaud} {comPort}";
+                commandArgs = $"-r \"{tempFileName}\" -S 0x8010000:32 -b {serialBaud} {comPort}";
 
                 // Run the read command asynchronously and wait for it to finish
                 await Task.Run(() => { returnCode = RunCommand.Run(flashMulti, command, commandArgs); });
