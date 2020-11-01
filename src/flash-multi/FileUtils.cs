@@ -37,6 +37,7 @@ namespace Flash_Multi
         private const int ModuleTypeMask = 0x3;
         private const int ChannelOrderMask = 0x7C;
         private const int MultiTelemetryTypeMask = 0xC00;
+        private const int ModuleSubTypeMask = 0xE000;
 
         // Single-bit bitmasks for firmware options
         private const int BootloaderSupportMask = 0x80;
@@ -208,10 +209,10 @@ namespace Flash_Multi
                 switch (fileDetails.ModuleType)
                 {
                     case "AVR":
-                        maxFileSize = fileDetails.BootloaderSupport ? 32232 : 32744;
+                        maxFileSize = fileDetails.BootloaderSupport ? (fileDetails.ModuleMcuFlashSizeKb * 1024) - 512 : fileDetails.ModuleMcuFlashSizeKb * 1024;
                         break;
                     case "STM32":
-                        maxFileSize = fileDetails.BootloaderSupport ? 120832 : 129024;
+                        maxFileSize = fileDetails.BootloaderSupport ? (fileDetails.ModuleMcuFlashSizeKb * 1024) - 8192 - 2048 : (fileDetails.ModuleMcuFlashSizeKb * 1024) - 2048;
                         break;
                 }
             }
@@ -276,7 +277,7 @@ namespace Flash_Multi
                 FirmwareFile file = new FirmwareFile
                 {
                     Signature = signature,
-                    ModuleType = match.Groups[1].Value == "avr" ? "AVR" : match.Groups[1].Value == "stm" ? "STM32" : match.Groups[1].Value == "orx" ? "OrangeRX" : "Unkown",
+                    ModuleType = match.Groups[1].Value == "avr" ? "AVR" : match.Groups[1].Value == "stm" ? "STM32F1" : match.Groups[1].Value == "orx" ? "OrangeRX" : "Unkown",
                     BootloaderSupport = match.Groups[2].Value.Substring(0, 1) == "b" ? true : false,
                     CheckForBootloader = match.Groups[2].Value.Substring(1, 1) == "c" ? true : false,
                     MultiTelemetryType = match.Groups[2].Value.Substring(2, 1) == "t" ? "OpenTX" : match.Groups[2].Value.Substring(2, 1) == "s" ? "erskyTx" : "Undefined",
@@ -304,6 +305,9 @@ namespace Flash_Multi
                     // Get the module type from the rightmost two bits
                     uint moduleType = flagDecimal & ModuleTypeMask;
 
+                    // Get the module sub-type from bits 14-16
+                    uint moduleSubType = (flagDecimal & ModuleSubTypeMask) >> 13;
+
                     // Get the channel order from bits 3-7
                     uint channelOrder = (flagDecimal & ChannelOrderMask) >> 2;
                     string channelOrderString = GetChannelOrderString(channelOrder);
@@ -322,13 +326,15 @@ namespace Flash_Multi
                     FirmwareFile file = new FirmwareFile
                     {
                         Signature = signature,
-                        ModuleType = moduleType == 0 ? "AVR" : moduleType == 1 ? "STM32" : moduleType == 3 ? "OrangeRX" : "Unknown",
+                        ModuleType = moduleType == 0 ? "AVR" : moduleType == 1 ? "STM32F1" : moduleType == 2 ? "OrangeRX" : "Unknown",
+                        ModuleSubType = (moduleType == 0) ? "Atmega328p" : (moduleType == 1 && moduleSubType == 0) ? "STM32F103CB" : (moduleType == 1 && moduleSubType == 1) ? "STM32F103C8" : (moduleType == 1 && moduleSubType == 2) ? "Jumper T18 5-in-1" : (moduleType == 2) ? "ATxmega32D4" : "Unknown",
+                        ModuleMcuFlashSizeKb = (moduleType == 0 || moduleType == 2) ? 32 : (moduleType == 1 && moduleSubType == 0) ? 128 : (moduleType == 1 && moduleSubType == 1) ? 64 : (moduleType == 1 && moduleSubType == 2) ? 128 : -1,
                         ChannelOrder = channelOrderString,
-                        BootloaderSupport = (flagDecimal & BootloaderSupportMask) > 0 ? true : false,
-                        CheckForBootloader = (flagDecimal & CheckForBootloaderMask) > 0 ? true : false,
-                        InvertTelemetry = (flagDecimal & InvertTelemetryMask) > 0 ? true : false,
-                        MultiTelemetryType = ((flagDecimal & MultiTelemetryTypeMask) >> 10) == 2 ? "OpenTX" : ((flagDecimal & MultiTelemetryTypeMask) >> 10) == 1 ? "erskyTx" : "Undefined",
-                        DebugSerial = (flagDecimal & SerialDebugMask) > 0 ? true : false,
+                        BootloaderSupport = (flagDecimal & BootloaderSupportMask) > 0,
+                        CheckForBootloader = (flagDecimal & CheckForBootloaderMask) > 0,
+                        InvertTelemetry = (flagDecimal & InvertTelemetryMask) > 0,
+                        MultiTelemetryType = ((flagDecimal & MultiTelemetryTypeMask) >> 10) == 2 ? "OpenTX or erSkyTx (MULTI_TELEMETRY)" : ((flagDecimal & MultiTelemetryTypeMask) >> 10) == 1 ? "erSkyTx Only (MULTI_STATUS)" : "Undefined",
+                        DebugSerial = (flagDecimal & SerialDebugMask) > 0,
                         Version = parsedVersion,
                     };
                     return file;
@@ -553,6 +559,16 @@ namespace Flash_Multi
             /// Gets or sets the type of module.
             /// </summary>
             public string ModuleType { get; set; }
+
+            /// <summary>
+            /// Gets or sets the module sub-type.
+            /// </summary>
+            public string ModuleSubType { get; set; }
+
+            /// <summary>
+            /// Gets or sets the module MCU flash size in KB.
+            /// </summary>
+            public int ModuleMcuFlashSizeKb{ get; set; }
 
             /// <summary>
             /// Gets or sets the channel order the firmware was compiled for.
