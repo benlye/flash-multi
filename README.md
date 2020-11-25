@@ -239,6 +239,8 @@ Clicking **Advanced -> Actions -> Upgrade Module Bootloader** will update the MU
 
 Updating the bootloader is necessary for some MULTI-Modules which are known to ship with broken or out-of-date bootloaders installed.  Clicking **Upgrade Module Bootloader** will replace the MULTI firmware with an application which will update the bootloader.  Once the process completes the module must be unplugged, plugged back in, and new firmware written to it.
 
+Updating the bootloader is also required before upgrading to firmware v1.3.1.77 or newer.  See [here](https://github.com/benlye/flash-multi/blob/master/doc/New_Bootloader.md#what-you-need-to-do) for instructions.
+
 **Important:** Read the on-screen instructions and pay attention to the module's red LED during the bootloader upgrade process.  It is important not to unplug the module until the red LED has been off for more than 5 seconds.
 
 This menu item is only enabled when a MULTI-Module in USB Serial mode or DFU Bootloader mode is attached, and the COM port (or DFU Device) corresponding to the module is selected.
