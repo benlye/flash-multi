@@ -152,9 +152,17 @@ namespace Flash_Multi
             // Set 'Enable Flash Verification' from the settings
             this.disableCompatibilityCheckToolStripMenuItem.Checked = Settings.Default.DisableFlashVerification;
 
+            /*
             // Set the 'Bootloader / USB Port' mode from the settings
             this.comPortUsbModeToolStripMenuItem.Checked = Settings.Default.ErrorIfNoUSB;
             this.stickyDfuUsbModeToolStripMenuItem.Checked = !Settings.Default.ErrorIfNoUSB;
+            */
+
+            // Force sticky-dfu bootloader
+            this.stickyDfuUsbModeToolStripMenuItem.Checked = true;
+            this.comPortUsbModeToolStripMenuItem.Checked = false;
+            Settings.Default.ErrorIfNoUSB = false;
+            Settings.Default.Save();
 
             // Hide the verbose output panel and set the height of the other panel
             int initialHeight = 215;
