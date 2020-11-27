@@ -18,13 +18,13 @@
       <Value Profile="(Default)">en-US</Value>
     </Setting>
     <Setting Name="RunAfterUpload" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="EnableDeviceDetection" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="ErrorIfNoUSB" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="WarnIfNoUSB" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
