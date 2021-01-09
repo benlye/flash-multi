@@ -46,8 +46,7 @@
             this.buttonCancel.Location = new System.Drawing.Point(322, 157);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(67, 24);
-            this.buttonCancel.TabIndex = 5;
-            this.buttonCancel.TabStop = false;
+            this.buttonCancel.TabIndex = 6;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
@@ -103,8 +102,7 @@
             this.buttonOK.Location = new System.Drawing.Point(249, 157);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(67, 24);
-            this.buttonOK.TabIndex = 7;
-            this.buttonOK.TabStop = false;
+            this.buttonOK.TabIndex = 5;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
             this.buttonOK.Click += new System.EventHandler(this.ButtonOK_Click);
@@ -115,14 +113,13 @@
             this.disableUsbWarning.Location = new System.Drawing.Point(57, 160);
             this.disableUsbWarning.Name = "disableUsbWarning";
             this.disableUsbWarning.Size = new System.Drawing.Size(179, 17);
-            this.disableUsbWarning.TabIndex = 3;
+            this.disableUsbWarning.TabIndex = 4;
             this.disableUsbWarning.Text = "Do not show this message again";
             this.disableUsbWarning.UseVisualStyleBackColor = true;
             // 
             // UsbSupportWarningDialog
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(404, 187);
             this.ControlBox = false;
             this.Controls.Add(this.disableUsbWarning);

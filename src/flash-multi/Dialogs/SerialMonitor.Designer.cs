@@ -40,8 +40,8 @@
             // 
             // serialOutput
             // 
-            resources.ApplyResources(this.serialOutput, "serialOutput");
             this.serialOutput.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            resources.ApplyResources(this.serialOutput, "serialOutput");
             this.serialOutput.Name = "serialOutput";
             this.serialOutput.ReadOnly = true;
             // 
@@ -90,8 +90,8 @@
             // 
             // SerialMonitor
             // 
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             resources.ApplyResources(this, "$this");
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.checkBoxAutoScroll);
             this.Controls.Add(this.buttonConnect);
             this.Controls.Add(this.buttonDisconnect);
