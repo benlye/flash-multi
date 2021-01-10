@@ -68,7 +68,6 @@ namespace Flash_Multi
             this.buttonSaveBackup = new System.Windows.Forms.Button();
             this.buttonRead = new System.Windows.Forms.Button();
             this.buttonSerialMonitor = new System.Windows.Forms.Button();
-            this.linkLabel2 = new System.Windows.Forms.LinkLabel();
             this.buttonErase = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.menuStrip2 = new System.Windows.Forms.MenuStrip();
@@ -250,14 +249,6 @@ namespace Flash_Multi
             this.buttonSerialMonitor.UseVisualStyleBackColor = true;
             this.buttonSerialMonitor.Click += new System.EventHandler(this.ButtonSerialMonitor_Click);
             // 
-            // linkLabel2
-            // 
-            resources.ApplyResources(this.linkLabel2, "linkLabel2");
-            this.linkLabel2.Name = "linkLabel2";
-            this.linkLabel2.TabStop = true;
-            this.linkLabel2.UseCompatibleTextRendering = true;
-            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ReleasesLink_LinkClicked);
-            // 
             // buttonErase
             // 
             resources.ApplyResources(this.buttonErase, "buttonErase");
@@ -436,11 +427,10 @@ namespace Flash_Multi
             // 
             // FlashMulti
             // 
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             resources.ApplyResources(this, "$this");
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.buttonErase);
             this.Controls.Add(this.splitContainer1);
-            this.Controls.Add(this.linkLabel2);
             this.Controls.Add(this.buttonSaveBackup);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.buttonSerialMonitor);
@@ -480,7 +470,6 @@ namespace Flash_Multi
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.TextBox textActivity;
         private System.Windows.Forms.LinkLabel linkLabel1;
-        private System.Windows.Forms.LinkLabel linkLabel2;
         private System.Windows.Forms.Button buttonRefresh;
         private System.Windows.Forms.Button buttonSerialMonitor;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;

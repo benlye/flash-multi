@@ -568,7 +568,7 @@ namespace Flash_Multi
             /// <summary>
             /// Gets or sets the module MCU flash size in KB.
             /// </summary>
-            public int ModuleMcuFlashSizeKb{ get; set; }
+            public int ModuleMcuFlashSizeKb { get; set; }
 
             /// <summary>
             /// Gets or sets the channel order the firmware was compiled for.

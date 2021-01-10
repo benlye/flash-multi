@@ -31,7 +31,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UsbSupportWarningDialog));
             this.buttonCancel = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.moreInfoLinkLabel = new System.Windows.Forms.LinkLabel();
             this.dialogText = new System.Windows.Forms.Label();
             this.warningIcon = new System.Windows.Forms.PictureBox();
             this.buttonOK = new System.Windows.Forms.Button();
@@ -43,7 +42,7 @@
             // buttonCancel
             // 
             this.buttonCancel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.buttonCancel.Location = new System.Drawing.Point(322, 157);
+            this.buttonCancel.Location = new System.Drawing.Point(322, 121);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(67, 24);
             this.buttonCancel.TabIndex = 6;
@@ -54,37 +53,23 @@
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.panel2.Controls.Add(this.moreInfoLinkLabel);
             this.panel2.Controls.Add(this.dialogText);
             this.panel2.Controls.Add(this.warningIcon);
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(405, 147);
+            this.panel2.Size = new System.Drawing.Size(405, 113);
             this.panel2.TabIndex = 6;
-            // 
-            // moreInfoLinkLabel
-            // 
-            this.moreInfoLinkLabel.AutoSize = true;
-            this.moreInfoLinkLabel.LinkArea = new System.Windows.Forms.LinkArea(6, 4);
-            this.moreInfoLinkLabel.Location = new System.Drawing.Point(54, 65);
-            this.moreInfoLinkLabel.Name = "moreInfoLinkLabel";
-            this.moreInfoLinkLabel.Size = new System.Drawing.Size(162, 17);
-            this.moreInfoLinkLabel.TabIndex = 3;
-            this.moreInfoLinkLabel.TabStop = true;
-            this.moreInfoLinkLabel.Text = "Click here for more information.";
-            this.moreInfoLinkLabel.UseCompatibleTextRendering = true;
-            this.moreInfoLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.MoreInfoLinkLabel_LinkClicked);
             // 
             // dialogText
             // 
             this.dialogText.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.dialogText.Location = new System.Drawing.Point(54, 13);
             this.dialogText.Name = "dialogText";
-            this.dialogText.Size = new System.Drawing.Size(306, 101);
+            this.dialogText.Size = new System.Drawing.Size(306, 96);
             this.dialogText.TabIndex = 0;
             this.dialogText.Text = "The selected firmware file was compiled without USB serial support.  The MULTI-Mo" +
-    "dule bootloader should be updated before writing this firmware.\r\n\r\n\r\n\r\nClick OK " +
-    "to write the firmware.";
+    "dule bootloader should be updated before writing this firmware.\r\n\r\nClick OK to w" +
+    "rite the firmware.";
             // 
             // warningIcon
             // 
@@ -99,7 +84,7 @@
             // buttonOK
             // 
             this.buttonOK.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.buttonOK.Location = new System.Drawing.Point(249, 157);
+            this.buttonOK.Location = new System.Drawing.Point(249, 121);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(67, 24);
             this.buttonOK.TabIndex = 5;
@@ -110,9 +95,9 @@
             // disableUsbWarning
             // 
             this.disableUsbWarning.AutoSize = true;
-            this.disableUsbWarning.Location = new System.Drawing.Point(57, 160);
+            this.disableUsbWarning.Location = new System.Drawing.Point(13, 121);
             this.disableUsbWarning.Name = "disableUsbWarning";
-            this.disableUsbWarning.Size = new System.Drawing.Size(179, 17);
+            this.disableUsbWarning.Size = new System.Drawing.Size(196, 19);
             this.disableUsbWarning.TabIndex = 4;
             this.disableUsbWarning.Text = "Do not show this message again";
             this.disableUsbWarning.UseVisualStyleBackColor = true;
@@ -120,12 +105,13 @@
             // UsbSupportWarningDialog
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(404, 187);
+            this.ClientSize = new System.Drawing.Size(404, 152);
             this.ControlBox = false;
             this.Controls.Add(this.disableUsbWarning);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.panel2);
+            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -134,7 +120,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "USB Support Warning";
             this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.warningIcon)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -149,6 +134,5 @@
         private System.Windows.Forms.PictureBox warningIcon;
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.CheckBox disableUsbWarning;
-        private System.Windows.Forms.LinkLabel moreInfoLinkLabel;
     }
 }

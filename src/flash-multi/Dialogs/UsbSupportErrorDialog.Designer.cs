@@ -55,7 +55,7 @@
             this.moreInfoLinkLabel.LinkArea = new System.Windows.Forms.LinkArea(6, 4);
             this.moreInfoLinkLabel.Location = new System.Drawing.Point(57, 114);
             this.moreInfoLinkLabel.Name = "moreInfoLinkLabel";
-            this.moreInfoLinkLabel.Size = new System.Drawing.Size(162, 17);
+            this.moreInfoLinkLabel.Size = new System.Drawing.Size(178, 21);
             this.moreInfoLinkLabel.TabIndex = 3;
             this.moreInfoLinkLabel.TabStop = true;
             this.moreInfoLinkLabel.Text = "Click here for more information.";
@@ -99,6 +99,7 @@
             this.ControlBox = false;
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.panel2);
+            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
