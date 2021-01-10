@@ -124,7 +124,7 @@ namespace Flash_Multi
             this.Text = string.Format("Flash Multi v{0}", Application.ProductVersion);
 
             // Set focus away from the textbox
-            this.ActiveControl = this.linkLabel2;
+            this.ActiveControl = this.label2;
 
             // Populate the list of serial ports
             this.PopulateComPorts();

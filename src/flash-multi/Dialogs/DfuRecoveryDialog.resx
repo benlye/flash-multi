@@ -118,11 +118,14 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="dialogText.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 9pt</value>
+  </data>
   <data name="dialogText.Location" type="System.Drawing.Point, System.Drawing">
     <value>54, 13</value>
   </data>
   <data name="dialogText.Size" type="System.Drawing.Size, System.Drawing">
-    <value>306, 84</value>
+    <value>335, 92</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="dialogText.TabIndex" type="System.Int32, mscorlib">
@@ -146,6 +149,9 @@ Flashing will continue automatically when the module is plugged back in.</value>
   </data>
   <data name="&gt;&gt;dialogText.ZOrder" xml:space="preserve">
     <value>1</value>
+  </data>
+  <data name="buttonCancel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 9pt</value>
   </data>
   <data name="buttonCancel.Location" type="System.Drawing.Point, System.Drawing">
     <value>320, 154</value>
@@ -227,15 +233,6 @@ Flashing will continue automatically when the module is plugged back in.</value>
   <data name="&gt;&gt;warningIcon.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
-  <data name="timerProgressBar.Location" type="System.Drawing.Point, System.Drawing">
-    <value>58, 100</value>
-  </data>
-  <data name="timerProgressBar.Size" type="System.Drawing.Size, System.Drawing">
-    <value>302, 23</value>
-  </data>
-  <data name="timerProgressBar.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
   <data name="&gt;&gt;timerProgressBar.Name" xml:space="preserve">
     <value>timerProgressBar</value>
   </data>
@@ -269,11 +266,35 @@ Flashing will continue automatically when the module is plugged back in.</value>
   <data name="&gt;&gt;panel2.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
+  <data name="timerProgressBar.Location" type="System.Drawing.Point, System.Drawing">
+    <value>58, 112</value>
+  </data>
+  <data name="timerProgressBar.Size" type="System.Drawing.Size, System.Drawing">
+    <value>302, 23</value>
+  </data>
+  <data name="timerProgressBar.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;timerProgressBar.Name" xml:space="preserve">
+    <value>timerProgressBar</value>
+  </data>
+  <data name="&gt;&gt;timerProgressBar.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ProgressBar, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;timerProgressBar.Parent" xml:space="preserve">
+    <value>panel2</value>
+  </data>
+  <data name="&gt;&gt;timerProgressBar.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>404, 187</value>
+  </data>
+  <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 9pt</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
