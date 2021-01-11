@@ -67,9 +67,9 @@
             this.dialogText.Name = "dialogText";
             this.dialogText.Size = new System.Drawing.Size(306, 96);
             this.dialogText.TabIndex = 0;
-            this.dialogText.Text = "The selected firmware file was compiled without USB serial support.  The MULTI-Mo" +
-    "dule bootloader should be updated before writing this firmware.\r\n\r\nClick OK to w" +
-    "rite the firmware.";
+            this.dialogText.Text = "The selected firmware file was compiled without USB serial support. The MULTI-Mod" +
+    "ule bootloader should be updated before writing this firmware.\r\n\r\nClick OK to wr" +
+    "ite the firmware.";
             // 
             // warningIcon
             // 
