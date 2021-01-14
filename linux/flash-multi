@@ -19,16 +19,16 @@ shopt -s extglob
 # *********************************************************************
 
 # Define the script version
-VERSION=0.5.0
+VERSION=0.6.0
 
 # Write the script header
 printf "flash-multi $VERSION\n\nThis program is Free Software and has NO WARRANTY.\nhttps://github.com/benlye/flash-multi/\n\n";
 
 # Prepare simple help text to display when needed
-USAGE="Usage: flash-multi [options] -f [firmware file] -p [serial device]\n\nOptions:\n  -h  Print this message and exit\n  -l  Install legacy bootloader\n  -r  Read and display the firmware file information and exit\n  -s  Don't prompt for confirmation\n  -b  Baud rate (57600, 115200, 500000)\n\n"
+USAGE="Usage: flash-multi [options] -f [firmware file] -p [serial device]\n\nOptions:\n  -h  Print this message and exit\n  -d  Disable MCU flash check\n  -l  Install legacy bootloader\n  -r  Read and display the firmware file information and exit\n  -s  Don't prompt for confirmation\n  -b  Baud rate (57600, 115200, 500000)\n\n"
 
 # Get the command line options
-while getopts ":f:p:b:hrsl" opt; do
+while getopts ":f:p:b:dhrsl" opt; do
   case $opt in
     f) FWFILE="$OPTARG"
     ;;
@@ -39,6 +39,8 @@ while getopts ":f:p:b:hrsl" opt; do
     r) SHOWINFO="True"
     ;;
     l) LEGACY="True"
+    ;;
+    d) DISABLEMCUCHECK="True"
     ;;
     s) SILENT="True"
     ;;
@@ -80,6 +82,33 @@ if [ "x" == "x$BAUDRATE" ]; then
   BAUDRATE=115200
 fi
 
+# Get the directory where the script is running.
+DIR=$(dirname "$0")
+
+# Determine the binaries to use based on the platform architecture
+uname -a | grep "Darwin" 2>&1 1>/dev/null
+if [ $? -eq 0 ]; then
+  TOOLS_DIR="$DIR/tools/macos"
+  GREP_ARGS=""
+  STAT_ARGS="-f %z"
+else
+  uname -m | grep "x86_64" 2>&1 1>/dev/null
+  if [ $? -eq 0 ]; then
+    TOOLS_DIR="$DIR/tools/64bit"
+  else
+    TOOLS_DIR="$DIR/tools/32bit"
+  fi
+
+  GREP_ARGS="-Pa"
+  STAT_ARGS="--printf=%s"
+fi
+
+AVRDUDE="$TOOLS_DIR/avrdude"
+AVRDUDE_CONF="$TOOLS_DIR/avrdude.conf"
+STM32_FLASH="$TOOLS_DIR/stm32flash"
+RESET_UTIL="$TOOLS_DIR/maple-reset"
+DFU_UTIL="$TOOLS_DIR/dfu-util"
+
 function confirm() {
   while true; do
     read -p "$1 [Y]es or [N]o: "
@@ -120,10 +149,63 @@ function module_type()
       b="AVR"
       ;;
     "1"|"stm")
-      b="STM32"
+      b="STM32F1"
       ;;
     "2"|"orx")
       b="OrangeRX"
+      ;;
+    *)
+      b="Unknown"
+      ;;
+  esac
+  printf "$b"
+}
+
+function module_subtype()
+{
+  case "$1:$2" in
+    "0:0")
+      b="Atmega328p"
+      ;;
+    "1:0")
+      b="STM32F103CB"
+      ;;
+    "1:1")
+      b="STM32F103C8"
+      ;;
+    "1:2")
+      b="Jumper T18 5-in-1"
+      ;;
+    "2:0")
+      b="ATxmega32D4"
+      ;;
+    *)
+      b="Unknown"
+      ;;
+  esac
+  printf "$b"
+}
+
+function module_mcuflashsize()
+{
+  case "$1:$2" in
+    "0:0")
+      b=32
+      ;;
+    "1:0")
+      b=128
+      ;;
+    "1:1")
+      b=64
+      ;;
+    "1:2")
+      b=128
+      ;;
+    "2:0")
+      b=32
+      ;;
+    *)
+      b=-1
       ;;
   esac
   printf "$b"
@@ -136,10 +218,10 @@ function telemetry_type()
       b="Disabled"
       ;;
     "1")
-      b="erSkyTX"
+      b="erSkyTx Only (MULTI_STATUS)"
       ;;
     "2")
-      b="OpenTX"
+      b="OpenTX or erSkyTx (MULTI_TELEMETRY)"
       ;;
     *)
       b="Unknown"
@@ -245,6 +327,13 @@ function get_signature()
     SIG_MODULE_TYPE="$(( 0x$SIG_FLAGS_HEX & 0x3 ))"
     SIG_BOARD_TYPE_NAME=$(module_type $SIG_MODULE_TYPE);
 
+    # Get the module sub-type
+    SIG_MODULE_SUBTYPE="$(( (0x$SIG_FLAGS_HEX & 0xE000) >> 13 ))"
+    SIG_MODULE_SUBTYPE_NAME=$(module_subtype $SIG_MODULE_TYPE $SIG_MODULE_SUBTYPE);
+
+    # Get the module flash size
+    SIG_MODULE_FLASH_SIZE=$(module_mcuflashsize $SIG_MODULE_TYPE $SIG_MODULE_SUBTYPE);
+
     # Get the channel order
     SIG_CHANNEL_ORDER="$(( (0x$SIG_FLAGS_HEX & 0x7C) >> 2 ))"
     FW_CHANNEL_ORDER=$(channel_order_string $SIG_CHANNEL_ORDER)
@@ -284,7 +373,9 @@ function get_signature()
   fi
 
   # Show the firmware information
+  printf "Firmware File Name:        $(basename $FWFILE)\n";
   printf "Multi Firmware Version:    $SIG_VERSION_STRING ($SIG_BOARD_TYPE_NAME)\n";
+  printf "Firmware Target:           $SIG_MODULE_SUBTYPE_NAME (${SIG_MODULE_FLASH_SIZE}KB)\n"
   printf "Expected Channel Order:    $FW_CHANNEL_ORDER\n";
   printf "Multi Telemetry Type:      $FW_TELEMETRY_TYPE\n";
   printf "Invert Telemetry Enabled:  $FW_INVERT_TELEMETRY_ENABLED\n";
@@ -337,34 +428,6 @@ if [ $MAPLE_DEVICE == "Native" ] || ([ $MAPLE_DEVICE == "Unknown" ] && [ "x$USBA
       exit 3;
   fi
 fi
-
-# Get the directory where the script is running.
-# DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-DIR=$(dirname "$0")
-
-# Determine the binaries to use based on the platform architecture
-uname -a | grep "Darwin" 2>&1 1>/dev/null
-if [ $? -eq 0 ]; then
-  TOOLS_DIR="$DIR/tools/macos"
-  GREP_ARGS=""
-  STAT_ARGS="-f %z"
-else
-  uname -m | grep "x86_64" 2>&1 1>/dev/null
-  if [ $? -eq 0 ]; then
-    TOOLS_DIR="$DIR/tools/64bit"
-  else
-    TOOLS_DIR="$DIR/tools/32bit"
-  fi
-
-  GREP_ARGS="-Pa"
-  STAT_ARGS="--printf=%s"
-fi
-
-AVRDUDE="$TOOLS_DIR/avrdude"
-AVRDUDE_CONF="$TOOLS_DIR/avrdude.conf"
-STM32_FLASH="$TOOLS_DIR/stm32flash"
-RESET_UTIL="$TOOLS_DIR/maple-reset"
-DFU_UTIL="$TOOLS_DIR/dfu-util"
 
 # Display information about the firmware file
 get_signature $FWFILE
@@ -427,6 +490,9 @@ else
   EXEC_ADDR=0x8000000
 fi
 
+# Set EEPROM end address according to module flash size
+ERASE_END=$(( ($SIG_MODULE_FLASH_SIZE * 1024) - 2048 ));
+
 # Check if the firmware will fit
 FWFILE_SIZE=`stat $STAT_ARGS "$FWFILE"`
 if [ $FWFILE_SIZE -gt $MAX_FILE_SIZE ]; then
@@ -448,8 +514,8 @@ then
   [ $FW_BOOTLOADER_SUPPORT == "True" ] && NUM_STEPS=3 || NUM_STEPS=2;
   
   printf "[$STEP/$NUM_STEPS] Erasing flash...\n"
-  printf "$STM32_FLASH -o -S 0x8000000:129024 -b $BAUDRATE \"$PORT\"\n"
-  "${STM32_FLASH}" -o -S 0x8000000:129024 -b $BAUDRATE "$PORT"
+  printf "$STM32_FLASH -o -S 0x8000000:$ERASE_END -b $BAUDRATE \"$PORT\"\n"
+  "${STM32_FLASH}" -o -S 0x8000000:$ERASE_END -b $BAUDRATE "$PORT"
   [ $? -ne 0 ] && printf "ERROR: Failed to erase flash!\n\n" && exit 3;
   STEP=$((STEP+1))
   
@@ -492,10 +558,11 @@ else
   
   STEP=1;
   NUM_STEPS=1;
-  
+
+  if [[ $MAPLE_DEVICE == "Native" ]]; then NUM_STEPS=$((NUM_STEPS+1)); fi;
+  if [[ ! $DISABLEMCUCHECK == "True" ]]; then NUM_STEPS=$((NUM_STEPS+1)); fi;
+
   if [[ $MAPLE_DEVICE == "Native" ]] ; then
-    NUM_STEPS=2;
-    
     printf "[$STEP/$NUM_STEPS] Resetting to DFU mode...\n"
     printf "$RESET_UTIL $PORT\n";
     "${RESET_UTIL}" $PORT;
@@ -507,6 +574,28 @@ else
     STEP=$((STEP+1))
   fi
   
+  if [[ $DISABLEMCUCHECK != "True" ]]; then
+    TEMPFILE=$(mktemp);
+    printf "[$STEP/$NUM_STEPS] Checking flash size ...\n";
+    printf "${DFU_UTIL} -a 2 -d 1EAF:0003 -U \"$TEMPFILE\"\n";
+    "${DFU_UTIL}" -a 2 -d 1EAF:0003 -U "$TEMPFILE";
+
+    TEMPFILE_SIZE=`stat $STAT_ARGS "$TEMPFILE"`
+    if [ $TEMPFILE_SIZE -eq 0 ]; then
+      printf "\nERROR: MCU Flash size verification failed!\n\n";
+      exit 6;
+    fi
+
+    EXPECTED_SIZE=$(( ($SIG_MODULE_FLASH_SIZE * 1024) - 8192 ))
+    if [ $TEMPFILE_SIZE -lt $EXPECTED_SIZE ]; then
+      printf "\nERROR: MCU Flash size is too small!\n\n";
+      exit 7;
+    fi
+
+    printf "\n";
+    STEP=$((STEP+1))
+  fi
+
   printf "[$STEP/$NUM_STEPS] Writing firmware...\n"
   printf "${DFU_UTIL} -d 1eaf:0003 -a 2 -D \"$FWFILE\" -R\n";
   "${DFU_UTIL}" -d 1eaf:0003 -a 2 -D "$FWFILE" -R;
