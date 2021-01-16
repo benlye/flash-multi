@@ -135,3 +135,20 @@ Starting execution at address 0x08002000... done.
 Firmware flashed successfully.
 
 ```
+
+# Using `nix`
+
+In case you happen to have [`nix`](https://nixos.org/explore.html) installed,
+you can simply use the `default.nix` file in the linux folder to build a
+compatible derivation of both `flash-multi` and `multi-bootreloader`. To
+install it in your users environment, simply run `nix-env -f . -i`.
+
+Beware: This does not alter udev rules, so you likely will run into permission
+problems with the DFU device and/or the serial device. Possible solution in
+descending level of recommendability:
+
++ install appropiate udev rules in your system
++ run the script in question as `root` user
++ run `while true; do sudo chown $USER /dev/bus/usb/*; done` while using the
+  script. Afterwards run `sudo udevadm control --reload-rules && udevadm trigger` to
+  reaply all udev rules in question.
