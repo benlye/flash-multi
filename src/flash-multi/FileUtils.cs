@@ -213,17 +213,14 @@ namespace Flash_Multi
                         break;
                     case "STM32":
                         maxFileSize = fileDetails.BootloaderSupport ? (fileDetails.ModuleMcuFlashSizeKb * 1024) - 8192 - 2048 : (fileDetails.ModuleMcuFlashSizeKb * 1024) - 2048;
-                        break;
-                }
-            }
 
-            // Check if the file contains EEPROM data if it is for an STM32
-            if (fileDetails.ModuleType == "STM32")
-            {
-                byte[] eePromData = Stm32EepromUtils.GetEepromDataFromBackup(filename);
-                if (eePromData != null && Stm32EepromUtils.FindValidPage(eePromData) >= 0)
-                {
-                    maxFileSize += 2048;
+                        byte[] eePromData = Stm32EepromUtils.GetEepromDataFromBackup(filename);
+                        if (eePromData != null && Stm32EepromUtils.FindValidPage(eePromData) >= 0)
+                        {
+                            maxFileSize += 2048;
+                        }
+
+                        break;
                 }
             }
 
