@@ -211,7 +211,7 @@ namespace Flash_Multi
                     case "AVR":
                         maxFileSize = fileDetails.BootloaderSupport ? (fileDetails.ModuleMcuFlashSizeKb * 1024) - 512 : fileDetails.ModuleMcuFlashSizeKb * 1024;
                         break;
-                    case "STM32":
+                    case "STM32F1":
                         maxFileSize = fileDetails.BootloaderSupport ? (fileDetails.ModuleMcuFlashSizeKb * 1024) - 8192 - 2048 : (fileDetails.ModuleMcuFlashSizeKb * 1024) - 2048;
 
                         byte[] eePromData = Stm32EepromUtils.GetEepromDataFromBackup(filename);
