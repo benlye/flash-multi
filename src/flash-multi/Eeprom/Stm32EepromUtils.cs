@@ -210,7 +210,14 @@ namespace Flash_Multi
         internal static bool EepromIsEmpty(string filename)
         {
             byte[] data = GetEepromDataFromBackup(filename);
-            return data.Distinct().Count() == 1 && data.Distinct().FirstOrDefault() == 255;
+            if (data != null)
+            {
+                return data.Distinct().Count() == 1 && data.Distinct().FirstOrDefault() == 255;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }
