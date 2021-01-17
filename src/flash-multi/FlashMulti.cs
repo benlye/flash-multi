@@ -1492,8 +1492,8 @@ namespace Flash_Multi
                     // Error if the new bootloader hasn't been enabled
                     UsbSupportErrorDialog usbSupportErrorDialog = new UsbSupportErrorDialog();
                     usbSupportErrorDialog.ShowDialog();
-                    this.EnableControls(true);
                     usbSupportErrorDialog.Dispose();
+                    this.EnableControls(true);
                     return;
                 }
                 else
@@ -1506,10 +1506,12 @@ namespace Flash_Multi
 
                         if (warnResult != DialogResult.OK)
                         {
-                            this.EnableControls(true);
                             usbSupportWarning.Dispose();
+                            this.EnableControls(true);
                             return;
                         }
+
+                        usbSupportWarning.Dispose();
                     }
                 }
             }
