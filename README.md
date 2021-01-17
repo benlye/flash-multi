@@ -1,5 +1,5 @@
 # Flash Multi
-<img src=https://img.shields.io/github/downloads/benlye/flash-multi/total.svg> <a href="https://scan.coverity.com/projects/benlye-flash-multi"><img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/18725.svg"/></a>
+<img alt="Github all releases" src="https://img.shields.io/github/downloads/benlye/flash-multi/total?label=total%20downloads"> <img alt="GitHub release (latest by SemVer)" src="https://img.shields.io/github/downloads/benlye/flash-multi/latest/total"> <a href="https://scan.coverity.com/projects/benlye-flash-multi"><img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/18725.svg"/></a>
 
 # About Flash Multi
 Flash Multi is an application for managing the firmware on a Jumper, iRangeX, Vantac, 'Banggood', or DIY MULTI-Module.  A GUI application is available for Windows and a shell script for Linux and macOS.
