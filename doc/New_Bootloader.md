@@ -44,7 +44,7 @@ This is where the new bootloader comes in - it keeps the module in DFU mode when
 There is a one-time process to update the bootloader on the module.  After the bootloader upgrade you will need to flash new firmware to your module.
 
 1. Launch Flash Multi
-1. Tell Flash Multi to use the new bootloader:
+1. Tell Flash Multi to use the new bootloader (Flash Multi v0.5.x only; not required for v0.6.0 or higher):
    1. Click **Advanced** -> **Settings** -> **USB Port Mode** -> **Sticky DFU Mode (New)**
 1. Plug your module in
 1. Ensure that the correct COM port is selected
