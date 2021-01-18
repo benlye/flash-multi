@@ -115,7 +115,10 @@ namespace Flash_Multi
         public FlashMulti()
         {
             // Set the language
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo(this.language);
+            if (this.language != null)
+            {
+                Thread.CurrentThread.CurrentUICulture = new CultureInfo(this.language);
+            }
 
             // Initialize
             this.InitializeComponent();
@@ -1231,7 +1234,7 @@ namespace Flash_Multi
                 }
 
                 // Parse the EEPROM data
-                if (eepromData.Length > 0)
+                if (eepromData != null && eepromData.Length > 0)
                 {
                     uint globalId;
                     if (tempEepromFilename != string.Empty)
@@ -1489,6 +1492,7 @@ namespace Flash_Multi
                     // Error if the new bootloader hasn't been enabled
                     UsbSupportErrorDialog usbSupportErrorDialog = new UsbSupportErrorDialog();
                     usbSupportErrorDialog.ShowDialog();
+                    usbSupportErrorDialog.Dispose();
                     this.EnableControls(true);
                     return;
                 }
@@ -1502,9 +1506,12 @@ namespace Flash_Multi
 
                         if (warnResult != DialogResult.OK)
                         {
+                            usbSupportWarning.Dispose();
                             this.EnableControls(true);
                             return;
                         }
+
+                        usbSupportWarning.Dispose();
                     }
                 }
             }

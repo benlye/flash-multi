@@ -43,6 +43,7 @@ namespace Flash_Multi
         protected override void OnShown(EventArgs e)
         {
             this.warningIcon.Image = System.Drawing.SystemIcons.Warning.ToBitmap();
+            base.OnShown(e);
         }
 
         /// <summary>

@@ -70,23 +70,21 @@ namespace Flash_Multi
         /// <returns>A value indicating whether or not the port was successfully opened.</returns>
         public bool SerialConnect(string serialPortName)
         {
+            SerialPort serialPort = new SerialPort(serialPortName, 115200, Parity.None, 8, StopBits.One)
+            {
+                Handshake = Handshake.XOnXOff,
+                DtrEnable = true,
+                RtsEnable = true,
+            };
+
             try
             {
-                SerialPort serialPort = new SerialPort(serialPortName, 115200, Parity.None, 8, StopBits.One)
-                {
-                    Handshake = Handshake.XOnXOff,
-                    DtrEnable = true,
-                    RtsEnable = true,
-                };
                 serialPort.Open();
-
                 serialPort.DataReceived += new SerialDataReceivedEventHandler(this.SerialPortDataReceived);
 
                 this.SerialPort = serialPort;
-
                 this.buttonConnect.Enabled = false;
                 this.buttonDisconnect.Enabled = true;
-
                 this.Text = $"Flash Multi Serial Monitor - {serialPortName} (Connected)";
 
                 Debug.WriteLine($"Connected to {serialPortName}.");
@@ -94,6 +92,11 @@ namespace Flash_Multi
             }
             catch (Exception ex)
             {
+                if (serialPort != null)
+                {
+                    serialPort.Dispose();
+                }
+
                 Debug.WriteLine($"Unable to open port:\n{ex.Message}");
                 using (new CenterWinDialog(this))
                 {
