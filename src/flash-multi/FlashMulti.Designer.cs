@@ -363,6 +363,7 @@ namespace Flash_Multi
             this.runAfterUploadToolStripMenuItem.CheckOnClick = true;
             this.runAfterUploadToolStripMenuItem.Name = "runAfterUploadToolStripMenuItem";
             resources.ApplyResources(this.runAfterUploadToolStripMenuItem, "runAfterUploadToolStripMenuItem");
+            this.runAfterUploadToolStripMenuItem.Click += new System.EventHandler(this.RunAfterUploadToolStripMenuItem_Click);
             // 
             // actionsToolStripMenuItem
             // 

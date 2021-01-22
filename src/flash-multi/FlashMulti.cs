@@ -136,13 +136,20 @@ namespace Flash_Multi
             this.buttonUpload.Enabled = false;
 
             // Set the serial speed from the settings
-            if (Properties.Settings.Default.SerialBaudRate == 57600)
+            switch (Properties.Settings.Default.SerialBaudRate)
             {
-                this.toolStripMenuItemBaudRate57600.Checked = true;
-            }
-            else
-            {
-                this.toolStripMenuItemBaudRate115200.Checked = true;
+                case 57600:
+                    this.toolStripMenuItemBaudRate57600.Checked = true;
+                    break;
+                case 115200:
+                    this.toolStripMenuItemBaudRate115200.Checked = true;
+                    break;
+                case 500000:
+                    this.toolStripMenuItemBaudRate500000.Checked = true;
+                    break;
+                default:
+                    this.toolStripMenuItemBaudRate115200.Checked = true;
+                    break;
             }
 
             // Set 'Run after upload' from the settings
