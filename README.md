@@ -202,7 +202,7 @@ Erasing the module will remove the firmware, and optionally erase the EEPROM dat
 
 **THIS OPERATION CANNOT BE UNDONE**
 
-Erasing the EEPROM data is necessary to restore a module which has had a backup which included EEPROM data retored to it (making it a clone) back to having its own unique ID.
+Erasing the EEPROM data is necessary to restore a module which has had a backup which included EEPROM data restored to it (making it a clone) back to having its own unique ID.
 
 1. If the module is installed in the radio and you are connecting to the module's USB port, ensure the radio is powered **off**
 1. Launch **Flash Multi**
