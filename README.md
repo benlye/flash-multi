@@ -187,6 +187,8 @@ EEPROM Global ID:         0x665DEF2A
 MULTI-Module read successfully
 ```
 
+> _**Note:** A Fixed Global ID (one which was set by modifying and compiling the firmware) cannot be read from the module.  The value displayed will always be the unique ID which is stored in the module's EEPROM the first time it is used, not the customized one._
+
 ## Saving Backups
 Once the module has been read, the existing firmware can be saved.  The backup can optionally include the EEPROM data.  Saving the EEPROM data allows a module to be cloned.
 
