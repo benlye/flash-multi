@@ -7,13 +7,13 @@ Like the Flash Multi Window application, the Linux and Mac script will automatic
 1. Download and extract the latest Linux release, for example:
 
    ```
-   wget https://github.com/benlye/flash-multi/releases/download/0.4.3/flash-multi-0.4.3.tar.gz
-   tar -xvzf flash-multi-0.4.3.tar.gz
+   wget https://github.com/benlye/flash-multi/releases/download/0.6.0/flash-multi-0.6.0.tar.gz
+   tar -xvzf flash-multi-0.6.0.tar.gz
    ```
    
 1. Change to the flash-multi directory, for example:
 
-   `cd flash-multi-0.4.3`
+   `cd flash-multi-0.6.0`
    
 1. Configure serial device permissions by running `tools/install.sh` as root to update the udev rules and add the current user to the dialout group, e.g.:
    
