@@ -1198,7 +1198,7 @@ namespace Flash_Multi
                         this.AppendLog($"Expected Channel Order:   {fileDetails.ChannelOrder}\r\n");
                         this.AppendLog($"Telemetry Type:           {fileDetails.MultiTelemetryType}\r\n");
                         this.AppendLog($"Invert Telemetry Enabled: {fileDetails.InvertTelemetry}\r\n");
-                        this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader}\r\n");
+                        this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader && fileDetails.BootloaderSupport}\r\n");
                         this.AppendLog($"Bootloader Enabled:       {fileDetails.BootloaderSupport}\r\n");
                         this.AppendLog($"USB Serial Support:       {usbSerialSupport}\r\n");
                         this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}\r\n");
@@ -1630,7 +1630,7 @@ namespace Flash_Multi
                             this.AppendLog($"Expected Channel Order:   {fileDetails.ChannelOrder}\r\n");
                             this.AppendLog($"Telemetry Type:           {fileDetails.MultiTelemetryType}\r\n");
                             this.AppendLog($"Invert Telemetry Enabled: {fileDetails.InvertTelemetry}\r\n");
-                            this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader}\r\n");
+                            this.AppendLog($"Flash from Radio Enabled: {fileDetails.CheckForBootloader && fileDetails.BootloaderSupport}\r\n");
                             this.AppendLog($"Bootloader Enabled:       {fileDetails.BootloaderSupport}\r\n");
                             this.AppendLog($"USB Serial Support:       {usbSerialSupport}\r\n");
                             this.AppendLog($"Serial Debug Enabled:     {fileDetails.DebugSerial}");
