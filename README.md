@@ -19,6 +19,7 @@ Just three steps are required to update your Jumper, iRangeX, or DIY MULTI-Modul
 
 # Documentation Index
 1. [Supported Modules](#supported-multi-modules)
+1. [Unsupported Modules](#unsupported-modules)
 1. [Flash Multi Requirements](#flash-multi-requirements)
 1. [Installing Flash Multi](#installing-flash-multi)
    1. [Windows](#windows)
@@ -62,10 +63,12 @@ Supported modules include:
 * 'Banggood' STM32 and ATmega328p MULTI-Modules
 * DIY STM32 and ATmega328p MULTI-Modules
 
-## Note for Jumper T16 Pro Owners
-**Flash Multi cannot be used to update the internal module in a Jumper T16 by connecting to the radio's USB port.**
+# Unsupported Modules
+**Flash Multi cannot be used to update the _internal_ module in any radio (e.g. T12, T16, TX16, T18, T-Lite, Zorro, etc.).**
 
-If your internal module has MULTI-Module firmware v1.2.1.85 or newer, and the radio is running OpenTX v2.3.2 or newer, you can update the internal module from the radio using [this process](https://www.multi-module.org/using-the-module/firmware-updates/update-methods#opentx).
+Internal modules are not connected to the radio's USB port so cannot be updated via the radio's port.
+
+If your internal module has MULTI-Module firmware v1.2.1.85 or newer, and the radio is running OpenTX v2.3.2 or newer, or any version of EdgeTX, you can update the internal module from the radio using [this process](https://www.multi-module.org/using-the-module/firmware-updates/update-methods#opentx).
 
 If your MULTI-Module has MULTI-Module firmware v1.2.1.51 you must use Flash Multi and a USB-to-serial adapter to update it one time, as explained [here](https://www.rcgroups.com/forums/showthread.php?3428887-Jumper-T16-Internal-Multiprotocol-Module-Firmware-Update).  Subsequent updates can then be installed from the radio.
 
